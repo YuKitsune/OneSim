@@ -11,7 +11,7 @@
       xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
       xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-      extensions:StatusBarExtensions.IsVisible="False"
+      extensions:StatusBarExtensions.IsVisible="True"
       Loaded="OnLoaded"
       mc:Ignorable="d">
 
@@ -22,7 +22,8 @@
                       IsCloseButtonOverlay="False"
                       CanReorderItems="True"
                       CanDragItems="True"
-                      AllowDrop="True">
+                      AllowDrop="True"
+                      TabDraggedOutside="OnTabDraggedOutside">
 
         <!-- Tab Resources -->
         <controls:TabView.Resources>

@@ -18,10 +18,19 @@ using Windows.UI.Xaml.Navigation;
 namespace OneSim.Uwp.Pages
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    ///     The Map page.
+    ///     Used for viewing online traffic.
     /// </summary>
-    public sealed partial class MapPage : Page
+    public sealed partial class MapPage : BasePage
     {
+        /// <summary>
+        ///     Gets the header string.
+        /// </summary>
+        public override string Header => "Map";
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MapPage"/> page.
+        /// </summary>
         public MapPage()
         {
             this.InitializeComponent();

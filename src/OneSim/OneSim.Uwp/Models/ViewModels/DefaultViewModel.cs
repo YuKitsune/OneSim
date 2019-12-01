@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OneSim.Uwp.Pages;
 
 namespace OneSim.Uwp.Models.ViewModels
 {
@@ -42,12 +43,353 @@ namespace OneSim.Uwp.Models.ViewModels
                 new PageCardItem
                 {
                     Name = "Map",
-                    Description = "See who's currently flying on online networks."
+                    Description = "See who's currently flying on online networks.",
+                    PageType = typeof(MapPage)
                 },
                 new PageCardItem
                 {
-                    Name = "Map",
-                    Description = "See who's currently flying on online networks."
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
+                },
+                new PageCardItem
+                {
+                    Name = "Dummy",
+                    Description = "blah.",
                 }
             };
         }

@@ -8,8 +8,8 @@
                   x:DataType="models:PageCardItem">
         <UserControl>
             <Grid x:Name="controlRoot"
-                  Width="344"
-                  Height="140"
+                  Width="275"
+                  Height="100"
                   Padding="12"
                   Background="{ThemeResource SystemControlBackgroundListLowBrush}">
 

@@ -119,11 +119,16 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\DynamicTabViewItem.xaml.cs">
+      <DependentUpon>DynamicTabViewItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\ColorToBrushConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
-    <Compile Include="IXamlRenderListener.cs" />
     <Compile Include="Models\PageCardItem.cs" />
     <Compile Include="Models\ViewModels\DefaultViewModel.cs" />
+    <Compile Include="Pages\BasePage.xaml.cs">
+      <DependentUpon>BasePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\DefaultPage.xaml.cs">
       <DependentUpon>DefaultPage.xaml</DependentUpon>
     </Compile>
@@ -171,6 +176,14 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\DynamicTabViewItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\BasePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\DefaultPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
