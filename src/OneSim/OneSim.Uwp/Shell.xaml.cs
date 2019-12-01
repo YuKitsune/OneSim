@@ -120,6 +120,9 @@ namespace OneSim.Uwp
                     await appWindow.TryShowAsync();
 
                     // Todo: Keep track of detached tabs so we can dispose of resources later
+
+                    // Remove tab
+                    _tabs.Items.Remove(tab);
                 }
             }
         }
