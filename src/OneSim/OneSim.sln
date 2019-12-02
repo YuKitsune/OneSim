@@ -5,6 +5,14 @@ VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Uwp", "OneSim.Uwp\OneSim.Uwp.csproj", "{1681497F-A8E2-4F0E-A4E8-ACB84A4BB852}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{54F8EABA-DD8A-4E0F-8AE9-871C972F6D93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{3E0230D3-30B7-42FE-8F4C-FF40BBA462D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{58685B8D-A526-48EF-AE59-7F927585EEED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Models", "OneSim.Models\OneSim.Models.csproj", "{65D1C1F5-D768-433C-894B-D43C87EEF655}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,11 +53,35 @@ Global
 		{1681497F-A8E2-4F0E-A4E8-ACB84A4BB852}.Release|x86.ActiveCfg = Release|x86
 		{1681497F-A8E2-4F0E-A4E8-ACB84A4BB852}.Release|x86.Build.0 = Release|x86
 		{1681497F-A8E2-4F0E-A4E8-ACB84A4BB852}.Release|x86.Deploy.0 = Release|x86
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|ARM.Build.0 = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|x64.Build.0 = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Debug|x86.Build.0 = Debug|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|ARM.ActiveCfg = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|ARM.Build.0 = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|ARM64.Build.0 = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|x64.ActiveCfg = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|x64.Build.0 = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|x86.ActiveCfg = Release|Any CPU
+		{65D1C1F5-D768-433C-894B-D43C87EEF655}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D696FB2D-65B2-44E2-929D-39F0173B1A24}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{65D1C1F5-D768-433C-894B-D43C87EEF655} = {58685B8D-A526-48EF-AE59-7F927585EEED}
+		{1681497F-A8E2-4F0E-A4E8-ACB84A4BB852} = {54F8EABA-DD8A-4E0F-8AE9-871C972F6D93}
 	EndGlobalSection
 EndGlobal
