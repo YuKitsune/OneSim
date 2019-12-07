@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{58685B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Models", "OneSim.Models\OneSim.Models.csproj", "{65D1C1F5-D768-433C-894B-D43C87EEF655}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FleetManager", "FleetManager", "{0588C5D5-08E8-40C8-8CBC-7FB80AB2DD00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,5 +85,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{65D1C1F5-D768-433C-894B-D43C87EEF655} = {58685B8D-A526-48EF-AE59-7F927585EEED}
 		{1681497F-A8E2-4F0E-A4E8-ACB84A4BB852} = {54F8EABA-DD8A-4E0F-8AE9-871C972F6D93}
+		{0588C5D5-08E8-40C8-8CBC-7FB80AB2DD00} = {3E0230D3-30B7-42FE-8F4C-FF40BBA462D0}
 	EndGlobalSection
 EndGlobal
