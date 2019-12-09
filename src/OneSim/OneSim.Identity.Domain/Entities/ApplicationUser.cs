@@ -5,7 +5,7 @@ namespace OneSim.Identity.Domain.Entities
 	/// <summary>
 	/// 	The Application User.
 	/// </summary>
-	public class ApplicationUser : IdentityUser<string>
+	public class ApplicationUser : IdentityUser
 	{
 	}
 }
