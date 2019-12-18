@@ -77,8 +77,8 @@ namespace OneSim.Identity.Application
 		///		The <see cref="Task"/>
 		/// </returns>
 		public async Task CreateUser(
-			ApplicationUser user, 
-			string password, 
+			ApplicationUser user,
+			string password,
 			IUrlHelper urlHelper,
 			string requestScheme,
 			IEmailSender emailSender)
@@ -94,7 +94,7 @@ namespace OneSim.Identity.Application
 				// Todo: Send email notification
 				await SendEmailConfirmationEmail(urlHelper, requestScheme, emailSender, user);
 				_logger.LogInformation($"A new user has been created with the username \"{user.UserName}\".");
-			} 
+			}
 			else if (result.Errors.Any())
 			{
 				throw new IdentityException(result.Errors, "One or more errors occurred when attempting to create a new user.");

@@ -2,6 +2,7 @@ namespace OneSim.Identity.Tests.Utils
 {
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
+
     using OneSim.Identity.Application.Interfaces;
     using OneSim.Identity.Domain.Entities;
 
@@ -14,7 +15,7 @@ namespace OneSim.Identity.Tests.Utils
         {
         }
 
-        public MockDbContext(DbContextOptions<MockDbContext> options)
+        public MockDbContext(DbContextOptions options)
             : base(options)
         {
         }
