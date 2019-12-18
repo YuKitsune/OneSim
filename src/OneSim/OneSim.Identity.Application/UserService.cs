@@ -56,6 +56,79 @@ namespace OneSim.Identity.Application
 		}
 
 		/// <summary>
+		/// 	Creates a new user.
+		/// </summary>
+		/// <param name="user">
+		///		The <see cref="ApplicationUser"/> to create.
+		/// </param>
+		/// <param name="password">
+		///		The password.
+		/// </param>
+		/// <param name="urlHelper">
+		///		The <see cref="IUrlHelper"/>.
+		/// </param>
+		/// <param name="requestScheme">
+		///		The Request Scheme.
+		/// </param>
+		/// <param name="emailSender">
+		///		The <see cref="IEmailSender"/>.
+		/// </param>
+		/// <returns>
+		///		The <see cref="Task"/>
+		/// </returns>
+		public async Task CreateUser(
+			ApplicationUser user, 
+			string password, 
+			IUrlHelper urlHelper,
+			string requestScheme,
+			IEmailSender emailSender)
+		{
+			// Check the inputs
+			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null or empty.");
+			if (string.IsNullOrEmpty(password)) throw new ArgumentNullException(nameof(password), "The Password cannot be null or empty.");
+
+			// Create the user
+			IdentityResult result = await _userManager.CreateAsync(user, password);
+			if (result.Succeeded)
+			{
+				// Todo: Send email notification
+				await SendEmailConfirmationEmail(urlHelper, requestScheme, emailSender, user);
+				_logger.LogInformation($"A new user has been created with the username \"{user.UserName}\".");
+			} 
+			else if (result.Errors.Any())
+			{
+				throw new IdentityException(result.Errors, "One or more errors occurred when attempting to create a new user.");
+			}
+		}
+
+		/// <summary>
+		/// 	Creates a new user.
+		/// </summary>
+		/// <param name="user">
+		///		The <see cref="ApplicationUser"/> to create.
+		/// </param>
+		/// <returns>
+		///		The <see cref="Task"/>
+		/// </returns>
+		public async Task DeleteUser(ApplicationUser user)
+		{
+			// Check the inputs
+			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null or empty.");
+
+			// Delete the user
+			IdentityResult result = await _userManager.DeleteAsync(user);
+			if (result.Succeeded)
+			{
+				// Todo: Send email notification
+				_logger.LogInformation($"User \"{user.UserName}\" has been deleted.");
+			} 
+			else if (result.Errors.Any())
+			{
+				throw new IdentityException(result.Errors, "One or more errors occurred when attempting to create a new user.");
+			}
+		}
+
+		/// <summary>
 		///		Sends a password reset email to the email address in the given <paramref name="user"/> so long as
 		/// 	they have confirmed their email address.
 		/// </summary>
