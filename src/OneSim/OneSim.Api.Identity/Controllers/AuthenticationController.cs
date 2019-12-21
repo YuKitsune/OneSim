@@ -23,7 +23,7 @@ namespace OneSim.Api.Identity.Controllers
         ///     The <see cref="ApplicationIdentityDbContext"/>.
         /// </summary>
         private readonly ApplicationIdentityDbContext _dbContext;
-        
+
         /// <summary>
         ///     The <see cref="AuthenticationService"/>.
         /// </summary>
@@ -39,7 +39,11 @@ namespace OneSim.Api.Identity.Controllers
         /// </summary>
         private readonly ITokenFactory _tokenFactory;
 
-        public AuthenticationController(AuthenticationService service, ApplicationIdentityDbContext dbContext, ILogger logger, ITokenFactory tokenFactory)
+        public AuthenticationController(
+            AuthenticationService service,
+            ApplicationIdentityDbContext dbContext,
+            ILogger logger,
+            ITokenFactory tokenFactory)
         {
             _authenticationService = service;
             _dbContext = dbContext;
@@ -63,27 +67,29 @@ namespace OneSim.Api.Identity.Controllers
             {
                 // Find the user
                 ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == logInRequest.UserName);
+
                 if (user == null) return new UnauthorizedResult();
-                
+
                 // Log in
                 Microsoft.AspNetCore.Identity.SignInResult result = await _authenticationService.LogIn(user, logInRequest.Password);
-                
+
                 // Reject if failed
                 // Todo: Account for 2FA
                 if (!result.Succeeded) return new UnauthorizedResult();
-                
+
                 // Generate JWT
                 string token = _tokenFactory.GenerateToken(user);
                 LogInResponse response = new LogInResponse
-                {
-                    Token = token
-                };
+                                         {
+                                             Token = token
+                                         };
 
                 return new JsonResult(response);
             }
             catch (Exception ex)
             {
                 _logger.LogCritical($"Failed to log user in. Exception:{Environment.NewLine}{ex}");
+
                 return StatusCode(500, "An error has occurred processing the log in request.");
             }
         }

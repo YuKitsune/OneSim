@@ -1,8 +1,14 @@
-﻿using System;
-
-namespace OneSim.Identity.Infrastructure
+﻿namespace OneSim.Identity.Infrastructure
 {
+    using System;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Security.Claims;
+    using System.Text;
+
+    using Microsoft.IdentityModel.Tokens;
+
     using OneSim.Identity.Application.Interfaces;
+    using OneSim.Identity.Domain;
     using OneSim.Identity.Domain.Entities;
 
     /// <summary>
@@ -10,6 +16,19 @@ namespace OneSim.Identity.Infrastructure
     /// </summary>
     public class JwtFactory : ITokenFactory
     {
+        /// <summary>
+        ///     Gets the <see cref="TokenSettings"/>.
+        /// </summary>
+        public TokenSettings Settings { get; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JwtFactory"/>.
+        /// </summary>
+        /// <param name="settings">
+        ///     The <see cref="TokenSettings"/>.
+        /// </param>
+        public JwtFactory(TokenSettings settings) => Settings = settings ?? throw new ArgumentNullException(nameof(settings), "The TokenSettings cannot be null.");
+
         /// <summary>
         ///     Generates a JSON Web Token for the provided <see cref="ApplicationUser"/>.
         /// </summary>
@@ -21,7 +40,25 @@ namespace OneSim.Identity.Infrastructure
         /// </returns>
         public string GenerateToken(ApplicationUser user)
         {
-            throw new NotImplementedException();
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            byte[] secret = Encoding.ASCII.GetBytes(Settings.Secret);
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+                                                      {
+                                                          Subject = new ClaimsIdentity(new[]
+                                                                                       {
+                                                                                           // Todo: Check this is correct
+                                                                                           new Claim(ClaimTypes.Name, user.Id)
+                                                                                       }),
+
+                                                          // Todo: See if we can remove the expiry date from the JWT. Or maybe have it user defined?
+                                                          Expires = DateTime.UtcNow.AddMonths(12),
+                                                          SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256Signature)
+                                                      };
+
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+            string tokenString = tokenHandler.WriteToken(token);
+
+            return tokenString;
         }
     }
 }
