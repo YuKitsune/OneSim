@@ -21,17 +21,12 @@ namespace OneSim.Identity.Application
 		/// <summary>
 		/// 	The <see cref="UserManager{TUser}"/> for the <see cref="ApplicationUser"/>.
 		/// </summary>
-		private UserManager<ApplicationUser> _userManager;
-
-		/// <summary>
-		///     The <see cref="SignInManager{TUser}"/> for the <see cref="ApplicationUser"/>.
-		/// </summary>
-		private SignInManager<ApplicationUser> _signInManager;
+		private readonly UserManager<ApplicationUser> _userManager;
 
 		/// <summary>
 		/// 	The <see cref="ILogger"/>.
 		/// </summary>
-		private ILogger _logger;
+		private readonly ILogger _logger;
 
 		/// <summary>
 		/// 	Initializes a new instance of the <see cref="UserService"/> class.
@@ -39,19 +34,12 @@ namespace OneSim.Identity.Application
 		/// <param name="userManager">
 		///     The <see cref="UserManager{TUser}"/> for the <see cref="ApplicationUser"/>.
 		/// </param>
-		/// <param name="signInManager">
-		///     The <see cref="SignInManager{TUser}"/> for the <see cref="ApplicationUser"/>.
-		/// </param>
 		/// <param name="logger">
 		///		The <see cref="ILogger"/>.
 		/// </param>
-		public UserService(
-			UserManager<ApplicationUser> userManager,
-			SignInManager<ApplicationUser> signInManager,
-			ILogger logger)
+		public UserService(UserManager<ApplicationUser> userManager, ILogger logger)
 		{
 			_userManager = userManager;
-			_signInManager = signInManager;
 			_logger = logger;
 		}
 
@@ -259,8 +247,8 @@ namespace OneSim.Identity.Application
 			// Log
 			_logger.LogInformation($"{user.UserName} has changed their password.");
 
-			// Attempt to re-sign in
-			await _signInManager.SignInAsync(user, true);
+			// Todo: Implement auto sign in after password change
+			//       this works in production, but unit testing this is a challenge
 		}
 
 		/// <summary>

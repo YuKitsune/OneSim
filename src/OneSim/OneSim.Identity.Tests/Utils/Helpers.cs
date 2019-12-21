@@ -2,8 +2,9 @@ namespace OneSim.Identity.Tests.Utils
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics.SymbolStore;
 	using System.Linq;
-
+	using System.Net;
 	using Microsoft.AspNetCore.Authentication;
 	using Microsoft.AspNetCore.Http;
 	using Microsoft.AspNetCore.Identity;
@@ -47,7 +48,15 @@ namespace OneSim.Identity.Tests.Utils
 			mockManager.Object.UserValidators.Add(new UserValidator<ApplicationUser>());
 			mockManager.Object.PasswordValidators.Add(new PasswordValidator<ApplicationUser>());
 
-			mockManager.Setup(x => x.DeleteAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(IdentityResult.Success);
+			mockManager.Setup(x => x.DeleteAsync(It.IsAny<ApplicationUser>()))
+				.ReturnsAsync(IdentityResult.Success)
+				.Callback<ApplicationUser>(
+				(user) =>
+				{
+					ApplicationUser targetUser = dbContext.Users.FirstOrDefault(u => u.UserName == user.UserName);
+					dbContext.Users.Remove(targetUser);
+					dbContext.SaveChanges();
+				});
 			mockManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
 					   .ReturnsAsync(IdentityResult.Success)
 					   .Callback<ApplicationUser, string>((x, y) =>
@@ -64,7 +73,51 @@ namespace OneSim.Identity.Tests.Utils
 															  targetUser.EmailConfirmed = true;
 															  dbContext.SaveChanges();
 														  });
+			mockManager.Setup(x => x.IsEmailConfirmedAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(
+				(ApplicationUser user) => user.EmailConfirmed);
+			mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(IdentityResult.Success)
+				.Callback<ApplicationUser, string, string>((user, oldPassword, newPassword) =>
+				{
+					ApplicationUser targetUser = dbContext
+						.Users.FirstOrDefault(u => u.Email == user.Email);
+					targetUser.PasswordHash = newPassword;
+					dbContext.SaveChanges();
+				});
 			mockManager.Setup(x => x.UpdateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(IdentityResult.Success);
+			mockManager
+				.Setup(x => x.ResetPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(IdentityResult.Success).Callback<ApplicationUser, string, string>(
+					(user, newPassword, token) =>
+					{
+						ApplicationUser targetUser = dbContext.Users.FirstOrDefault(u => u.UserName == user.UserName);
+						targetUser.PasswordHash = newPassword;
+						dbContext.SaveChanges();
+					});
+			mockManager
+				.Setup(x => x.AddPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+				.ReturnsAsync(IdentityResult.Success).Callback<ApplicationUser, string>(
+					(user, newPassword) =>
+					{
+						ApplicationUser targetUser = dbContext.Users.FirstOrDefault(u => u.UserName == user.UserName);
+						targetUser.PasswordHash = newPassword;
+						dbContext.SaveChanges();
+					});
+			mockManager.Setup(x =>
+					x.VerifyTwoFactorTokenAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(true);
+			mockManager.Setup(x =>
+					x.GenerateNewTwoFactorRecoveryCodesAsync(It.IsAny<ApplicationUser>(), It.IsAny<int>()))
+				.ReturnsAsync(new List<string>() {"TEST"});
+			mockManager.Setup(x => x.SetTwoFactorEnabledAsync(It.IsAny<ApplicationUser>(), It.IsAny<bool>()))
+				.ReturnsAsync(IdentityResult.Success)
+				.Callback<ApplicationUser, bool>(
+					(user, enabled) =>
+					{
+						ApplicationUser targetUser = dbContext.Users.FirstOrDefault(u => u.UserName == user.UserName);
+						targetUser.TwoFactorEnabled = enabled;
+						dbContext.SaveChanges();
+					});
 
 			return mockManager.Object;
 		}

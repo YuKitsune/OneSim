@@ -1,20 +1,12 @@
 namespace OneSim.Identity.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security.Principal;
     using System.Threading.Tasks;
-
-    using Microsoft.AspNetCore.Identity;
-    using Microsoft.EntityFrameworkCore.Internal;
-    using Microsoft.Extensions.Logging;
-
-    using Moq;
-
     using NUnit.Framework;
 
     using OneSim.Identity.Application;
-    using OneSim.Identity.Application.Interfaces;
     using OneSim.Identity.Domain.Entities;
     using OneSim.Identity.Domain.Exceptions;
     using OneSim.Identity.Tests.Utils;
@@ -45,7 +37,7 @@ namespace OneSim.Identity.Tests
             string password = "MySecurePassword123";
 
             // Act
-            UserService service = new UserService(mocks.UserManager, mocks.SignInManager, mocks.Logger);
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(userToCreate, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
 
             // Assert
@@ -68,7 +60,7 @@ namespace OneSim.Identity.Tests
             string password = "MySecurePassword123";
 
             // Create the user first
-            UserService service = new UserService(mocks.UserManager, mocks.SignInManager, mocks.Logger);
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(userToDelete, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
 
             // Act
@@ -93,9 +85,9 @@ namespace OneSim.Identity.Tests
             string password = "MySecurePassword123";
 
             // Create the user first
-            UserService service = new UserService(mocks.UserManager, mocks.SignInManager, mocks.Logger);
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
-            await service.ConfirmEmail(testUser, string.Empty);
+            await service.ConfirmEmail(testUser, "Not am empty string");
 
             // Act
             await service.SendPasswordResetEmail(mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender, testUser);
@@ -119,7 +111,7 @@ namespace OneSim.Identity.Tests
             string password = "MySecurePassword123";
 
             // Create the user first
-            UserService service = new UserService(mocks.UserManager, mocks.SignInManager, mocks.Logger);
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
 
             // Act / Assert
@@ -144,9 +136,9 @@ namespace OneSim.Identity.Tests
             string password = "MySecurePassword123";
 
             // Create the user first
-            UserService service = new UserService(mocks.UserManager, mocks.SignInManager, mocks.Logger);
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
-            await service.ConfirmEmail(testUser, string.Empty);
+            await service.ConfirmEmail(testUser, "Not an empty string");
             await service.SendPasswordResetEmail(mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender, testUser);
 
             // Act
@@ -172,14 +164,16 @@ namespace OneSim.Identity.Tests
             string newPassword = "MyNewSecurePassword321";
 
             // Create the user
-            UserService service = new UserService(mocks.UserManager, mocks.SignInManager, mocks.Logger);
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(testUser, oldPassword, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
 
             // Act
+            string oldPasswordHash = testUser.PasswordHash;
             await service.ChangePassword(testUser, oldPassword, newPassword);
+            string newPasswordHash = testUser.PasswordHash;
 
             // Assert
-            Assert.IsTrue(true);
+            Assert.AreNotEqual(oldPasswordHash, newPasswordHash);
         }
 
         /// <summary>
@@ -197,7 +191,7 @@ namespace OneSim.Identity.Tests
             string password = "MySecurePassword123";
 
             // Create the user
-            UserService service = new UserService(mocks.UserManager, mocks.SignInManager, mocks.Logger);
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
 
             // Act
@@ -222,7 +216,7 @@ namespace OneSim.Identity.Tests
             string password = "MySecurePassword123";
 
             // Create the user
-            UserService service = new UserService(mocks.UserManager, mocks.SignInManager, mocks.Logger);
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
 
             // Act
@@ -241,8 +235,21 @@ namespace OneSim.Identity.Tests
         [Test]
         public async Task TwoFactorAuthenticationCanBeEnabled()
         {
-            await Task.Yield();
-            Assert.Fail();
+            // Arrange
+            MockSet mocks = new MockSet();
+            ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
+            string password = "MySecurePassword123";
+
+            // Create the user
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
+            await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
+            await service.ConfirmEmail(testUser, "NotAnEmptyString");
+
+            // Act
+            await service.EnableTwoFactorAuthentication(testUser, "NotAnEmptyString");
+            
+            // Assert
+            Assert.IsTrue(mocks.DbContext.Users.Any(u => u.TwoFactorEnabled));
         }
 
         /// <summary>
@@ -254,8 +261,22 @@ namespace OneSim.Identity.Tests
         [Test]
         public async Task TwoFactorAuthenticationCanBeReset()
         {
-            await Task.Yield();
-            Assert.Fail();
+            // Arrange
+            MockSet mocks = new MockSet();
+            ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
+            string password = "MySecurePassword123";
+
+            // Create the user
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
+            await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
+            await service.ConfirmEmail(testUser, "NotAnEmptyString");
+            await service.EnableTwoFactorAuthentication(testUser, "NotAnEmptyString");
+
+            // Act
+            await service.ResetTwoFactorAuthentication(testUser);
+            
+            // Assert
+            Assert.IsTrue(!mocks.DbContext.Users.Any(u => u.TwoFactorEnabled));
         }
 
         /// <summary>
@@ -267,8 +288,22 @@ namespace OneSim.Identity.Tests
         [Test]
         public async Task TwoFactorAuthenticationCanBeDisabled()
         {
-            await Task.Yield();
-            Assert.Fail();
+            // Arrange
+            MockSet mocks = new MockSet();
+            ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
+            string password = "MySecurePassword123";
+
+            // Create the user
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
+            await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
+            await service.ConfirmEmail(testUser, "NotAnEmptyString");
+            await service.EnableTwoFactorAuthentication(testUser, "NotAnEmptyString");
+
+            // Act
+            await service.DisableTwoFactorAuthentication(testUser);
+            
+            // Assert
+            Assert.IsTrue(!mocks.DbContext.Users.Any(u => u.TwoFactorEnabled));
         }
 
         /// <summary>
@@ -280,8 +315,22 @@ namespace OneSim.Identity.Tests
         [Test]
         public async Task RecoveryCodesCanBeGenerated()
         {
-            await Task.Yield();
-            Assert.Fail();
+            // Arrange
+            MockSet mocks = new MockSet();
+            ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
+            string password = "MySecurePassword123";
+
+            // Create the user
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
+            await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
+            await service.ConfirmEmail(testUser, "NotAnEmptyString");
+            await service.EnableTwoFactorAuthentication(testUser, "NotAnEmptyString");
+
+            // Act
+            IEnumerable<string> codes = await service.GetRecoveryCodes(testUser);
+            
+            // Assert
+            Assert.IsTrue(!codes.Any(string.IsNullOrEmpty));
         }
 
         /// <summary>
@@ -294,8 +343,21 @@ namespace OneSim.Identity.Tests
         [Test]
         public async Task RecoveryCodesCannotBeGeneratedWithoutTwoFactorAuthenticationEnabled()
         {
-            await Task.Yield();
-            Assert.Fail();
+            // Arrange
+            MockSet mocks = new MockSet();
+            ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
+            string password = "MySecurePassword123";
+
+            // Create the user
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
+            await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
+            await service.ConfirmEmail(testUser, "NotAnEmptyString");
+
+            // Act / Assert
+            Assert.ThrowsAsync<Exception>(async () =>
+            {
+                await service.GetRecoveryCodes(testUser);
+            });
         }
     }
 }

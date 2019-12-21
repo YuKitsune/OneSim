@@ -17,17 +17,17 @@ namespace OneSim.Identity.Application
 		/// <summary>
 		///     The <see cref="SignInManager{TUser}"/> for the <see cref="ApplicationUser"/>.
 		/// </summary>
-		private SignInManager<ApplicationUser> _signInManager;
+		private readonly SignInManager<ApplicationUser> _signInManager;
 
 		/// <summary>
 		/// 	The <see cref="ILogger"/>.
 		/// </summary>
-		private ILogger _logger;
+		private readonly ILogger _logger;
 
 		/// <summary>
 		///     The <see cref="ITokenFactory"/>.
 		/// </summary>
-		private ITokenFactory _tokenFactory;
+		private readonly ITokenFactory _tokenFactory;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="AuthenticationService"/> class.
