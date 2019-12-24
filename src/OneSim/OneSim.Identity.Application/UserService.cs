@@ -24,9 +24,9 @@ namespace OneSim.Identity.Application
 		private readonly UserManager<ApplicationUser> _userManager;
 
 		/// <summary>
-		/// 	The <see cref="ILogger"/>.
+		/// 	The <see cref="ILogger{TCategoryName}"/>.
 		/// </summary>
-		private readonly ILogger _logger;
+		private readonly ILogger<UserService> _logger;
 
 		/// <summary>
 		/// 	Initializes a new instance of the <see cref="UserService"/> class.
@@ -35,9 +35,9 @@ namespace OneSim.Identity.Application
 		///     The <see cref="UserManager{TUser}"/> for the <see cref="ApplicationUser"/>.
 		/// </param>
 		/// <param name="logger">
-		///		The <see cref="ILogger"/>.
+		///		The <see cref="ILogger{TCategoryName}"/>.
 		/// </param>
-		public UserService(UserManager<ApplicationUser> userManager, ILogger logger)
+		public UserService(UserManager<ApplicationUser> userManager, ILogger<UserService> logger)
 		{
 			_userManager = userManager;
 			_logger = logger;
@@ -69,7 +69,7 @@ namespace OneSim.Identity.Application
 			string password,
 			IUrlHelper urlHelper,
 			string requestScheme,
-			IEmailSender emailSender)
+			IEmailSender emailSender = null)
 		{
 			// Check the inputs
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null or empty.");
@@ -80,7 +80,7 @@ namespace OneSim.Identity.Application
 			if (result.Succeeded)
 			{
 				// Todo: Send email notification
-				await SendEmailConfirmationEmail(urlHelper, requestScheme, emailSender, user);
+				if (emailSender != null) await SendEmailConfirmationEmail(urlHelper, requestScheme, emailSender, user);
 				_logger.LogInformation($"A new user has been created with the username \"{user.UserName}\".");
 			}
 			else if (result.Errors.Any())

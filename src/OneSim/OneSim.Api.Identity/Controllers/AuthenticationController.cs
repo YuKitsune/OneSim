@@ -1,18 +1,18 @@
 namespace OneSim.Api.Identity.Controllers
 {
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
+
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
+
     using OneSim.Api.Data;
     using OneSim.Api.Data.Requests;
     using OneSim.Api.Identity.Data;
     using OneSim.Identity.Application;
     using OneSim.Identity.Application.Interfaces;
     using OneSim.Identity.Domain.Entities;
-    using OneSim.Identity.Infrastructure;
 
     /// <summary>
     ///     The Authentication <see cref="Controller"/>.
@@ -30,19 +30,34 @@ namespace OneSim.Api.Identity.Controllers
         private readonly AuthenticationService _authenticationService;
 
         /// <summary>
-        ///     The <see cref="ILogger"/>.
+        ///     The <see cref="ILogger{TCategoryName}"/>.
         /// </summary>
-        private readonly ILogger _logger;
+        private readonly ILogger<AuthenticationController> _logger;
 
         /// <summary>
         ///     The <see cref="ITokenFactory"/>.
         /// </summary>
         private readonly ITokenFactory _tokenFactory;
 
+        /// <summary>
+        ///     Initializes a new instance of t he <see cref="AuthenticationController"/> class.
+        /// </summary>
+        /// <param name="service">
+        ///     The <see cref="AuthenticationService"/>.
+        /// </param>
+        /// <param name="dbContext">
+        ///     The <see cref="ApplicationIdentityDbContext"/>.
+        /// </param>
+        /// <param name="logger">
+        ///    The <see cref="ILogger{TCategoryName}"/>.
+        /// </param>
+        /// <param name="tokenFactory">
+        ///    The <see cref="ITokenFactory"/>.
+        /// </param>
         public AuthenticationController(
             AuthenticationService service,
             ApplicationIdentityDbContext dbContext,
-            ILogger logger,
+            ILogger<AuthenticationController> logger,
             ITokenFactory tokenFactory)
         {
             _authenticationService = service;

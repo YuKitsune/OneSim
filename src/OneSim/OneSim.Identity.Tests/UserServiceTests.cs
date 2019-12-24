@@ -32,7 +32,7 @@ namespace OneSim.Identity.Tests
         public async Task UserCanBeCreated()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser userToCreate = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -55,7 +55,7 @@ namespace OneSim.Identity.Tests
         public async Task UserCanBeDeleted()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser userToDelete = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -80,7 +80,7 @@ namespace OneSim.Identity.Tests
         public async Task PasswordResetEmailIsSent()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -106,7 +106,7 @@ namespace OneSim.Identity.Tests
         public async Task PasswordResetEmailIsNotSentToUnConfirmedEmail()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -131,7 +131,7 @@ namespace OneSim.Identity.Tests
         public async Task PasswordCanBeReset()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -158,7 +158,7 @@ namespace OneSim.Identity.Tests
         public async Task PasswordCanBeChanged()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string oldPassword = "MySecurePassword123";
             string newPassword = "MyNewSecurePassword321";
@@ -186,7 +186,7 @@ namespace OneSim.Identity.Tests
         public async Task EmailConfirmationEmailIsSent()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -211,7 +211,7 @@ namespace OneSim.Identity.Tests
         public async Task EmailCanBeConfirmed()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -236,7 +236,7 @@ namespace OneSim.Identity.Tests
         public async Task TwoFactorAuthenticationCanBeEnabled()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -247,7 +247,7 @@ namespace OneSim.Identity.Tests
 
             // Act
             await service.EnableTwoFactorAuthentication(testUser, "NotAnEmptyString");
-            
+
             // Assert
             Assert.IsTrue(mocks.DbContext.Users.Any(u => u.TwoFactorEnabled));
         }
@@ -262,7 +262,7 @@ namespace OneSim.Identity.Tests
         public async Task TwoFactorAuthenticationCanBeReset()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -274,7 +274,7 @@ namespace OneSim.Identity.Tests
 
             // Act
             await service.ResetTwoFactorAuthentication(testUser);
-            
+
             // Assert
             Assert.IsTrue(!mocks.DbContext.Users.Any(u => u.TwoFactorEnabled));
         }
@@ -289,7 +289,7 @@ namespace OneSim.Identity.Tests
         public async Task TwoFactorAuthenticationCanBeDisabled()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -301,7 +301,7 @@ namespace OneSim.Identity.Tests
 
             // Act
             await service.DisableTwoFactorAuthentication(testUser);
-            
+
             // Assert
             Assert.IsTrue(!mocks.DbContext.Users.Any(u => u.TwoFactorEnabled));
         }
@@ -316,7 +316,7 @@ namespace OneSim.Identity.Tests
         public async Task RecoveryCodesCanBeGenerated()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -328,7 +328,7 @@ namespace OneSim.Identity.Tests
 
             // Act
             IEnumerable<string> codes = await service.GetRecoveryCodes(testUser);
-            
+
             // Assert
             Assert.IsTrue(!codes.Any(string.IsNullOrEmpty));
         }
@@ -344,7 +344,7 @@ namespace OneSim.Identity.Tests
         public async Task RecoveryCodesCannotBeGeneratedWithoutTwoFactorAuthenticationEnabled()
         {
             // Arrange
-            MockSet mocks = new MockSet();
+            MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser testUser = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
             string password = "MySecurePassword123";
 
@@ -354,10 +354,7 @@ namespace OneSim.Identity.Tests
             await service.ConfirmEmail(testUser, "NotAnEmptyString");
 
             // Act / Assert
-            Assert.ThrowsAsync<Exception>(async () =>
-            {
-                await service.GetRecoveryCodes(testUser);
-            });
+            Assert.ThrowsAsync<Exception>(async () => await service.GetRecoveryCodes(testUser));
         }
     }
 }

@@ -43,12 +43,11 @@
                 ApplicationUser existingUser = dbContext.Users.FirstOrDefault(u => u.Email == seedUser.Email);
 
                 // If the doesn't exist, then create a new one
-                if (existingUser != null)
+                if (existingUser == null)
                 {
                     UserService userService = services.GetService<UserService>();
                     IUrlHelper urlHelper = services.GetService<IUrlHelper>();
-                    IEmailSender emailSender = services.GetService<IEmailSender>();
-                    userService.CreateUser(seedUser, "Password123456789!@#$%^&*(", urlHelper, "https", emailSender).GetAwaiter().GetResult();
+                    userService.CreateUser(seedUser, "Password123456789!@#$%^&*(", urlHelper, "https").GetAwaiter().GetResult();
                 }
             }
 

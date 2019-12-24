@@ -5,6 +5,7 @@
     using System.Security.Claims;
     using System.Text;
 
+    using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
 
     using OneSim.Identity.Application.Interfaces;
@@ -28,6 +29,19 @@
         ///     The <see cref="TokenSettings"/>.
         /// </param>
         public JwtFactory(TokenSettings settings) => Settings = settings ?? throw new ArgumentNullException(nameof(settings), "The TokenSettings cannot be null.");
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JwtFactory"/>.
+        /// </summary>
+        /// <param name="configuration">
+        ///     The <see cref="IConfiguration"/> containing the <see cref="TokenSettings"/>.
+        /// </param>
+        public JwtFactory(IConfiguration configuration)
+        {
+            TokenSettings settings = configuration.GetSection("TokenSettings").Get<TokenSettings>();
+            Settings = settings ??
+                       throw new ArgumentNullException(nameof(settings), "The TokenSettings cannot be null.");
+        }
 
         /// <summary>
         ///     Generates a JSON Web Token for the provided <see cref="ApplicationUser"/>.

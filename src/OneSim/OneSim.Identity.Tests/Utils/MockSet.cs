@@ -11,7 +11,7 @@ namespace OneSim.Identity.Tests.Utils
 	/// <summary>
 	/// 	A collection of pre-made mock objects.
 	/// </summary>
-	public class MockSet
+	public class MockSet <TLogCategory> where TLogCategory : class
 	{
 		/// <summary>
 		/// 	Gets the <see cref="IIdentityDbContext"/>.
@@ -29,9 +29,9 @@ namespace OneSim.Identity.Tests.Utils
 		public SignInManager<ApplicationUser> SignInManager { get; }
 
 		/// <summary>
-		/// 	Gets the <see cref="ILogger"/>.
+		/// 	Gets the <see cref="ILogger{TCategoryName}"/>.
 		/// </summary>
-		public ILogger Logger { get; }
+		public ILogger<TLogCategory> Logger { get; }
 
 		/// <summary>
 		/// 	Gets the <see cref="IUrlHelper"/>.
@@ -44,14 +44,14 @@ namespace OneSim.Identity.Tests.Utils
 		public MockEmailSender EmailSender { get; }
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="MockSet"/>.
+		/// 	Initializes a new instance of the <see cref="MockSet{TLogCategory}"/>.
 		/// </summary>
 		public MockSet()
 		{
 			DbContext = Helpers.GetDbContext();
 			UserManager = Helpers.GetUserManager(DbContext);
 			SignInManager = Helpers.GetSignInManager(UserManager);
-			Logger = new Mock<ILogger>().Object;
+			Logger = new Mock<ILogger<TLogCategory>>().Object;
 			UrlHelper = Helpers.GetUrlHelper();
 			EmailSender = new MockEmailSender();
 		}

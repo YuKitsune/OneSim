@@ -10,16 +10,21 @@ namespace OneSim.Api.Identity
 
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
 
     using System.Text;
 
     using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.IdentityModel.Tokens;
 
+    using OneSim.Identity.Application;
     using OneSim.Identity.Application.Interfaces;
     using OneSim.Identity.Domain;
     using OneSim.Identity.Domain.Entities;
     using OneSim.Identity.Infrastructure;
+
+    using IUrlHelper = OneSim.Identity.Application.Interfaces.IUrlHelper;
 
     /// <summary>
     ///     The startup.
@@ -84,12 +89,12 @@ namespace OneSim.Api.Identity
                                                                     };
                                   });
 
-            // Add JWT factory
-            services.AddSingleton<ITokenFactory>(_ => new JwtFactory(tokenSettings));
-            /*services.AddSingleton<AuthenticationService>(s =>
-                                                             new AuthenticationService(s.GetRequiredService<SignInManager<ApplicationUser>>(),
-                                                                                       s.GetRequiredService<ITokenFactory>(),
-                                                                                       s.GetRequiredService<ILogger>()));*/
+            // Add Dependencies
+            services.AddScoped<ITokenFactory, JwtFactory>();
+            services.AddScoped<IUrlHelper, UrlHelper>();
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
+            services.AddScoped<AuthenticationService>();
+            services.AddScoped<UserService>();
 
             // Configure password and username requirements
             services.Configure<IdentityOptions>(options =>
@@ -116,14 +121,13 @@ namespace OneSim.Api.Identity
         ///     The <see cref="IApplicationBuilder"/>.
         /// </param>
         /// <param name="env">
-        ///     The <see cref="IHostingEnvironment"/>.
+        ///     The <see cref="IWebHostEnvironment"/>.
         /// </param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -133,10 +137,15 @@ namespace OneSim.Api.Identity
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
-
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+                             {
+                                 endpoints.MapRazorPages();
+                                 endpoints.MapControllerRoute(name: "default",
+                                                              pattern: "{controller=Authentication}/{action=LogIn}");
+                             });
         }
     }
 }

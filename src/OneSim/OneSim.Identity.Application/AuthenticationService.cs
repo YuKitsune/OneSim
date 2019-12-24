@@ -20,9 +20,9 @@ namespace OneSim.Identity.Application
 		private readonly SignInManager<ApplicationUser> _signInManager;
 
 		/// <summary>
-		/// 	The <see cref="ILogger"/>.
+		/// 	The <see cref="ILogger{TCategoryName}"/>.
 		/// </summary>
-		private readonly ILogger _logger;
+		private readonly ILogger<AuthenticationService> _logger;
 
 		/// <summary>
 		///     The <see cref="ITokenFactory"/>.
@@ -39,12 +39,12 @@ namespace OneSim.Identity.Application
 		///     The <see cref="ITokenFactory"/>.
 		/// </param>
 		/// <param name="logger">
-		///		The <see cref="ILogger"/>.
+		///		The <see cref="ILogger{TCategoryName}"/>.
 		/// </param>
 		public AuthenticationService(
 			SignInManager<ApplicationUser> signInManager,
 			ITokenFactory tokenFactory,
-			ILogger logger)
+			ILogger<AuthenticationService> logger)
 		{
 			_signInManager = signInManager;
 			_logger = logger;
