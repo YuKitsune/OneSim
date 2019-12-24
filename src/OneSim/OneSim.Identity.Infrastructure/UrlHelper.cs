@@ -2,7 +2,7 @@ namespace OneSim.Identity.Infrastructure
 {
 	using Microsoft.Extensions.Configuration;
 
-	using OneSim.Identity.Application.Interfaces;
+	using OneSim.Identity.Application.Abstractions;
 
 	public class UrlHelper : IUrlHelper
 	{

@@ -12,10 +12,10 @@ namespace OneSim.Api.Identity.Controllers
 	using OneSim.Api.Data.Responses;
 	using OneSim.Api.Identity.Data;
 	using OneSim.Identity.Application;
-	using OneSim.Identity.Application.Interfaces;
+	using OneSim.Identity.Application.Abstractions;
 	using OneSim.Identity.Domain.Entities;
 
-	using IUrlHelper = OneSim.Identity.Application.Interfaces.IUrlHelper;
+	using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 
 	/// <summary>
 	/// 	The Users <see cref="Controller"/>.

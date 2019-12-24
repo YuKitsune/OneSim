@@ -5,7 +5,7 @@ namespace OneSim.Identity.Tests.Utils
 
 	using Moq;
 
-	using OneSim.Identity.Application.Interfaces;
+	using OneSim.Identity.Application.Abstractions;
 	using OneSim.Identity.Domain.Entities;
 
 	/// <summary>

@@ -8,7 +8,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
 
-    using OneSim.Identity.Application.Interfaces;
+    using OneSim.Identity.Application.Abstractions;
     using OneSim.Identity.Domain;
     using OneSim.Identity.Domain.Entities;
 

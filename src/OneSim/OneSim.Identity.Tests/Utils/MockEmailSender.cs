@@ -3,7 +3,7 @@ namespace OneSim.Identity.Tests.Utils
 	using System.Collections.Generic;
 	using System.Threading.Tasks;
 
-	using OneSim.Identity.Application.Interfaces;
+	using OneSim.Identity.Application.Abstractions;
 
 	/// <summary>
 	/// 	The mock <see cref="IEmailSender"/>.

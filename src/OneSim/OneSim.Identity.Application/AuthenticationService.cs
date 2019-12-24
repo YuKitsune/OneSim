@@ -6,7 +6,7 @@ namespace OneSim.Identity.Application
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.Extensions.Logging;
 
-	using OneSim.Identity.Application.Interfaces;
+	using OneSim.Identity.Application.Abstractions;
 	using OneSim.Identity.Domain.Entities;
 
 	/// <summary>

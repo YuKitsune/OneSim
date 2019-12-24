@@ -8,8 +8,8 @@ namespace OneSim.Identity.Application
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.Extensions.Logging;
 
+	using OneSim.Identity.Application.Abstractions;
 	using OneSim.Identity.Application.Exceptions;
-	using OneSim.Identity.Application.Interfaces;
 	using OneSim.Identity.Domain.Entities;
 	using OneSim.Identity.Domain.Exceptions;
 

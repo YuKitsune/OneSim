@@ -9,7 +9,7 @@
 
     using OneSim.Api.Identity.Data;
     using OneSim.Identity.Application;
-    using OneSim.Identity.Application.Interfaces;
+    using OneSim.Identity.Application.Abstractions;
     using OneSim.Identity.Domain.Entities;
 
     /// <summary>

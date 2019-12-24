@@ -19,12 +19,12 @@ namespace OneSim.Api.Identity
     using Microsoft.IdentityModel.Tokens;
 
     using OneSim.Identity.Application;
-    using OneSim.Identity.Application.Interfaces;
+    using OneSim.Identity.Application.Abstractions;
     using OneSim.Identity.Domain;
     using OneSim.Identity.Domain.Entities;
     using OneSim.Identity.Infrastructure;
 
-    using IUrlHelper = OneSim.Identity.Application.Interfaces.IUrlHelper;
+    using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 
     /// <summary>
     ///     The startup.

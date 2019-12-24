@@ -1,4 +1,4 @@
-namespace OneSim.Identity.Application.Interfaces
+namespace OneSim.Identity.Application.Abstractions
 {
 	using OneSim.Identity.Domain.Entities;
 

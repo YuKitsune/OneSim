@@ -3,7 +3,7 @@ namespace OneSim.Identity.Tests.Utils
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 
-    using OneSim.Identity.Application.Interfaces;
+    using OneSim.Identity.Application.Abstractions;
     using OneSim.Identity.Domain.Entities;
 
     /// <summary>

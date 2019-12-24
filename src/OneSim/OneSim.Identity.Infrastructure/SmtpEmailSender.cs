@@ -10,7 +10,7 @@ namespace OneSim.Identity.Infrastructure
 
 	using MimeKit;
 
-	using OneSim.Identity.Application.Interfaces;
+	using OneSim.Identity.Application.Abstractions;
 
 	/// <summary>
 	/// 	The SMTP based email sender.
