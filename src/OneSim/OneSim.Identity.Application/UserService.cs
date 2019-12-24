@@ -19,9 +19,9 @@ namespace OneSim.Identity.Application
 	public class UserService
 	{
 		/// <summary>
-		/// 	The <see cref="UserManager{TUser}"/> for the <see cref="ApplicationUser"/>.
+		/// 	Gets the <see cref="UserManager{TUser}"/> for the <see cref="ApplicationUser"/>.
 		/// </summary>
-		private readonly UserManager<ApplicationUser> _userManager;
+		public UserManager<ApplicationUser> UserManager { get; }
 
 		/// <summary>
 		/// 	The <see cref="ILogger{TCategoryName}"/>.
@@ -39,7 +39,7 @@ namespace OneSim.Identity.Application
 		/// </param>
 		public UserService(UserManager<ApplicationUser> userManager, ILogger<UserService> logger)
 		{
-			_userManager = userManager;
+			UserManager = userManager;
 			_logger = logger;
 		}
 
@@ -76,7 +76,7 @@ namespace OneSim.Identity.Application
 			if (string.IsNullOrEmpty(password)) throw new ArgumentNullException(nameof(password), "The Password cannot be null or empty.");
 
 			// Create the user
-			IdentityResult result = await _userManager.CreateAsync(user, password);
+			IdentityResult result = await UserManager.CreateAsync(user, password);
 			if (result.Succeeded)
 			{
 				// Todo: Send email notification
@@ -104,12 +104,12 @@ namespace OneSim.Identity.Application
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null or empty.");
 
 			// Delete the user
-			IdentityResult result = await _userManager.DeleteAsync(user);
+			IdentityResult result = await UserManager.DeleteAsync(user);
 			if (result.Succeeded)
 			{
 				// Todo: Send email notification
 				_logger.LogInformation($"User \"{user.UserName}\" has been deleted.");
-			} 
+			}
 			else if (result.Errors.Any())
 			{
 				throw new IdentityException(result.Errors, "One or more errors occurred when attempting to create a new user.");
@@ -148,11 +148,11 @@ namespace OneSim.Identity.Application
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null.");
 
 			// Can't reset a password for an unconfirmed email address
-			if (!await _userManager.IsEmailConfirmedAsync(user))
+			if (!await UserManager.IsEmailConfirmedAsync(user))
 				throw new EmailUnconfirmedException(user, $"Cannot send password reset email when email address is unconfirmed.");
 
 			// Get the reset token
-			string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+			string resetToken = await UserManager.GeneratePasswordResetTokenAsync(user);
 
 			// Get the callback URL
 			string callbackUrl = urlHelper.ResetPasswordCallbackLink(user.Id, resetToken, requestScheme);
@@ -187,19 +187,19 @@ namespace OneSim.Identity.Application
 
 			// Determine whether to set or change the password
 			IdentityResult result;
-			bool hasPassword = await _userManager.HasPasswordAsync(user);
+			bool hasPassword = await UserManager.HasPasswordAsync(user);
 			if (hasPassword)
 			{
 				// Only need to check the token if we're resetting the password
 				if (string.IsNullOrEmpty(resetToken)) throw new ArgumentNullException(nameof(resetToken), "The Password Reset Token cannot be null or empty.");
 
 				// Reset the password
-				result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+				result = await UserManager.ResetPasswordAsync(user, resetToken, newPassword);
 			}
 			else
 			{
 				// Set the password
-				result = await _userManager.AddPasswordAsync(user, newPassword);
+				result = await UserManager.AddPasswordAsync(user, newPassword);
 			}
 
 			// Log some stuff
@@ -237,7 +237,7 @@ namespace OneSim.Identity.Application
 			if (string.IsNullOrEmpty(newPassword)) throw new ArgumentNullException(nameof(newPassword), "The New Password cannot be null or empty.");
 
 			// Attempt to change the password
-			IdentityResult result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+			IdentityResult result = await UserManager.ChangePasswordAsync(user, oldPassword, newPassword);
 			if (!result.Succeeded)
 			{
 				// Something went wrong
@@ -282,7 +282,7 @@ namespace OneSim.Identity.Application
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null.");
 
 			// Get the confirmation code
-			string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+			string code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
 
 			// Get the callback url
 			string callbackUrl = urlHelper.EmailConfirmationLink(user.Id, code, requestScheme);
@@ -317,7 +317,7 @@ namespace OneSim.Identity.Application
 				throw new ArgumentNullException(nameof(code), "The Confirmation Code cannot be null or empty.");
 
 			// Confirm the email address
-			IdentityResult result = await _userManager.ConfirmEmailAsync(user, code);
+			IdentityResult result = await UserManager.ConfirmEmailAsync(user, code);
 
 			// Log some stuff
 			if (result.Succeeded)
@@ -355,18 +355,18 @@ namespace OneSim.Identity.Application
 			verificationCode = verificationCode.Replace(" ", string.Empty).Replace("-", string.Empty);
 
 			// Check if the token is valid
-			bool is2FaTokenValid = await _userManager.VerifyTwoFactorTokenAsync(user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+			bool is2FaTokenValid = await UserManager.VerifyTwoFactorTokenAsync(user, UserManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
 
 			if (!is2FaTokenValid) throw new InvalidTwoFactorAuthenticationCodeException(verificationCode, "Verification code is invalid.");
 
 			// Attempt to enable 2FA
-			await _userManager.SetTwoFactorEnabledAsync(user, true);
+			await UserManager.SetTwoFactorEnabledAsync(user, true);
 
 			// Log
 			_logger.LogInformation($"{user.UserName} has enabled 2FA.");
 
 			// Get recovery codes
-			return await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+			return await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
 		}
 
 		/// <summary>
@@ -380,14 +380,16 @@ namespace OneSim.Identity.Application
 		/// </returns>
 		public async Task ResetTwoFactorAuthentication(ApplicationUser user)
 		{
+			// Todo: Need to figure out what to return here or something. Where do I get the new code from?
+
 			// Check the inputs
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null.");
 
 			// Disable 2FA
-			await _userManager.SetTwoFactorEnabledAsync(user, false);
+			await UserManager.SetTwoFactorEnabledAsync(user, false);
 
 			// Reset the 2FA key
-			await _userManager.ResetAuthenticatorKeyAsync(user);
+			await UserManager.ResetAuthenticatorKeyAsync(user);
 
 			// Log
 			_logger.LogInformation($"{user.UserName} has reset their 2FA key.");
@@ -408,7 +410,7 @@ namespace OneSim.Identity.Application
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null.");
 
 			// Attempt to disable 2fa
-			IdentityResult result = await _userManager.SetTwoFactorEnabledAsync(user, false);
+			IdentityResult result = await UserManager.SetTwoFactorEnabledAsync(user, false);
 
 			// Throw an exception if something went wrong
 			if (!result.Succeeded) throw new IdentityException(result.Errors, $"One or more errors occured when attempting to disable 2FA for {user.UserName}.");
@@ -436,7 +438,7 @@ namespace OneSim.Identity.Application
 				throw new Exception($"Cannot generate recovery codes for {user.UserName} because they do not have 2FA enabled.");
 
 			// Generate the recovery codes
-			IEnumerable<string> recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+			IEnumerable<string> recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
 
 			// Log
 			_logger.LogInformation($"{user.UserName} has generated new 2FA recovery codes.");

@@ -5,7 +5,14 @@ namespace OneSim.Api.Data.Requests
     /// </summary>
     public class LogInRequest
     {
+        /// <summary>
+        /// 	Gets or sets the UserName.
+        /// </summary>
         public string UserName { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the un-encrypted password.
+        /// </summary>
         public string Password { get; set; }
     }
 }

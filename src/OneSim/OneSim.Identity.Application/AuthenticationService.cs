@@ -99,6 +99,48 @@ namespace OneSim.Identity.Application
 		}
 
 		/// <summary>
+		/// 	Attempts to log the given <paramref name="user"/> in using a Two-Factor Authentication token.
+		/// </summary>
+		/// <param name="user">
+		///		The <see cref="ApplicationUser"/>.
+		/// </param>
+		/// <param name="token">
+		///		The Two-Factor Authentication token.
+		/// </param>
+		/// <returns>
+		///		The <see cref="Microsoft.AspNetCore.Identity.SignInResult"/>.
+		/// </returns>
+		public async Task<SignInResult> TwoFactorAuthenticationLogIn(ApplicationUser user, string token)
+		{
+			// Check the inputs
+			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null.");
+			if (string.IsNullOrEmpty(token))
+				throw new ArgumentNullException(nameof(token), "The token cannot be null or empty.");
+
+			SignInResult result = await _signInManager.TwoFactorAuthenticatorSignInAsync(token, true, true);
+
+			// Log some data
+			if (result.Succeeded)
+			{
+				_logger.LogInformation($"{user.UserName} logged in.");
+			}
+			else if (result.IsLockedOut)
+			{
+				_logger.LogWarning($"{user.UserName} has been locked out.");
+			}
+			else if (result.RequiresTwoFactor)
+			{
+				_logger.LogError($"{user.UserName} requires two-factor authentication, but this is the 2FA method.");
+			}
+			else
+			{
+				_logger.LogWarning($"Failed to log in {user.UserName}.");
+			}
+
+			return result;
+		}
+
+		/// <summary>
 		///		Logs the given <paramref name="user"/> in using a Two-Factor Authentication recovery code.
 		/// </summary>
 		/// <param name="user">
@@ -110,7 +152,7 @@ namespace OneSim.Identity.Application
 		/// <returns>
 		///		The <see cref="SignInResult"/>.
 		/// </returns>
-		public async Task<SignInResult> LogInWithRecoveryCode(ApplicationUser user, string recoveryCode)
+		public async Task<SignInResult> RecoveryCodeLogIn(ApplicationUser user, string recoveryCode)
 		{
 			// Check the inputs
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null.");

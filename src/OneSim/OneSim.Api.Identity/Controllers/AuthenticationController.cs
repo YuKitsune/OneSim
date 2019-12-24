@@ -7,8 +7,8 @@ namespace OneSim.Api.Identity.Controllers
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
 
-    using OneSim.Api.Data;
     using OneSim.Api.Data.Requests;
+    using OneSim.Api.Data.Responses;
     using OneSim.Api.Identity.Data;
     using OneSim.Identity.Application;
     using OneSim.Identity.Application.Interfaces;
@@ -89,8 +89,16 @@ namespace OneSim.Api.Identity.Controllers
                 Microsoft.AspNetCore.Identity.SignInResult result = await _authenticationService.LogIn(user, logInRequest.Password);
 
                 // Reject if failed
-                // Todo: Account for 2FA
                 if (!result.Succeeded) return new UnauthorizedResult();
+
+                // Alert client if two-factor is required
+                if (!result.RequiresTwoFactor)
+                {
+                    return new JsonResult(new LogInResponse
+                                          {
+                                              TwoFactorAuthenticationRequired = false
+                                          });
+                }
 
                 // Generate JWT
                 string token = _tokenFactory.GenerateToken(user);
@@ -106,6 +114,90 @@ namespace OneSim.Api.Identity.Controllers
                 _logger.LogCritical($"Failed to log user in. Exception:{Environment.NewLine}{ex}");
 
                 return StatusCode(500, "An error has occurred processing the log in request.");
+            }
+        }
+
+        /// <summary>
+        ///     Attempts to log the user in using Two-Factor Authentication.
+        /// </summary>
+        /// <param name="logInRequest">
+        ///     The <see cref="TwoFactorAuthenticationLogInRequest"/>.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="ActionResult"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> TwoFactorAuthenticationLogIn(
+            [FromBody] TwoFactorAuthenticationLogInRequest logInRequest)
+        {
+            try
+            {
+                // Find the user
+                ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == logInRequest.UserName);
+
+                if (user == null) return new UnauthorizedResult();
+
+                // Log in
+                Microsoft.AspNetCore.Identity.SignInResult result = await _authenticationService.TwoFactorAuthenticationLogIn(user, logInRequest.Token);
+
+                // Reject if failed
+                if (!result.Succeeded) return new UnauthorizedResult();
+
+                // Generate JWT
+                string token = _tokenFactory.GenerateToken(user);
+                LogInResponse response = new LogInResponse
+                                         {
+                                             Token = token
+                                         };
+
+                return new JsonResult(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"Failed to log user in using Two-Factor authentication. Exception:{Environment.NewLine}{ex}");
+
+                return StatusCode(500, "An error has occurred processing the Two-Factor Authentication log in request.");
+            }
+        }
+
+        /// <summary>
+        ///     Attempts to log the user in using a Two-Factor Authentication Recovery Code.
+        /// </summary>
+        /// <param name="logInRequest">
+        ///     The <see cref="TwoFactorAuthenticationLogInRequest"/>.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="ActionResult"/>.
+        /// </returns>
+        public async Task<ActionResult> RecoveryCodeLogIn([FromBody] TwoFactorAuthenticationLogInRequest logInRequest)
+        {
+            try
+            {
+                // Find the user
+                ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == logInRequest.UserName);
+
+                if (user == null) return new UnauthorizedResult();
+
+                // Log in
+                Microsoft.AspNetCore.Identity.SignInResult result = await _authenticationService.RecoveryCodeLogIn(user, logInRequest.Token);
+
+                // Reject if failed
+                if (!result.Succeeded) return new UnauthorizedResult();
+
+                // Generate JWT
+                string token = _tokenFactory.GenerateToken(user);
+                LogInResponse response = new LogInResponse
+                                         {
+                                             Token = token
+                                         };
+
+                return new JsonResult(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"Failed to log user in using Two-Factor authentication. Exception:{Environment.NewLine}{ex}");
+
+                return StatusCode(500, "An error has occurred processing the Two-Factor Authentication log in request.");
             }
         }
     }
