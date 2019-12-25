@@ -15,8 +15,9 @@ namespace OneSim.Api.Identity
     using System.Text;
 
     using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.IdentityModel.Tokens;
+
+    using Newtonsoft.Json.Serialization;
 
     using OneSim.Identity.Application;
     using OneSim.Identity.Application.Abstractions;
@@ -27,7 +28,7 @@ namespace OneSim.Api.Identity
     using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 
     /// <summary>
-    ///     The startup.
+    ///     The Startup class.
     /// </summary>
     public class Startup
     {
@@ -98,20 +99,21 @@ namespace OneSim.Api.Identity
 
             // Configure password and username requirements
             services.Configure<IdentityOptions>(options =>
-            {
-                // Password settings
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequiredLength = 8;
-                options.Password.RequiredUniqueChars = 1;
+                                                {
+                                                    // Password settings
+                                                    options.Password.RequireDigit = true;
+                                                    options.Password.RequireLowercase = true;
+                                                    options.Password.RequireUppercase = true;
+                                                    options.Password.RequireNonAlphanumeric = true;
+                                                    options.Password.RequiredLength = 8;
+                                                    options.Password.RequiredUniqueChars = 1;
 
-                // User settings
-                options.User.AllowedUserNameCharacters =
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = false;
-            });
+                                                    // User settings
+                                                    options.User.AllowedUserNameCharacters =
+                                                        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                                                    options.User.RequireUniqueEmail = false;
+                                                });
+
             // Use Newtonsoft.Json for controller actions. Just makes things easier on the client side if we're all
             // using the same thing.
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());

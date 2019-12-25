@@ -23,13 +23,35 @@ namespace OneSim.Identity.Tests
         public const string DefaultRequestScheme = "HTTPS";
 
         /// <summary>
-        ///     Ensures a new user can be created and an email confirmation email is sent to the user.
+        ///     Ensures a new user can be created.
         /// </summary>
         /// <returns>
         ///     The <see cref="Task"/>.
         /// </returns>
         [Test]
         public async Task UserCanBeCreated()
+        {
+            // Arrange
+            MockSet<UserService> mocks = new MockSet<UserService>();
+            ApplicationUser userToCreate = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
+            string password = "MySecurePassword123";
+
+            // Act
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
+            await service.CreateUser(userToCreate, password);
+
+            // Assert
+            Assert.IsTrue(mocks.DbContext.Users.Any(u => u.UserName == userToCreate.UserName));
+        }
+
+        /// <summary>
+        ///     Ensures a new user can be created and an email confirmation email is sent to the user.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="Task"/>.
+        /// </returns>
+        [Test]
+        public async Task UserCanBeCreatedWithEmailConfirmationEmail()
         {
             // Arrange
             MockSet<UserService> mocks = new MockSet<UserService>();
@@ -90,7 +112,7 @@ namespace OneSim.Identity.Tests
             await service.ConfirmEmail(testUser, "Not am empty string");
 
             // Act
-            await service.SendPasswordResetEmail(mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender, testUser);
+            await service.SendPasswordResetEmail(testUser, mocks.EmailSender, DefaultRequestScheme, mocks.UrlHelper);
 
             // Assert
             Assert.IsTrue(mocks.EmailSender.SentMessages.Count == 2);
@@ -115,10 +137,7 @@ namespace OneSim.Identity.Tests
             await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
 
             // Act / Assert
-            Assert.ThrowsAsync<EmailUnconfirmedException>(async () => await service.SendPasswordResetEmail(mocks.UrlHelper,
-                                                                                                           DefaultRequestScheme,
-                                                                                                           mocks.EmailSender,
-                                                                                                           testUser));
+            Assert.ThrowsAsync<EmailUnconfirmedException>(async () => await service.SendPasswordResetEmail(testUser, mocks.EmailSender, DefaultRequestScheme, mocks.UrlHelper));
         }
 
         /// <summary>
@@ -139,7 +158,7 @@ namespace OneSim.Identity.Tests
             UserService service = new UserService(mocks.UserManager, mocks.Logger);
             await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
             await service.ConfirmEmail(testUser, "Not an empty string");
-            await service.SendPasswordResetEmail(mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender, testUser);
+            await service.SendPasswordResetEmail(testUser, mocks.EmailSender, DefaultRequestScheme, mocks.UrlHelper);
 
             // Act
             await service.ResetPassword(testUser, "MyNewSecurePassword321", "NotAnEmptyString");
@@ -195,7 +214,7 @@ namespace OneSim.Identity.Tests
             await service.CreateUser(testUser, password, mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender);
 
             // Act
-            await service.SendEmailConfirmationEmail(mocks.UrlHelper, DefaultRequestScheme, mocks.EmailSender, testUser);
+            await service.SendEmailConfirmationEmail(testUser, mocks.EmailSender, DefaultRequestScheme, mocks.UrlHelper);
 
             // Assert
             Assert.IsTrue(mocks.EmailSender.SentMessages.Count == 2);

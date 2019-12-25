@@ -1,9 +1,9 @@
 namespace OneSim.Api.Data.Responses
 {
     /// <summary>
-    ///     The Log In Request.
+    ///     The Log In <see cref="BaseResponse"/>.
     /// </summary>
-    public class LogInResponse
+    public class LogInResponse : BaseResponse
     {
         /// <summary>
         ///     Gets or sets a value indicating whether or not Two-Factor Authentication is required.
@@ -16,8 +16,14 @@ namespace OneSim.Api.Data.Responses
         public string Token { get; set; }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="LogInResponse"/> class.
+        /// 	Initializes a new instance of the <see cref="LogInResponse"/> class.
         /// </summary>
-        public LogInResponse() => TwoFactorAuthenticationRequired = false;
+        /// <param name="status">
+        ///		The <see cref="ResponseStatus"/>.
+        /// </param>
+        /// <param name="message">
+        ///		The message.
+        /// </param>
+        public LogInResponse(ResponseStatus status, string message) : base(status, message) => TwoFactorAuthenticationRequired = false;
     }
 }

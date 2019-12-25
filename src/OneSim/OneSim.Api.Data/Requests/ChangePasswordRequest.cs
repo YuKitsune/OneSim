@@ -3,13 +3,8 @@ namespace OneSim.Api.Data.Requests
 	/// <summary>
 	/// 	The Change Password Request.
 	/// </summary>
-	public class ChangePasswordRequest
+	public class ChangePasswordRequest : BaseRequest
 	{
-		/// <summary>
-		/// 	Gets or sets the email address.
-		/// </summary>
-		public string Email { get; set; }
-
 		/// <summary>
 		/// 	Gets or sets the old password.
 		/// </summary>

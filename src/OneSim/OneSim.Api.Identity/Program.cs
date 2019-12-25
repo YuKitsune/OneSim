@@ -49,7 +49,7 @@
                 {
                     UserService userService = services.GetService<UserService>();
                     IUrlHelper urlHelper = services.GetService<IUrlHelper>();
-                    userService.CreateUser(seedUser, "Password123456789!@#$%^&*(", urlHelper, "https").GetAwaiter().GetResult();
+                    userService.CreateUser(seedUser, "Password123456789!@#$%^&*(").GetAwaiter().GetResult();
                 }
             }
 

@@ -3,13 +3,8 @@ namespace OneSim.Api.Data.Requests
 	/// <summary>
 	/// 	The Enable Two Factor Authentication Request.
 	/// </summary>
-	public class EnableTwoFactorAuthenticationRequest
+	public class EnableTwoFactorAuthenticationRequest : BaseRequest
 	{
-		/// <summary>
-		/// 	Gets or sets the email address.
-		/// </summary>
-		public string Email { get; set; }
-
 		/// <summary>
 		/// 	Gets or sets the verification code.
 		/// </summary>

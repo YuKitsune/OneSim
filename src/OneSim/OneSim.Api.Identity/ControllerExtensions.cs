@@ -29,12 +29,12 @@ namespace OneSim.Api.Identity
 		/// </returns>
 		public static async Task<ApplicationUser> GetCurrentUserAsync(this Controller controller, ApplicationIdentityDbContext dbContext)
 		{
-			// Get the user from the email
-			string email = controller.HttpContext.User.FindFirst(ClaimTypes.Email).Value;
-			ApplicationUser user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+			// Get the user from the user ID
+			string userId = controller.HttpContext.User.Identity.Name;
+			ApplicationUser user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
 			// Todo: Create custom domain exception
-			if (user == null) throw new Exception($"Unable to find user with email \"{email}\".");
+			if (user == null) throw new Exception($"Unable to find user with ID \"{userId}\".");
 
 			return user;
 		}

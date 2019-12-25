@@ -3,7 +3,7 @@ namespace OneSim.Api.Data.Requests
     /// <summary>
     ///     The Log In Request.
     /// </summary>
-    public class LogInRequest
+    public class LogInRequest : BaseRequest
     {
         /// <summary>
         /// 	Gets or sets the UserName.

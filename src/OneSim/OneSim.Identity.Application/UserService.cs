@@ -52,24 +52,10 @@ namespace OneSim.Identity.Application
 		/// <param name="password">
 		///		The password.
 		/// </param>
-		/// <param name="urlHelper">
-		///		The <see cref="IUrlHelper"/>.
-		/// </param>
-		/// <param name="requestScheme">
-		///		The Request Scheme.
-		/// </param>
-		/// <param name="emailSender">
-		///		The <see cref="IEmailSender"/>.
-		/// </param>
 		/// <returns>
 		///		The <see cref="Task"/>
 		/// </returns>
-		public async Task CreateUser(
-			ApplicationUser user,
-			string password,
-			IUrlHelper urlHelper,
-			string requestScheme,
-			IEmailSender emailSender = null)
+		public async Task CreateUser(ApplicationUser user, string password)
 		{
 			// Check the inputs
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null or empty.");
@@ -79,8 +65,52 @@ namespace OneSim.Identity.Application
 			IdentityResult result = await UserManager.CreateAsync(user, password);
 			if (result.Succeeded)
 			{
-				// Todo: Send email notification
-				if (emailSender != null) await SendEmailConfirmationEmail(urlHelper, requestScheme, emailSender, user);
+				_logger.LogInformation($"A new user has been created with the username \"{user.UserName}\".");
+			}
+			else if (result.Errors.Any())
+			{
+				throw new IdentityException(result.Errors, "One or more errors occurred when attempting to create a new user.");
+			}
+		}
+
+		/// <summary>
+		/// 	Creates a new user and sends an Email Confirmation email to the newly created user.
+		/// </summary>
+		/// <param name="user">
+		///     The <see cref="ApplicationUser"/> to create.
+		/// </param>
+		/// <param name="password">
+		///     The password.
+		/// </param>
+		/// <param name="urlHelper">
+		///     The <see cref="IUrlHelper"/>.
+		/// </param>
+		/// <param name="requestScheme">
+		///     The Request Scheme.
+		/// </param>
+		/// <param name="emailSender">
+		///     The <see cref="IEmailSender"/>.
+		/// </param>
+		/// <returns>
+		/// 	The <see cref="Task"/>
+		/// </returns>
+		public async Task CreateUser(
+			ApplicationUser user,
+			string password,
+			IUrlHelper urlHelper,
+			string requestScheme,
+			IEmailSender emailSender)
+		{
+			// Check the inputs
+			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null or empty.");
+			if (string.IsNullOrEmpty(password)) throw new ArgumentNullException(nameof(password), "The Password cannot be null or empty.");
+
+			// Create the user
+			IdentityResult result = await UserManager.CreateAsync(user, password);
+			if (result.Succeeded)
+			{
+				// Send email notification
+				await SendEmailConfirmationEmail(user, emailSender, requestScheme, urlHelper);
 				_logger.LogInformation($"A new user has been created with the username \"{user.UserName}\".");
 			}
 			else if (result.Errors.Any())
@@ -117,29 +147,29 @@ namespace OneSim.Identity.Application
 		}
 
 		/// <summary>
-		///		Sends a password reset email to the email address in the given <paramref name="user"/> so long as
+		/// 	Sends a password reset email to the email address in the given <paramref name="user"/> so long as
 		/// 	they have confirmed their email address.
 		/// </summary>
-		/// <param name="urlHelper">
-		///		The <see cref="IUrlHelper"/>.
-		/// </param>
-		/// <param name="requestScheme">
-		///		The Request Scheme.
+		/// <param name="user">
+		/// 	The <see cref="ApplicationUser"/>.
 		/// </param>
 		/// <param name="emailSender">
-		///		The <see cref="IEmailSender"/>.
+		/// 	The <see cref="IEmailSender"/>.
 		/// </param>
-		/// <param name="user">
-		///		The <see cref="ApplicationUser"/>.
+		/// <param name="requestScheme">
+		/// 	The Request Scheme.
+		/// </param>
+		/// <param name="urlHelper">
+		/// 	The <see cref="IUrlHelper"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="Task"/>.
+		/// 	The <see cref="Task"/>.
 		/// </returns>
 		public async Task SendPasswordResetEmail(
-			IUrlHelper urlHelper,
-			string requestScheme,
+			ApplicationUser user,
 			IEmailSender emailSender,
-			ApplicationUser user)
+			string requestScheme,
+			IUrlHelper urlHelper)
 		{
 			// Check the inputs
 			if (urlHelper == null) throw new ArgumentNullException(nameof(urlHelper), "The URL Helper cannot be null.");
@@ -252,28 +282,28 @@ namespace OneSim.Identity.Application
 		}
 
 		/// <summary>
-		///		Sends an email confirmation email to the given <paramref name="user"/>.
+		/// 	Sends an email confirmation email to the given <paramref name="user"/>.
 		/// </summary>
-		/// <param name="urlHelper">
-		///		The <see cref="IUrlHelper"/>.
-		/// </param>
-		/// <param name="requestScheme">
-		///		The Request Scheme.
+		/// <param name="user">
+		/// 	The <see cref="ApplicationUser"/>.
 		/// </param>
 		/// <param name="emailSender">
-		///		The <see cref="IEmailSender"/>.
+		/// 	The <see cref="IEmailSender"/>.
 		/// </param>
-		/// <param name="user">
-		///		The <see cref="ApplicationUser"/>.
+		/// <param name="requestScheme">
+		/// 	The Request Scheme.
+		/// </param>
+		/// <param name="urlHelper">
+		/// 	The <see cref="IUrlHelper"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="Task"/>.
+		/// 	The <see cref="Task"/>.
 		/// </returns>
 		public async Task SendEmailConfirmationEmail(
-			IUrlHelper urlHelper,
-			string requestScheme,
+			ApplicationUser user,
 			IEmailSender emailSender,
-			ApplicationUser user)
+			string requestScheme,
+			IUrlHelper urlHelper)
 		{
 			// Check the inputs
 			if (urlHelper == null) throw new ArgumentNullException(nameof(urlHelper), "The URL Helper cannot be null.");

@@ -3,7 +3,7 @@ namespace OneSim.Api.Data.Requests
 	/// <summary>
 	/// 	The Delete User Request.
 	/// </summary>
-	public class DeleteUserRequest
+	public class DeleteUserRequest : BaseRequest
 	{
 		/// <summary>
 		/// 	Gets or sets the username.
