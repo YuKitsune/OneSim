@@ -8,7 +8,8 @@ namespace OneSim.Api.Identity
 	using Microsoft.EntityFrameworkCore;
 
 	using OneSim.Api.Identity.Data;
-	using OneSim.Identity.Domain.Entities;
+    using OneSim.Identity.Application.Exceptions;
+    using OneSim.Identity.Domain.Entities;
 
 	/// <summary>
 	/// 	The <see cref="Controller"/> extensions.
@@ -29,12 +30,11 @@ namespace OneSim.Api.Identity
 		/// </returns>
 		public static async Task<ApplicationUser> GetCurrentUserAsync(this Controller controller, ApplicationIdentityDbContext dbContext)
 		{
-			// Get the user from the user ID
+            // Get the user from the user ID
 			string userId = controller.HttpContext.User.Identity.Name;
 			ApplicationUser user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-			// Todo: Create custom domain exception
-			if (user == null) throw new Exception($"Unable to find user with ID \"{userId}\".");
+			if (user == null) throw new UserNotFoundException(userId, $"Unable to find user with ID \"{userId}\".");
 
 			return user;
 		}
