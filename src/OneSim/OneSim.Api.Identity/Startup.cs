@@ -112,6 +112,9 @@ namespace OneSim.Api.Identity
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = false;
             });
+            // Use Newtonsoft.Json for controller actions. Just makes things easier on the client side if we're all
+            // using the same thing.
+            services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
         }
 
         /// <summary>
