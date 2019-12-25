@@ -145,12 +145,8 @@ namespace OneSim.Api.Identity
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-                             {
-                                 endpoints.MapRazorPages();
-                                 endpoints.MapControllerRoute(name: "default",
-                                                              pattern: "{controller=Authentication}/{action=LogIn}");
-                             });
+            app.UseEndpoints(endpoints => endpoints.MapControllerRoute(name: "default",
+                                                                       pattern: "{controller=Authentication}/{action=LogIn}"));
         }
     }
 }
