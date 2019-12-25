@@ -38,7 +38,9 @@
                 ApplicationIdentityDbContext dbContext = services.GetService<ApplicationIdentityDbContext>();
                 ApplicationUser seedUser = new ApplicationUser
                                            {
-                                               UserName = "SeedySally101", Email = "eoinmoth@yahoo.ie"
+                                               UserName = "SeedySally101",
+                                               Email = "eoinmoth@yahoo.ie",
+                                               Type = UserType.Administrator
                                            };
                 ApplicationUser existingUser = dbContext.Users.FirstOrDefault(u => u.Email == seedUser.Email);
 
