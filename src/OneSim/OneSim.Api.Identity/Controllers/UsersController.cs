@@ -90,6 +90,7 @@ namespace OneSim.Api.Identity.Controllers
 		/// <returns>
 		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
+		[HttpPost]
 		public async Task<ActionResult> CreateUser([FromBody] CreateUserRequest request)
 		{
 			try
@@ -127,20 +128,20 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Attempts to delete the current user.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="DeleteUserRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		public async Task<ActionResult> DeleteUser([FromBody] DeleteUserRequest request)
+        /// <summary>
+        /// 	Attempts to delete the current user.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="DeleteUserRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> DeleteUser([FromBody] DeleteUserRequest request)
 		{
 			try
 			{
-				// Todo: Add some feature in so administrators can delete users
 				// Ensure the current user is allowed to complete this action
 				// Note: Administrators cannot delete users on their behalf
 				if (!await RequestMatchesUser(request, false))
@@ -172,17 +173,18 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Attempts to send an Email Confirmation email to the currently logged in user, or user defined in the
-		/// 	<paramref name="request"/>.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="BaseRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		public async Task<ActionResult> SendEmailConfirmationEmail([FromBody] BaseRequest request)
+        /// <summary>
+        /// 	Attempts to send an Email Confirmation email to the currently logged in user, or user defined in the
+        /// 	<paramref name="request"/>.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="BaseRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> SendEmailConfirmationEmail([FromBody] BaseRequest request)
 		{
 			try
 			{
@@ -206,17 +208,18 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Attempts to confirm the email address of the currently logged in user using the
-		/// 	<see cref="ConfirmEmailRequest.ConfirmationCode"/>.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="ConfirmEmailRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
+        /// <summary>
+        /// 	Attempts to confirm the email address of the currently logged in user using the
+        /// 	<see cref="ConfirmEmailRequest.ConfirmationCode"/>.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="ConfirmEmailRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
 		{
 			try
 			{
@@ -241,17 +244,18 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Attempts to send a password reset email to the currently logged in user, or the user defined in the
-		/// 	<paramref name="request"/>.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="BaseRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		public async Task<ActionResult> SendPasswordResetEmail([FromBody] BaseRequest request)
+        /// <summary>
+        /// 	Attempts to send a password reset email to the currently logged in user, or the user defined in the
+        /// 	<paramref name="request"/>.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="BaseRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> SendPasswordResetEmail([FromBody] BaseRequest request)
 		{
 			try
 			{
@@ -275,17 +279,18 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Resets the password for the currently logged in user using the
-		/// 	<see cref="ResetPasswordRequest.ResetToken"/>.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="ResetPasswordRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        /// <summary>
+        /// 	Resets the password for the currently logged in user using the
+        /// 	<see cref="ResetPasswordRequest.ResetToken"/>.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="ResetPasswordRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
 		{
 			try
 			{
@@ -310,16 +315,17 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Attempts to change the password for the currently logged in user.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="ChangePasswordRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        /// <summary>
+        /// 	Attempts to change the password for the currently logged in user.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="ChangePasswordRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
 		{
 			try
 			{
@@ -344,17 +350,18 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Attempts to enable Two-Factor Authentication for the currently logged in user.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="EnableTwoFactorAuthenticationRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="EnableTwoFactorAuthenticationResponse"/>, or
-		/// 	<see cref="BaseResponse"/> in the event of an error.
-		/// </returns>
-		public async Task<ActionResult> EnableTwoFactorAuthentication(
+        /// <summary>
+        /// 	Attempts to enable Two-Factor Authentication for the currently logged in user.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="EnableTwoFactorAuthenticationRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="EnableTwoFactorAuthenticationResponse"/>, or
+        /// 	<see cref="BaseResponse"/> in the event of an error.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> EnableTwoFactorAuthentication(
 			[FromBody] EnableTwoFactorAuthenticationRequest request)
 		{
 			try
@@ -383,16 +390,17 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Attempts to reset Two-Factor Authentication for the currently logged in user.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="BaseRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		public async Task<ActionResult> ResetTwoFactorAuthentication([FromBody] BaseRequest request)
+        /// <summary>
+        /// 	Attempts to reset Two-Factor Authentication for the currently logged in user.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="BaseRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> ResetTwoFactorAuthentication([FromBody] BaseRequest request)
 		{
 			try
 			{
@@ -420,16 +428,17 @@ namespace OneSim.Api.Identity.Controllers
 			}
 		}
 
-		/// <summary>
-		/// 	Attempts to disable Two-Factor Authentication for the currently logged in user.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="BaseRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		public async Task<ActionResult> DisableTwoFactorAuthentication([FromBody] BaseRequest request)
+        /// <summary>
+        /// 	Attempts to disable Two-Factor Authentication for the currently logged in user.
+        /// </summary>
+        /// <param name="request">
+        ///		The <see cref="BaseRequest"/>.
+        /// </param>
+        /// <returns>
+        ///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+        /// </returns>
+        [HttpPost]
+        public async Task<ActionResult> DisableTwoFactorAuthentication([FromBody] BaseRequest request)
 		{
 			try
 			{
