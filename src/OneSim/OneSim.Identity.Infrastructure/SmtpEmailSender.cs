@@ -1,7 +1,7 @@
 namespace OneSim.Identity.Infrastructure
 {
-	using System;
-	using System.Threading.Tasks;
+    using System;
+    using System.Threading.Tasks;
 
 	using MailKit.Net.Smtp;
 
