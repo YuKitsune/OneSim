@@ -9,6 +9,7 @@ namespace OneSim.Api.Identity.Controllers
 
     using OneSim.Api.Data.Requests;
     using OneSim.Api.Data.Responses;
+    using OneSim.Api.Data.RouteHelpers.Identity;
     using OneSim.Api.Identity.Data;
     using OneSim.Identity.Application;
     using OneSim.Identity.Application.Abstractions;
@@ -17,6 +18,7 @@ namespace OneSim.Api.Identity.Controllers
     /// <summary>
     ///     The Authentication <see cref="Controller"/>.
     /// </summary>
+    [Route(Authentication.ControllerRoute)]
     public class AuthenticationController : Controller
     {
         /// <summary>
@@ -76,7 +78,8 @@ namespace OneSim.Api.Identity.Controllers
         ///     The <see cref="ActionResult"/> containing the <see cref="LogInResponse"/>, or <see cref="BaseResponse"/>
         ///     in the event of an error.
         /// </returns>
-        [HttpPost]
+        [Route(Authentication.LogIn),
+         HttpPost]
         public async Task<ActionResult> LogIn([FromBody] LogInRequest request)
         {
             try
@@ -128,7 +131,8 @@ namespace OneSim.Api.Identity.Controllers
         ///     The <see cref="ActionResult"/> containing the <see cref="LogInResponse"/>, or <see cref="BaseResponse"/>
         ///     in the event of an error.
         /// </returns>
-        [HttpPost]
+        [Route(Authentication.TwoFactorAuthenticationLogIn),
+         HttpPost]
         public async Task<ActionResult> TwoFactorAuthenticationLogIn(
             [FromBody] TwoFactorAuthenticationLogInRequest request)
         {
@@ -172,6 +176,8 @@ namespace OneSim.Api.Identity.Controllers
         ///     The <see cref="ActionResult"/> containing the <see cref="LogInResponse"/>, or <see cref="BaseResponse"/>
         ///     in the event of an error.
         /// </returns>
+        [Route(Authentication.RecoveryCodeLogIn),
+         HttpPost]
         public async Task<ActionResult> RecoveryCodeLogIn([FromBody] TwoFactorAuthenticationLogInRequest request)
         {
             try
