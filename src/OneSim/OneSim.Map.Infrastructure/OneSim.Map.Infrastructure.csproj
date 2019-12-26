@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OneSim.Map.Application\OneSim.Map.Application.csproj" />
+      <ProjectReference Include="..\OneSim.Map.Domain\OneSim.Map.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
