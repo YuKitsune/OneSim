@@ -1,7 +1,7 @@
 namespace OneSim.Identity.Infrastructure
 {
-    using System;
-    using System.Threading.Tasks;
+	using System;
+	using System.Threading.Tasks;
 
 	using MailKit.Net.Smtp;
 
@@ -13,7 +13,7 @@ namespace OneSim.Identity.Infrastructure
 	using OneSim.Identity.Application.Abstractions;
 
 	/// <summary>
-	/// 	The SMTP based email sender.
+	/// 	The SMTP based <see cref="IEmailSender"/> implementation.
 	/// </summary>
 	public class SmtpEmailSender : IEmailSender
 	{
