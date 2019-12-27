@@ -8,6 +8,11 @@ namespace OneSim.Map.Domain.Entities
 	public class Point3d
 	{
 		/// <summary>
+		/// 	Gets or sets the ID.
+		/// </summary>
+		public int Id { get; set; }
+
+		/// <summary>
 		/// 	Gets or sets the latitude.
 		/// </summary>
 		public double Latitude { get; set; }

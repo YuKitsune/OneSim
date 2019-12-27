@@ -8,7 +8,7 @@ namespace OneSim.Map.Domain.Entities
 		/// <summary>
 		///     Gets or sets the ID.
 		/// </summary>
-		public string Id { get; set; }
+		public int Id { get; set; }
 
 		/// <summary>
 		///     Gets or sets the name of the server.

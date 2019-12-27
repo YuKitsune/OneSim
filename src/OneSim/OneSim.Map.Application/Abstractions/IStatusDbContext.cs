@@ -1,5 +1,6 @@
 namespace OneSim.Map.Application.Abstractions
 {
+	using System.Threading;
 	using System.Threading.Tasks;
 
 	using Microsoft.EntityFrameworkCore;
@@ -52,9 +53,12 @@ namespace OneSim.Map.Application.Abstractions
 		/// <summary>
 		/// 	Persists the changes to the database as an asynchronous operation.
 		/// </summary>
+		/// <param name="cancellationToken">
+		///		The <see cref="CancellationToken"/>.
+		/// </param>
 		/// <returns>
 		///		The number of entries persisted to the database.
 		/// </returns>
-		Task<int> SaveChangesAsync();
+		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 	}
 }

@@ -22,7 +22,7 @@ namespace OneSim.Map.Application
 		/// <summary>
 		/// 	Gets the <see cref="List{T}"/> of <see cref="FlightNotification"/>s.
 		/// </summary>
-		public List<FlightNotification> PreFileNotices { get; }
+		public List<FlightNotification> FlightNotifications { get; }
 
 		/// <summary>
 		/// 	Gets the <see cref="List{T}"/> of <see cref="Server"/>s.
@@ -41,7 +41,7 @@ namespace OneSim.Map.Application
 		{
 			Pilots = new List<Pilot>();
 			Controllers = new List<AirTrafficController>();
-			PreFileNotices = new List<FlightNotification>();
+			FlightNotifications = new List<FlightNotification>();
 			Servers = new List<Server>();
 			Errors = new List<StatusFileParseError>();
 		}

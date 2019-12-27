@@ -321,7 +321,7 @@ CONNECTED CLIENTS = 317
 											};
 
 			// Act
-			FlightNotification flightNotification = parser.ParsePreFileNoticeLine(PreFileNoticeLine);
+			FlightNotification flightNotification = parser.ParseFlightNotificationLine(PreFileNoticeLine);
 
 			// Assert
 			Assert.AreEqual(expectedPreFile.NetworkId, flightNotification.NetworkId);
@@ -387,7 +387,7 @@ CONNECTED CLIENTS = 317
 			Assert.AreEqual(0, result.Errors.Count);
 			Assert.AreEqual(1, result.Controllers.Count);
 			Assert.AreEqual(2, result.Pilots.Count);
-			Assert.AreEqual(1, result.PreFileNotices.Count);
+			Assert.AreEqual(1, result.FlightNotifications.Count);
 			Assert.AreEqual(1, result.Servers.Count);
 		}
 

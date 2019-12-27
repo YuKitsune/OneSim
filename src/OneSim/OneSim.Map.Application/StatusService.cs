@@ -2,6 +2,7 @@ namespace OneSim.Map.Application
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Threading.Tasks;
 
@@ -68,17 +69,11 @@ namespace OneSim.Map.Application
 			IHistoricalDbContext historicalDbContext,
 			ILogger<StatusService> logger)
 		{
-			if (statusFileProvider == null) throw new ArgumentNullException(nameof(statusFileProvider), "The Status File Provider cannot be null.");
-			if (statusFileParser == null) throw new ArgumentNullException(nameof(statusFileParser), "The Status File Parser cannot be null.");
-			if (statusDbContext == null) throw new ArgumentNullException(nameof(statusDbContext), "The Status DbContext cannot be null.");
-			if (historicalDbContext == null) throw new ArgumentNullException(nameof(historicalDbContext), "The Historical DbContext cannot be null.");
-			if (logger == null) throw new ArgumentNullException(nameof(logger), "The Logger cannot be null.");
-
-			_statusFileProvider = statusFileProvider;
-			_statusFileParser = statusFileParser;
-			_statusDbContext = statusDbContext;
-			_historicalDbContext = historicalDbContext;
-			_logger = logger;
+			_statusFileProvider = statusFileProvider ?? throw new ArgumentNullException(nameof(statusFileProvider), "The Status File Provider cannot be null.");
+			_statusFileParser = statusFileParser ?? throw new ArgumentNullException(nameof(statusFileParser), "The Status File Parser cannot be null.");
+			_statusDbContext = statusDbContext ?? throw new ArgumentNullException(nameof(statusDbContext), "The Status DbContext cannot be null.");
+			_historicalDbContext = historicalDbContext ?? throw new ArgumentNullException(nameof(historicalDbContext), "The Historical DbContext cannot be null.");
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger), "The Logger cannot be null.");
 		}
 
 		/// <summary>
@@ -97,7 +92,7 @@ namespace OneSim.Map.Application
 				// Get the status data
 				_logger.LogInformation("Downloading Status data.");
 				StatusFileDownloadResult downloadResult = await _statusFileProvider.GetStatusFileAsync();
-				_logger.LogInformation($"Download complete. Time elapsed: {downloadResult.DownloadTime.TotalSeconds}.{downloadResult.DownloadTime.Milliseconds} seconds");
+				_logger.LogInformation($"Download complete. Total download time: {downloadResult.DownloadTime.TotalSeconds:##,###.00}s.");
 
 				// Store the Status Data for archiving purposes
 				archiveEntry.StatusFile = downloadResult.RawStatusFile;
@@ -105,19 +100,26 @@ namespace OneSim.Map.Application
 				archiveEntry.DownloadTime = downloadResult.DownloadTime;
 				_historicalDbContext.StatusFiles.Add(archiveEntry);
 				await _historicalDbContext.SaveChangesAsync();
+				_logger.LogInformation("Status data archived.");
 
 				// Parse the data
 				_logger.LogInformation("Parsing Status data.");
+				Stopwatch stopwatch = new Stopwatch();
+				stopwatch.Start();
 				StatusFileParseResult parseResult = _statusFileParser.Parse(downloadResult.RawStatusFile);
+				stopwatch.Stop();
+				_logger.LogInformation($"Parse complete. Total parse time: {stopwatch.Elapsed.TotalSeconds:##,###.00}s.");
 
 				// Update the data
-				_logger.LogInformation("Parse complete. Updating database.");
-				await UpdatePilotsAsync(parseResult.Pilots);
-				await UpdateControllersAsync(parseResult.Controllers);
-				await UpdatePreFileNoticesAsync(parseResult.PreFileNotices);
-				await UpdateServersAsync(parseResult.Servers);
+				using (_logger.BeginScope("Updating database"))
+				{
+					await UpdatePilotsAsync(parseResult.Pilots);
+					await UpdateControllersAsync(parseResult.Controllers);
+					await UpdatePreFileNoticesAsync(parseResult.FlightNotifications);
+					await UpdateServersAsync(parseResult.Servers);
 
-				_logger.LogInformation("Database updated.");
+					_logger.LogInformation("Database update complete.");
+				}
 			}
 		}
 
@@ -132,10 +134,12 @@ namespace OneSim.Map.Application
 		/// </returns>
 		private async Task UpdatePilotsAsync(ICollection<Pilot> newPilots)
 		{
-			_logger.LogInformation($"Updating Pilots.");
+			_logger.LogInformation("Updating Pilots.");
 
 			// Get all the pilots from the last batch
-			List<Pilot> oldPilots = await _statusDbContext.Pilots.ToListAsync();
+			List<Pilot> oldPilots = await _statusDbContext.Pilots
+														  .Include(p => p.FlightPlan)
+														  .ToListAsync();
 
 			// Get all the pilots still connected
 			List<Pilot> pilotsStillOnline = oldPilots.Where(p => newPilots
@@ -143,10 +147,11 @@ namespace OneSim.Map.Application
 																.Contains(new { p.Callsign, p.NetworkId }))
 													 .ToList();
 
-			// Remove all of the pilots, flight plans and history trails
-			_statusDbContext.Points.RemoveRange(oldPilots.SelectMany(op => op.History));
-			_statusDbContext.FlightPlans.RemoveRange(oldPilots.Select(p => p.FlightPlan));
-			_statusDbContext.Pilots.RemoveRange(oldPilots);
+			// Remove all of the pilots, flight plans (only for pilots with plans) and history trails
+			_statusDbContext.Points.RemoveRange(_statusDbContext.Points);
+			_statusDbContext.Pilots.RemoveRange(_statusDbContext.Pilots);
+			_statusDbContext.FlightPlans.RemoveRange(_statusDbContext.Pilots.Where(p => p.FlightPlan != null).Select(p => p.FlightPlan));
+			await _statusDbContext.SaveChangesAsync();
 
 			// Update the histories for all the new pilots
 			foreach (Pilot pilot in newPilots)
@@ -173,7 +178,6 @@ namespace OneSim.Map.Application
 
 			// Save our changes
 			await _statusDbContext.SaveChangesAsync();
-			_logger.LogInformation($"Pilots Updated.");
 		}
 
 		/// <summary>
@@ -189,16 +193,13 @@ namespace OneSim.Map.Application
 		{
 			_logger.LogInformation("Updating Controllers.");
 
-			// Get all the Controllers from the last batch
-			List<AirTrafficController> oldControllers = await _statusDbContext.Controllers.ToListAsync();
-
-			// Remove all of the Controllers
-			_statusDbContext.Controllers.RemoveRange(oldControllers);
+			// Remove all of the controllers
+			_statusDbContext.Controllers.RemoveRange(_statusDbContext.Controllers);
+			await _statusDbContext.SaveChangesAsync();
 
 			// Add all the new controllers
 			await _statusDbContext.Controllers.AddRangeAsync(newControllers);
 			await _statusDbContext.SaveChangesAsync();
-			_logger.LogInformation($"Controllers Updated.");
 		}
 
 		/// <summary>
@@ -215,17 +216,18 @@ namespace OneSim.Map.Application
 			_logger.LogInformation($"Updating Flight Notifications.");
 
 			// Get all the notices from the last batch
-			List<FlightNotification> oldNotifications = await _statusDbContext.FlightNotifications.ToListAsync();
+			List<FlightNotification> oldNotifications = await _statusDbContext.FlightNotifications
+																			  .Include(n => n.FlightPlan)
+																			  .ToListAsync();
 
 			// Remove all of the notices and flight plans
 			_statusDbContext.FlightPlans.RemoveRange(oldNotifications.Select(n => n.FlightPlan));
-			_statusDbContext.FlightNotifications.RemoveRange(oldNotifications);
+			_statusDbContext.FlightNotifications.RemoveRange(_statusDbContext.FlightNotifications);
+			await _statusDbContext.SaveChangesAsync();
 
 			// Add all the new notices
 			await _statusDbContext.FlightNotifications.AddRangeAsync(newFlightNotifications);
 			await _statusDbContext.SaveChangesAsync();
-
-			_logger.LogInformation($"Flight Notifications Updated.");
 		}
 
 		/// <summary>
@@ -239,19 +241,15 @@ namespace OneSim.Map.Application
 		/// </returns>
 		private async Task UpdateServersAsync(IEnumerable<Server> newServers)
 		{
-			_logger.LogInformation($"Updating Servers.");
+			_logger.LogInformation("Updating Servers.");
 
-			// Get all the servers from the last batch
-			List<Server> oldServers = await _statusDbContext.Servers.ToListAsync();
-
-			// Remove all of the notices
-			_statusDbContext.Servers.RemoveRange(oldServers);
+			// Remove all of the servers
+			_statusDbContext.Servers.RemoveRange(_statusDbContext.Servers);
+			await _statusDbContext.SaveChangesAsync();
 
 			// Add all the new servers
 			await _statusDbContext.Servers.AddRangeAsync(newServers);
 			await _statusDbContext.SaveChangesAsync();
-
-			_logger.LogInformation($"Servers Updated.");
 		}
 	}
 }
