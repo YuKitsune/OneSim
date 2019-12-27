@@ -1,13 +1,10 @@
-namespace OneSim.Api.Identity
+namespace OneSim.Identity.Api
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-
-    using OneSim.Api.Identity.Data;
-
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -19,11 +16,13 @@ namespace OneSim.Api.Identity
 
     using Newtonsoft.Json.Serialization;
 
+    using OneSim.Identity.Api.Data;
     using OneSim.Identity.Application;
     using OneSim.Identity.Application.Abstractions;
     using OneSim.Identity.Domain;
     using OneSim.Identity.Domain.Entities;
     using OneSim.Identity.Infrastructure;
+    using OneSim.Identity.Persistence;
 
     using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 
@@ -91,6 +90,7 @@ namespace OneSim.Api.Identity
                                   });
 
             // Add Dependencies
+            services.AddScoped<IIdentityDbContext, ApplicationIdentityDbContext>();
             services.AddScoped<ITokenFactory, JwtFactory>();
             services.AddScoped<IUrlHelper, UrlHelper>();
             services.AddScoped<IEmailSender, SmtpEmailSender>();
@@ -146,7 +146,8 @@ namespace OneSim.Api.Identity
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => endpoints.MapControllerRoute(name: "default",
-                                                                       pattern: "{controller=Authentication}/{action=LogIn}"));
+                                                                       pattern:
+                                                                       "{controller=Authentication}/{action=LogIn}"));
         }
     }
 }

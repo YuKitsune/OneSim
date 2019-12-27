@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace OneSim.Api.Identity.Data.Migrations
+namespace OneSim.Identity.Api.Data.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

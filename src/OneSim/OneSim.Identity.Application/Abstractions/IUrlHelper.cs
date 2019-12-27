@@ -1,5 +1,7 @@
 namespace OneSim.Identity.Application.Abstractions
 {
+	using OneSim.Identity.Domain.Entities;
+
 	/// <summary>
 	/// 	The URL Helper.
 	/// </summary>

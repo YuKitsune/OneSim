@@ -1,4 +1,4 @@
-namespace OneSim.Api.Identity.Controllers
+namespace OneSim.Identity.Api.Controllers
 {
 	using System;
 	using System.Collections.Generic;
@@ -11,10 +11,11 @@ namespace OneSim.Api.Identity.Controllers
 
 	using OneSim.Api.Data.Requests;
 	using OneSim.Api.Data.Responses;
-	using OneSim.Api.Identity.Data;
+	using OneSim.Identity.Api.Data;
 	using OneSim.Identity.Application;
 	using OneSim.Identity.Application.Abstractions;
 	using OneSim.Identity.Domain.Entities;
+	using OneSim.Identity.Persistence;
 
 	using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 

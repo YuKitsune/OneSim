@@ -39,7 +39,7 @@ namespace OneSim.Identity.Infrastructure
 			if (configuration == null) throw new ArgumentNullException(nameof(configuration), "The Configuration cannot be null.");
 
 			MailgunSettings settings = configuration.GetSection("MailgunSettings").Get<MailgunSettings>();
-			_settings = settings ?? throw new Exception("Unable to find Mailgun settings.");
+			_settings = settings ?? throw new Exception("Couldn't find the \"MailgunSettings\" section in the configuration.");
 		}
 
 		/// <summary>

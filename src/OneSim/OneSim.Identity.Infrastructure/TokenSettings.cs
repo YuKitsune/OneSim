@@ -1,4 +1,4 @@
-namespace OneSim.Identity.Domain
+namespace OneSim.Identity.Infrastructure
 {
 	/// <summary>
 	/// 	The Token settings.

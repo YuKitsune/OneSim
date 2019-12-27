@@ -10,7 +10,7 @@ namespace OneSim.Identity.Application.Abstractions
 	public interface IIdentityDbContext
 	{
 		/// <summary>
-		/// 	Gets or sets the <see cref="ApplicationUser"/>s <see cref="DbSet{TEntity}"/>.
+		/// 	Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="ApplicationUser"/>s.
 		/// </summary>
 		DbSet<ApplicationUser> Users { get; set; }
 

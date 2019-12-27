@@ -5,10 +5,12 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using OneSim.Api.Identity.Data;
+using OneSim.Identity.Api.Data;
 
-namespace OneSim.Api.Identity.Data.Migrations
+namespace OneSim.Identity.Api.Data.Migrations
 {
+    using OneSim.Identity.Persistence;
+
     [DbContext(typeof(ApplicationIdentityDbContext))]
     [Migration("20191224065557_Add2faMethod")]
     partial class Add2faMethod

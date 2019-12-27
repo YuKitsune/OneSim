@@ -63,7 +63,7 @@ namespace OneSim.Identity.Infrastructure
 
 			// Get the SMTP settings from the Configuration
 			SmtpSettings settings = configuration.GetSection("SmtpSettings").Get<SmtpSettings>();
-			_settings = settings ?? throw new Exception("Unable to find SMTP settings.");
+			_settings = settings ?? throw new Exception("Couldn't find the \"SmtpSettings\" section in the configuration.");
 		}
 
 		/// <summary>

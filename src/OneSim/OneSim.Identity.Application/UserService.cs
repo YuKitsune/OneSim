@@ -39,8 +39,8 @@ namespace OneSim.Identity.Application
 		/// </param>
 		public UserService(UserManager<ApplicationUser> userManager, ILogger<UserService> logger)
 		{
-			UserManager = userManager;
-			_logger = logger;
+			UserManager = userManager ?? throw new ArgumentNullException(nameof(userManager), "The UserManager cannot be null.");
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger), "The Logger cannot be null.");
 		}
 
 		/// <summary>

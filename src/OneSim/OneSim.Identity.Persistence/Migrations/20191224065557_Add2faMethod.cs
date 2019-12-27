@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace OneSim.Api.Identity.Data.Migrations
+namespace OneSim.Identity.Api.Data.Migrations
 {
     public partial class Add2faMethod : Migration
     {

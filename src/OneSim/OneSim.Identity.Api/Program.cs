@@ -1,4 +1,4 @@
-﻿namespace OneSim.Api.Identity
+﻿namespace OneSim.Identity.Api
 {
     using System;
     using System.Linq;
@@ -7,10 +7,11 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
 
-    using OneSim.Api.Identity.Data;
+    using OneSim.Identity.Api.Data;
     using OneSim.Identity.Application;
     using OneSim.Identity.Application.Abstractions;
     using OneSim.Identity.Domain.Entities;
+    using OneSim.Identity.Persistence;
 
     /// <summary>
     ///     The Program.

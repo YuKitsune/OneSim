@@ -69,6 +69,11 @@
       <ProjectReference Include="..\OneSim.Identity.Application\OneSim.Identity.Application.csproj" />
       <ProjectReference Include="..\OneSim.Identity.Domain\OneSim.Identity.Domain.csproj" />
       <ProjectReference Include="..\OneSim.Identity.Infrastructure\OneSim.Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\OneSim.Identity.Persistence\OneSim.Identity.Persistence.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Data" />
     </ItemGroup>
 
 </Project>

@@ -46,9 +46,9 @@ namespace OneSim.Identity.Application
 			ITokenFactory tokenFactory,
 			ILogger<AuthenticationService> logger)
 		{
-			_signInManager = signInManager;
-			_logger = logger;
-			_tokenFactory = tokenFactory;
+			_signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager), "The SignInManager cannot be null.");
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger), "The Logger cannot be null.");
+			_tokenFactory = tokenFactory ?? throw new ArgumentNullException(nameof(tokenFactory), "The TokenFactory cannot be null.");
 		}
 
 		/// <summary>

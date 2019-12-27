@@ -1,15 +1,13 @@
-namespace OneSim.Api.Identity
+namespace OneSim.Identity.Api
 {
-	using System;
-	using System.Security.Claims;
 	using System.Threading.Tasks;
 
 	using Microsoft.AspNetCore.Mvc;
 	using Microsoft.EntityFrameworkCore;
 
-	using OneSim.Api.Identity.Data;
-    using OneSim.Identity.Application.Exceptions;
+	using OneSim.Identity.Application.Exceptions;
     using OneSim.Identity.Domain.Entities;
+	using OneSim.Identity.Persistence;
 
 	/// <summary>
 	/// 	The <see cref="Controller"/> extensions.

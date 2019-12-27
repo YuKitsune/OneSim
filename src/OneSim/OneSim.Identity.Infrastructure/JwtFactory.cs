@@ -40,7 +40,7 @@
         {
             TokenSettings settings = configuration.GetSection("TokenSettings").Get<TokenSettings>();
             Settings = settings ??
-                       throw new ArgumentNullException(nameof(settings), "The TokenSettings cannot be null.");
+                       throw new ArgumentNullException(nameof(settings), "Couldn't find the \"TokenSettings\" section in the configuration.");
         }
 
         /// <summary>

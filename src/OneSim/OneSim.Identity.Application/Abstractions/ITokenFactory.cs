@@ -8,7 +8,7 @@ namespace OneSim.Identity.Application.Abstractions
 	public interface ITokenFactory
 	{
 		/// <summary>
-		/// 	Generates a token for the <paramref name="user"/>.
+		/// 	Generates a token for the given <paramref name="user"/>.
 		/// </summary>
 		/// <param name="user">
 		///		The <see cref="ApplicationUser"/>.
