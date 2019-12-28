@@ -49,7 +49,7 @@
 			VatsimStatusFileSection? currentSection = null;
 
 			// Split the status file by each new line
-			string[] lines = rawStatusFile.Split(Environment.NewLine);
+			string[] lines = rawStatusFile.Split(new[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
 			// Loop through ever line (Decided to use a simple for loop for performance)
 			string currentLine = string.Empty;
