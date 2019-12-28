@@ -96,7 +96,7 @@ namespace OneSim.Api.Map
 		/// <param name="env">
 		///     The <see cref="IWebHostEnvironment"/>.
 		/// </param>
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			if (env.IsDevelopment())
 			{
