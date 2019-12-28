@@ -13,16 +13,20 @@ namespace OneSim.Map.Application
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The Status Service.
-	/// 	Responsible for parsing the Status files containing information about online ATC and pilots, and maintaining
-	/// 	a database of live, and historical data.
+	/// 	The class responsible for maintaining a database of currently online pilots and ATC for a particular
+	/// 	Online Flight Simulation Network.
 	/// </summary>
 	public class StatusService
 	{
 		/// <summary>
-		/// 	The <see cref="IStatusFileProvider"/>.
+		/// 	The <see cref="IStatusDataProvider"/>.
 		/// </summary>
-		private readonly IStatusFileProvider _statusFileProvider;
+		private readonly IStatusDataProvider _statusDataProvider;
+
+		/// <summary>
+		/// 	The <see cref="IStatusDataParser"/>.
+		/// </summary>
+		private readonly IStatusDataParser _statusDataParser;
 
 		/// <summary>
 		/// 	The <see cref="IStatusDbContext"/>.
@@ -35,11 +39,6 @@ namespace OneSim.Map.Application
 		private readonly IHistoricalDbContext _historicalDbContext;
 
 		/// <summary>
-		/// 	The <see cref="IStatusFileParser"/>.
-		/// </summary>
-		private readonly IStatusFileParser _statusFileParser;
-
-		/// <summary>
 		/// 	The <see cref="Logger{TCategoryName}"/>.
 		/// </summary>
 		private readonly ILogger<StatusService> _logger;
@@ -47,11 +46,11 @@ namespace OneSim.Map.Application
 		/// <summary>
 		/// 	Initializes a new instance of the <see cref="StatusService"/> class.
 		/// </summary>
-		/// <param name="statusFileProvider">
-		///		The <see cref="IStatusFileProvider"/>.
+		/// <param name="statusDataProvider">
+		///		The <see cref="IStatusDataProvider"/>.
 		/// </param>
-		/// <param name="statusFileParser">
-		///		The <see cref="IStatusFileParser"/>.
+		/// <param name="statusDataParser">
+		///		The <see cref="IStatusDataParser"/>.
 		/// </param>
 		/// <param name="statusDbContext">
 		///		The <see cref="IStatusDbContext"/>.
@@ -63,21 +62,22 @@ namespace OneSim.Map.Application
 		///		The <see cref="ILogger{TCategoryName}"/>.
 		/// </param>
 		public StatusService(
-			IStatusFileProvider statusFileProvider,
-			IStatusFileParser statusFileParser,
+			IStatusDataProvider statusDataProvider,
+			IStatusDataParser statusDataParser,
 			IStatusDbContext statusDbContext,
 			IHistoricalDbContext historicalDbContext,
 			ILogger<StatusService> logger)
 		{
-			_statusFileProvider = statusFileProvider ?? throw new ArgumentNullException(nameof(statusFileProvider), "The Status File Provider cannot be null.");
-			_statusFileParser = statusFileParser ?? throw new ArgumentNullException(nameof(statusFileParser), "The Status File Parser cannot be null.");
+			_statusDataProvider = statusDataProvider ?? throw new ArgumentNullException(nameof(statusDataProvider), "The Status File Provider cannot be null.");
+			_statusDataParser = statusDataParser ?? throw new ArgumentNullException(nameof(statusDataParser), "The Status File Parser cannot be null.");
 			_statusDbContext = statusDbContext ?? throw new ArgumentNullException(nameof(statusDbContext), "The Status DbContext cannot be null.");
 			_historicalDbContext = historicalDbContext ?? throw new ArgumentNullException(nameof(historicalDbContext), "The Historical DbContext cannot be null.");
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger), "The Logger cannot be null.");
 		}
 
 		/// <summary>
-		/// 	Updates the status data.
+		/// 	Updates the status data in the <see cref="IStatusDbContext"/> and creates a new entry in the
+		/// 	<see cref="IHistoricalDbContext"/>.
 		/// </summary>
 		/// <returns>
 		///		The <see cref="Task"/>.
@@ -87,18 +87,18 @@ namespace OneSim.Map.Application
 			using (_logger.BeginScope("Updating Status data"))
 			{
 				// Start preparing the archive entry
-				StatusFileArchiveEntry archiveEntry = new StatusFileArchiveEntry();
+				StatusDataArchiveEntry archiveEntry = new StatusDataArchiveEntry();
 
 				// Get the status data
 				_logger.LogInformation("Downloading Status data.");
-				StatusFileDownloadResult downloadResult = await _statusFileProvider.GetStatusFileAsync();
+				StatusDownloadResult downloadResult = await _statusDataProvider.GetStatusDataAsync();
 				_logger.LogInformation($"Download complete. Total download time: {downloadResult.DownloadTime.TotalSeconds:##,###.00}s.");
 
 				// Store the Status Data for archiving purposes
-				archiveEntry.StatusFile = downloadResult.RawStatusFile;
+				archiveEntry.StatusFile = downloadResult.RawContent;
 				archiveEntry.DateReceived = downloadResult.DateReceived;
 				archiveEntry.DownloadTime = downloadResult.DownloadTime;
-				_historicalDbContext.StatusFiles.Add(archiveEntry);
+				_historicalDbContext.StatusData.Add(archiveEntry);
 				await _historicalDbContext.SaveChangesAsync();
 				_logger.LogInformation("Status data archived.");
 
@@ -106,7 +106,7 @@ namespace OneSim.Map.Application
 				_logger.LogInformation("Parsing Status data.");
 				Stopwatch stopwatch = new Stopwatch();
 				stopwatch.Start();
-				StatusFileParseResult parseResult = _statusFileParser.Parse(downloadResult.RawStatusFile);
+				StatusParseResult parseResult = _statusDataParser.Parse(downloadResult.RawContent);
 				stopwatch.Stop();
 				_logger.LogInformation($"Parse complete. Total parse time: {stopwatch.Elapsed.TotalSeconds:##,###.00}s.");
 

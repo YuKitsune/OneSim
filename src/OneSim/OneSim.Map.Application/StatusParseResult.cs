@@ -5,9 +5,9 @@ namespace OneSim.Map.Application
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The status file parse result.
+	/// 	The results from parsing a set of status data.
 	/// </summary>
-	public class StatusFileParseResult
+	public class StatusParseResult
 	{
 		/// <summary>
 		/// 	Gets the <see cref="List{T}"/> of <see cref="Pilot"/>s.
@@ -30,20 +30,20 @@ namespace OneSim.Map.Application
 		public List<Server> Servers { get; }
 
 		/// <summary>
-		/// 	Gets the <see cref="List{T}"/> of <see cref="StatusFileParseError"/>s.
+		/// 	Gets the <see cref="List{T}"/> of <see cref="StatusDataParseError"/>s.
 		/// </summary>
-		public List<StatusFileParseError> Errors { get; }
+		public List<StatusDataParseError> Errors { get; }
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="StatusFileParseResult"/>.
+		/// 	Initializes a new instance of the <see cref="StatusParseResult"/>.
 		/// </summary>
-		public StatusFileParseResult()
+		public StatusParseResult()
 		{
 			Pilots = new List<Pilot>();
 			Controllers = new List<AirTrafficController>();
 			FlightNotifications = new List<FlightNotification>();
 			Servers = new List<Server>();
-			Errors = new List<StatusFileParseError>();
+			Errors = new List<StatusDataParseError>();
 		}
 	}
 }

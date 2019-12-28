@@ -11,9 +11,9 @@ namespace OneSim.Map.Persistence
 	public class HistoricalDbContext : DbContext, IHistoricalDbContext
 	{
 		/// <summary>
-		/// 	Gets or sets the <see cref="StatusFileArchiveEntry"/>s <see cref="DbSet{TEntity}"/>.
+		/// 	Gets or sets the <see cref="StatusDataArchiveEntry"/>s <see cref="DbSet{TEntity}"/>.
 		/// </summary>
-		public DbSet<StatusFileArchiveEntry> StatusFiles { get; set; }
+		public DbSet<StatusDataArchiveEntry> StatusData { get; set; }
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="HistoricalDbContext"/> class.

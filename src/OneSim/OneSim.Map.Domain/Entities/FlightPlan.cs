@@ -13,9 +13,14 @@ namespace OneSim.Map.Domain.Entities
         public int Id { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="FlightRules"/>.
+        ///     Gets or sets the <see cref="FlightPlanRules"/>.
         /// </summary>
         public FlightPlanRules FlightRules { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the <see cref="FlightType"/>.
+        /// </summary>
+        public FlightType FightType { get; set; }
 
         /// <summary>
         ///     Gets or sets the aircraft type ICAO code.
@@ -48,6 +53,11 @@ namespace OneSim.Map.Domain.Entities
         public string AlternateIcao { get; set; }
 
         /// <summary>
+        ///     Gets or sets the ICAO code of the second alternative airport.
+        /// </summary>
+        public string AlternateIcao2 { get; set; }
+
+        /// <summary>
         ///     Gets or sets the <see cref="DateTime"/> representing estimated UTC time of departure.
         /// </summary>
         public DateTime? EstimatedTimeOfDeparture { get; set; }
@@ -68,7 +78,7 @@ namespace OneSim.Map.Domain.Entities
         /// <summary>
         ///     Gets or sets the <see cref="TimeSpan"/> representing the amount of fuel on board.
         /// </summary>
-        public TimeSpan? FuelOnBoard { get; set; }
+        public TimeSpan? Endurance { get; set; }
 
         /// <summary>
         ///     Gets or sets the route.
@@ -79,6 +89,11 @@ namespace OneSim.Map.Domain.Entities
         ///     Gets or sets the remarks.
         /// </summary>
         public string Remarks { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the amount of people on board the flight.
+        /// </summary>
+        public int? PersonsOnBoard { get; set; }
 
         /// <summary>
         ///     Gets the <see cref="DateTime"/> at which the flight is scheduled to arrive.

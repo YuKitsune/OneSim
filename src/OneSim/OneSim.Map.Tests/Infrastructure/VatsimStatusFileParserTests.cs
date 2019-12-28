@@ -108,7 +108,7 @@ CONNECTED CLIENTS = 317
 		public void PilotWithFlightPlanCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimStatusDataParser parser = new VatsimStatusDataParser();
 			Pilot expectedPilot = new Pilot
 								  {
 									  Callsign = "QFA238",
@@ -135,7 +135,7 @@ CONNECTED CLIENTS = 317
 																							   DateTimeKind.Utc),
 													   FlightRules = FlightPlanRules.InstrumentFlightRules,
 													   TimeEnroute = new TimeSpan(0, 37, 0),
-													   FuelOnBoard = new TimeSpan(2, 21, 0),
+													   Endurance = new TimeSpan(2, 21, 0),
 													   AlternateIcao = "WSSS",
 													   Route = "MASBO A457 GUPTA",
 													   Remarks =
@@ -148,7 +148,7 @@ CONNECTED CLIENTS = 317
 								  };
 
 			// Act
-			List<StatusFileParseError> errors = new List<StatusFileParseError>();
+			List<StatusDataParseError> errors = new List<StatusDataParseError>();
 			Pilot pilot = parser.ParsePilotLine(PilotWithFlightPlan);
 
 			// Assert
@@ -178,7 +178,7 @@ CONNECTED CLIENTS = 317
 			Assert.AreEqual(expectedPilot.FlightPlan.ActualTimeOfDeparture, pilot.FlightPlan.ActualTimeOfDeparture);
 			Assert.AreEqual(expectedPilot.FlightPlan.FlightRules, pilot.FlightPlan.FlightRules);
 			Assert.AreEqual(expectedPilot.FlightPlan.TimeEnroute, pilot.FlightPlan.TimeEnroute);
-			Assert.AreEqual(expectedPilot.FlightPlan.FuelOnBoard, pilot.FlightPlan.FuelOnBoard);
+			Assert.AreEqual(expectedPilot.FlightPlan.Endurance, pilot.FlightPlan.Endurance);
 			Assert.AreEqual(expectedPilot.FlightPlan.Route, pilot.FlightPlan.Route);
 			Assert.AreEqual(expectedPilot.FlightPlan.Remarks, pilot.FlightPlan.Remarks);
 			Assert.AreEqual(expectedPilot.FlightPlan.ScheduledTimeOfArrival, pilot.FlightPlan.ScheduledTimeOfArrival);
@@ -192,7 +192,7 @@ CONNECTED CLIENTS = 317
 		public void PilotWithoutFlightPlanCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimStatusDataParser parser = new VatsimStatusDataParser();
 			Pilot expectedPilot = new Pilot
 								  {
 									  Callsign = "SWA6264",
@@ -210,7 +210,7 @@ CONNECTED CLIENTS = 317
 								  };
 
 			// Act
-			List<StatusFileParseError> errors = new List<StatusFileParseError>();
+			List<StatusDataParseError> errors = new List<StatusDataParseError>();
 			Pilot pilot = parser.ParsePilotLine(PilotWithoutFlightPlan);
 
 			// Assert
@@ -246,7 +246,7 @@ CONNECTED CLIENTS = 317
 		public void ControllerLineCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimStatusDataParser parser = new VatsimStatusDataParser();
 			AirTrafficController expectedController = new AirTrafficController
 													  {
 														  Callsign = "AS_TWR",
@@ -289,7 +289,7 @@ CONNECTED CLIENTS = 317
 		public void PreFileNoticeLineCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimStatusDataParser parser = new VatsimStatusDataParser();
 			FlightNotification expectedPreFile = new FlightNotification
 											{
 												Callsign = "JST442",
@@ -312,7 +312,7 @@ CONNECTED CLIENTS = 317
 																				  DateTimeKind.Utc),
 																 FlightRules = FlightPlanRules.InstrumentFlightRules,
 																 TimeEnroute = new TimeSpan(1, 47, 0),
-																 FuelOnBoard = new TimeSpan(3, 15, 0),
+																 Endurance = new TimeSpan(3, 15, 0),
 																 AlternateIcao = string.Empty,
 																 Route = "DCT NONIX H66 TW Y23 BERNI DCT",
 																 Remarks =
@@ -339,7 +339,7 @@ CONNECTED CLIENTS = 317
 			Assert.AreEqual(expectedPreFile.FlightPlan.ActualTimeOfDeparture, flightNotification.FlightPlan.ActualTimeOfDeparture);
 			Assert.AreEqual(expectedPreFile.FlightPlan.FlightRules, flightNotification.FlightPlan.FlightRules);
 			Assert.AreEqual(expectedPreFile.FlightPlan.TimeEnroute, flightNotification.FlightPlan.TimeEnroute);
-			Assert.AreEqual(expectedPreFile.FlightPlan.FuelOnBoard, flightNotification.FlightPlan.FuelOnBoard);
+			Assert.AreEqual(expectedPreFile.FlightPlan.Endurance, flightNotification.FlightPlan.Endurance);
 			Assert.AreEqual(expectedPreFile.FlightPlan.Route, flightNotification.FlightPlan.Route);
 			Assert.AreEqual(expectedPreFile.FlightPlan.Remarks, flightNotification.FlightPlan.Remarks);
 			Assert.AreEqual(expectedPreFile.FlightPlan.ScheduledTimeOfArrival, flightNotification.FlightPlan.ScheduledTimeOfArrival);
@@ -352,7 +352,7 @@ CONNECTED CLIENTS = 317
 		public void ServerLineCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimStatusDataParser parser = new VatsimStatusDataParser();
 			Server expectedServer = new Server
 									{
 										NetworkIdentifier = "SYD-1",
@@ -372,16 +372,16 @@ CONNECTED CLIENTS = 317
 		}
 
 		/// <summary>
-		/// 	Ensures the <see cref="VatsimStatusFileParser"/> can parse all required data from a file.
+		/// 	Ensures the <see cref="VatsimStatusDataParser"/> can parse all required data from a file.
 		/// </summary>
 		[Test]
 		public void ParserCanParseWholeFile()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimStatusDataParser parser = new VatsimStatusDataParser();
 
 			// Act
-			StatusFileParseResult result = parser.Parse(StatusFileExample);
+			StatusParseResult result = parser.Parse(StatusFileExample);
 
 			// Assert
 			Assert.AreEqual(0, result.Errors.Count);
@@ -392,13 +392,13 @@ CONNECTED CLIENTS = 317
 		}
 
 		/// <summary>
-		/// 	Ensures the <see cref="VatsimStatusFileParser.ParseFlightPlanAltitude"/> method works given an Altitude.
+		/// 	Ensures the <see cref="VatsimStatusDataParser.ParseFlightPlanAltitude"/> method works given an Altitude.
 		/// </summary>
 		[Test]
 		public void AltitudeParserWorksWithAltitudes()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimStatusDataParser parser = new VatsimStatusDataParser();
 			string altitudeString1 = "A050";
 			string altitudeString2 = "050";
 			string altitudeString3 = "A95";
@@ -418,13 +418,13 @@ CONNECTED CLIENTS = 317
 		}
 
 		/// <summary>
-		/// 	Ensures the <see cref="VatsimStatusFileParser.ParseFlightPlanAltitude"/> method works given a Flight Level.
+		/// 	Ensures the <see cref="VatsimStatusDataParser.ParseFlightPlanAltitude"/> method works given a Flight Level.
 		/// </summary>
 		[Test]
 		public void AltitudeParserWorksWithFlightLevels()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimStatusDataParser parser = new VatsimStatusDataParser();
 			string flightLevelString1 = "FL380";
 			string flightLevelString2 = "FL 380";
 			string flightLevelString3 = "F280";

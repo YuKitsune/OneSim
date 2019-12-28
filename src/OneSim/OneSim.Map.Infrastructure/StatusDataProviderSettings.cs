@@ -1,12 +1,12 @@
 namespace OneSim.Map.Infrastructure
 {
 	/// <summary>
-	/// 	The VATSIM Status File Parser settings.
+	/// 	The Status Data Provider settings.
 	/// </summary>
-	public class VatsimStatusFileProviderSettings
+	public class StatusDataProviderSettings
 	{
 		/// <summary>
-		/// 	Gets or sets the URL at which the other URLs to full data files can be found.
+		/// 	Gets or sets the URL at which the other URLs to full data sets can be found.
 		/// </summary>
 		public string RootStatusUrl { get; set; }
 

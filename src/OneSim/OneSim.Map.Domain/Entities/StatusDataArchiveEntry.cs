@@ -5,7 +5,7 @@ namespace OneSim.Map.Domain.Entities
 	/// <summary>
 	/// 	The Status File Archive Entry.
 	/// </summary>
-	public class StatusFileArchiveEntry
+	public class StatusDataArchiveEntry
 	{
 		/// <summary>
 		/// 	Gets or sets the ID.

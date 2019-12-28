@@ -62,12 +62,12 @@ namespace OneSim.Api.Map
 			NetworkType targetNetwork = settings.TargetNetwork;
 
 			// Get the StatusFileProvider
-			Type statusFileProviderType = GetImplementationFor<IStatusFileProvider>(targetNetwork, "OneSim.Map.Infrastructure");
-			services.AddScoped(typeof(IStatusFileProvider), statusFileProviderType);
+			Type statusFileProviderType = GetImplementationFor<IStatusDataProvider>(targetNetwork, "OneSim.Map.Infrastructure");
+			services.AddScoped(typeof(IStatusDataProvider), statusFileProviderType);
 
 			// Get the StatusFileParser
-			Type statusFileParserType = GetImplementationFor<IStatusFileParser>(targetNetwork, "OneSim.Map.Infrastructure");
-			services.AddScoped(typeof(IStatusFileParser), statusFileParserType);
+			Type statusFileParserType = GetImplementationFor<IStatusDataParser>(targetNetwork, "OneSim.Map.Infrastructure");
+			services.AddScoped(typeof(IStatusDataParser), statusFileParserType);
 
 			// Add DbContext Interfaces
 			services.AddScoped<IStatusDbContext, StatusDbContext>();

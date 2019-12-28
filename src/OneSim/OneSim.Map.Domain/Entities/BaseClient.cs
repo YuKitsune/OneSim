@@ -34,11 +34,6 @@ namespace OneSim.Map.Domain.Entities
 		public string Server { get; set; }
 
 		/// <summary>
-		///     Gets or sets the protocol revision in use client software.
-		/// </summary>
-		public string ProtocolRevision { get; set; }
-
-		/// <summary>
 		///     Gets or sets the UTC <see cref="DateTime"/> at which the current <see cref="BaseClient"/> connected to
 		/// 	the network.
 		/// </summary>

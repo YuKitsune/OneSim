@@ -2,6 +2,8 @@ namespace OneSim.Map.Domain.Entities
 {
 	using System.Collections.Generic;
 
+	using Newtonsoft.Json;
+
 	using OneSim.Map.Domain.ValueObjects;
 
 	/// <summary>
@@ -37,6 +39,7 @@ namespace OneSim.Map.Domain.Entities
         /// <summary>
         ///     Gets or sets the <see cref="SquawkCode"/>.
         /// </summary>
+        [JsonConverter(typeof(SquawkCodeConverter))]
         public SquawkCode Squawk { get; set; }
 
         /// <summary>

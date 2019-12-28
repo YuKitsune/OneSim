@@ -1,4 +1,4 @@
-namespace OneSim.Map.Infrastructure
+namespace OneSim.Map.Infrastructure.Ivao
 {
 	using System;
 	using System.Collections.Generic;
@@ -15,10 +15,10 @@ namespace OneSim.Map.Infrastructure
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The VATSIM <see cref="IStatusFileProvider"/>
+	/// 	The IvAo <see cref="IStatusDataProvider"/>.
 	/// </summary>
-	[Network(NetworkType.Vatsim)]
-	public class VatsimStatusFileProvider : IStatusFileProvider
+	[Network(NetworkType.Ivao)]
+	public class IvaoStatusDataProvider : IStatusDataProvider
 	{
 		/// <summary>
 		/// 	Gets or sets the last URL used to fetch the VATSIM Status data.
@@ -29,9 +29,9 @@ namespace OneSim.Map.Infrastructure
 		private static string LastUsedUrl { get; set; }
 
 		/// <summary>
-		/// 	The <see cref="VatsimStatusFileProviderSettings"/>.
+		/// 	The <see cref="StatusDataProviderSettings"/>.
 		/// </summary>
-		private readonly VatsimStatusFileProviderSettings _settings;
+		private readonly StatusDataProviderSettings _settings;
 
 		/// <summary>
 		/// 	The Status file URLs.
@@ -44,43 +44,43 @@ namespace OneSim.Map.Infrastructure
 		private DateTime _lastRootDownloadTime;
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="VatsimStatusFileProvider"/> class.
+		/// 	Initializes a new instance of the <see cref="IvaoStatusDataProvider"/> class.
 		/// </summary>
 		/// <param name="settings">
-		///		The <see cref="VatsimStatusFileProviderSettings"/>.
+		///		The <see cref="StatusDataProviderSettings"/>.
 		/// </param>
-		public VatsimStatusFileProvider(VatsimStatusFileProviderSettings settings) =>
+		public IvaoStatusDataProvider(StatusDataProviderSettings settings) =>
 			_settings = settings ?? throw new ArgumentNullException(nameof(settings), "The settings cannot be null.");
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="VatsimStatusFileProvider"/> class.
+		/// 	Initializes a new instance of the <see cref="IvaoStatusDataProvider"/> class.
 		/// </summary>
 		/// <param name="configuration">
 		///		The <see cref="IConfiguration"/>.
 		/// </param>
-		public VatsimStatusFileProvider(IConfiguration configuration)
+		public IvaoStatusDataProvider(IConfiguration configuration)
 		{
 			// Extract the settings from the configuration
-			VatsimStatusFileProviderSettings settings =
-				configuration.GetSection("StatusProviderSettings").Get<VatsimStatusFileProviderSettings>();
+			StatusDataProviderSettings settings =
+				configuration.GetSection("StatusProviderSettings").Get<StatusDataProviderSettings>();
 			_settings = settings ?? throw new ArgumentNullException(nameof(settings), "Couldn't find the \"StatusProviderSettings\" section in the configuration.");
 		}
 
 		/// <summary>
-		/// 	Gets the status file.
+		/// 	Gets the status data.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="StatusFileDownloadResult"/>.
+		///		The <see cref="StatusDownloadResult"/>.
 		/// </returns>
-		public StatusFileDownloadResult GetStatusFile() => GetStatusFileAsync().GetAwaiter().GetResult();
+		public StatusDownloadResult GetStatusData() => GetStatusDataAsync().GetAwaiter().GetResult();
 
 		/// <summary>
-		/// 	Gets the status file as an asynchronous operation.
+		/// 	Gets the status data as an asynchronous operation.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="StatusFileDownloadResult"/>.
+		///		The <see cref="StatusDownloadResult"/>.
 		/// </returns>
-		public async Task<StatusFileDownloadResult> GetStatusFileAsync()
+		public async Task<StatusDownloadResult> GetStatusDataAsync()
 		{
 			// If there is no previously used URL, or we need to refresh the URLs then download new URLs
 			if (string.IsNullOrEmpty(LastUsedUrl) ||
@@ -112,7 +112,7 @@ namespace OneSim.Map.Infrastructure
 			LastUsedUrl = url;
 
 			// Return the result
-			return new StatusFileDownloadResult(statusFile, url, downloadTime, stopwatch.Elapsed);
+			return new StatusDownloadResult(statusFile, url, downloadTime, stopwatch.Elapsed);
 		}
 
 		/// <summary>
@@ -185,7 +185,13 @@ namespace OneSim.Map.Infrastructure
 				urlList.Remove(excludeUrl);
 
 				// Check we haven't lost all URLs
-				if (!urlList.Any()) throw new Exception($"Asked to exclude \"{excludeUrl}\", but it's the only available URL in the list.");
+				if (!urlList.Any())
+				{
+					// Todo: Figure out what to properly do here. It's possible we could end up having just one URL
+					// available
+					// throw new Exception($"Asked to exclude \"{excludeUrl}\", but it's the only available URL in the list.");
+					return excludeUrl;
+				}
 			}
 
 			// Take a random index

@@ -1,4 +1,4 @@
-namespace OneSim.Map.Application.Exceptions
+namespace OneSim.Map.Infrastructure.Exceptions
 {
 	using System;
 

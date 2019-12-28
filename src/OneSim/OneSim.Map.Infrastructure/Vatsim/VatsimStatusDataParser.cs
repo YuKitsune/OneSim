@@ -6,30 +6,29 @@
 
 	using OneSim.Map.Application;
 	using OneSim.Map.Application.Abstractions;
-	using OneSim.Map.Application.Exceptions;
 	using OneSim.Map.Domain.Attributes;
 	using OneSim.Map.Domain.Entities;
 	using OneSim.Map.Infrastructure.Exceptions;
 
 	/// <summary>
-	/// 	The VATSIM Status File Parser.
+	/// 	The VATSIM Status Data Parser.
 	/// </summary>
 	[Network(NetworkType.Vatsim)]
-	public class VatsimStatusFileParser : IStatusFileParser
+	public class VatsimStatusDataParser : IStatusDataParser
 	{
 		/// <summary>
-		/// 	Parses the given <see cref="string"/> as a Status File.
+		/// 	Parses the given <see cref="string"/> as a set of Status data
 		/// </summary>
 		/// <param name="rawStatusFile">
 		///		The raw status file.
 		/// </param>
 		/// <returns>
-		///		The <see cref="StatusFileParseResult"/>.
+		///		The <see cref="StatusParseResult"/>.
 		/// </returns>
-		public StatusFileParseResult Parse(string rawStatusFile)
+		public StatusParseResult Parse(string rawStatusFile)
 		{
 			// Prepare our results
-			StatusFileParseResult result = new StatusFileParseResult();
+			StatusParseResult result = new StatusParseResult();
 
 			// Create a dictionary of each of the section headers along with their corresponding enum value
 			// Will use this to determine what section header we're looking for in the file
@@ -120,7 +119,7 @@
 				}
 				catch (Exception ex)
 				{
-					result.Errors.Add(new StatusFileParseError(currentLine, ex.Message, ex));
+					result.Errors.Add(new StatusDataParseError(currentLine, ex.Message, ex));
 				}
 			}
 
@@ -153,7 +152,7 @@
 
 				case "ATC": return ParseControllerLine(clientLine);
 
-				default: throw new NotSupportedException($"Unexpected Client Type {clientType}.");
+				default: throw new NotSupportedException($"Unsupported Client Type {clientType}.");
 			}
 		}
 
@@ -189,7 +188,6 @@
 							  NetworkId = pilotLineSections[1],
 							  Name = pilotLineSections[2],
 							  Server = pilotLineSections[14],
-							  ProtocolRevision = pilotLineSections[15],
 							  LogonTime = ParseStatusDateTime(pilotLineSections[37]),
 							  Latitude = double.Parse(pilotLineSections[5]),
 							  Longitude = double.Parse(pilotLineSections[6]),
@@ -222,7 +220,7 @@
 									   TimeEnroute = new TimeSpan(hours: int.Parse(pilotLineSections[24]),
 																  minutes: int.Parse(pilotLineSections[25]),
 																  seconds: 0),
-									   FuelOnBoard = new TimeSpan(hours: int.Parse(pilotLineSections[26]),
+									   Endurance = new TimeSpan(hours: int.Parse(pilotLineSections[26]),
 																  minutes: int.Parse(pilotLineSections[27]),
 																  seconds: 0),
 									   AlternateIcao = pilotLineSections[28],
@@ -270,7 +268,6 @@
 												  NetworkId = controllerLineSections[1],
 												  Name = controllerLineSections[2],
 												  Server = controllerLineSections[14],
-												  ProtocolRevision = controllerLineSections[15],
 												  LogonTime = ParseStatusDateTime(controllerLineSections[37]),
 												  Frequency = controllerLineSections[4],
 												  Rating = (ControllerRating) int.Parse(controllerLineSections[16]),
@@ -321,7 +318,7 @@
 																		 TimeEnroute = new TimeSpan(hours: int.Parse(preFileNoticeLineSections[24]),
 																									minutes: int.Parse(preFileNoticeLineSections[25]),
 																									seconds: 0),
-																		 FuelOnBoard = new TimeSpan(hours: int.Parse(preFileNoticeLineSections[26]),
+																		 Endurance = new TimeSpan(hours: int.Parse(preFileNoticeLineSections[26]),
 																									minutes: int.Parse(preFileNoticeLineSections[27]),
 																									seconds: 0),
 																		 AlternateIcao = preFileNoticeLineSections[28],
@@ -375,7 +372,7 @@
 		/// <returns>
 		///		The altitude in feet represented by an <see cref="int"/>.
 		/// </returns>
-		public int ParseFlightPlanAltitude(string altitudeString)
+		public static int ParseFlightPlanAltitude(string altitudeString)
 		{
 			// If given a bullshit value, then give back a bullshit value
 			if (string.IsNullOrEmpty(altitudeString)) return 0;
@@ -449,7 +446,7 @@
 		/// <returns>
 		///		The resulting <see cref="DateTime"/>.
 		/// </returns>
-		public DateTime ParseStatusDateTime(string dateTime) =>
+		public static DateTime ParseStatusDateTime(string dateTime) =>
 			new DateTime(year: int.Parse(dateTime.Substring(0, 4)),
 						 month: int.Parse(dateTime.Substring(4, 2)),
 						 day: int.Parse(dateTime.Substring(6, 2)),
@@ -470,7 +467,7 @@
 		/// <returns>
 		///		The resulting <see cref="DateTime"/>.
 		/// </returns>
-		public DateTime? ParseFlightPlanDateTime(string dateTimeString)
+		public static DateTime? ParseFlightPlanDateTime(string dateTimeString)
 		{
 			// for different lengths of time
 			switch (dateTimeString.Length)

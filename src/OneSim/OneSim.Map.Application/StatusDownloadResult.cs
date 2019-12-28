@@ -3,47 +3,47 @@ namespace OneSim.Map.Application
 	using System;
 
 	/// <summary>
-	/// 	The status file download result.
+	/// 	The Online Flight Simulation Network status data download result.
 	/// </summary>
-	public class StatusFileDownloadResult
+	public class StatusDownloadResult
 	{
 		/// <summary>
-		/// 	Gets the raw status file content.
+		/// 	Gets the raw content of the status data.
 		/// </summary>
-		public string RawStatusFile { get; }
+		public string RawContent { get; }
 
 		/// <summary>
-		/// 	Gets the <see cref="DateReceived"/> at which the file was downloaded.
+		/// 	Gets the <see cref="DateReceived"/> at which the data was downloaded.
 		/// </summary>
 		public DateTime DateReceived { get; }
 
 		/// <summary>
-		/// 	Gets the <see cref="TimeSpan"/> taken to download the status file.
+		/// 	Gets the <see cref="TimeSpan"/> taken to download the status data.
 		/// </summary>
 		public TimeSpan DownloadTime { get; }
 
 		/// <summary>
-		/// 	Gets the URL where the status file was downloaded from.
+		/// 	Gets the URL where the status data was downloaded from.
 		/// </summary>
 		public string SourceUrl { get; }
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="StatusFileDownloadResult"/> class.
+		/// 	Initializes a new instance of the <see cref="StatusDownloadResult"/> class.
 		/// </summary>
-		/// <param name="rawStatusFile">
-		///		The raw status file content.
+		/// <param name="rawContent">
+		///		The raw content of the status data.
 		/// </param>
 		/// <param name="sourceUrl">
-		///		The URL where the <paramref name="rawStatusFile"/> was downloaded from.
+		///		The URL where the <paramref name="rawContent"/> was downloaded from.
 		/// </param>
 		/// <param name="dateReceived">
-		///		The <see cref="DateTime"/> at which the <paramref name="rawStatusFile"/> was downloaded.
+		///		The <see cref="DateTime"/> at which the <paramref name="rawContent"/> was downloaded.
 		/// </param>
 		/// <param name="downloadTime">
-		///		The <see cref="TimeSpan"/> taken to download the <paramref name="rawStatusFile"/>.
+		///		The <see cref="TimeSpan"/> taken to download the <paramref name="rawContent"/>.
 		/// </param>
-		public StatusFileDownloadResult(
-			string rawStatusFile,
+		public StatusDownloadResult(
+			string rawContent,
 			string sourceUrl,
 			DateTime dateReceived,
 			TimeSpan downloadTime)
@@ -54,7 +54,7 @@ namespace OneSim.Map.Application
 				downloadTime == default)
 				throw new ArgumentNullException(nameof(downloadTime), "The Download Time cannot be null, or the default TimeSpan value.");
 
-			RawStatusFile = rawStatusFile;
+			RawContent = rawContent;
 			SourceUrl = sourceUrl;
 			DateReceived = dateReceived;
 			DownloadTime = downloadTime;
