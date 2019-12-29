@@ -56,7 +56,7 @@ namespace OneSim.Traffic.Map
 			TrafficApiSettings settings = Configuration.GetSection("TrafficApiSettings").Get<TrafficApiSettings>();
 
 			// Todo: Custom domain exception
-			if (settings == null) throw new Exception("The MapApiSettings were not found in the configuration file.");
+			if (settings == null) throw new Exception("The TrafficApiSettings were not found in the configuration file.");
 
 			NetworkType targetNetwork = settings.TargetNetwork;
 
