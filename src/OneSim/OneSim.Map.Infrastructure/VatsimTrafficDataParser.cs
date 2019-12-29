@@ -15,7 +15,7 @@
 	/// 	The VATSIM Status File Parser.
 	/// </summary>
 	[Network(NetworkType.Vatsim)]
-	public class VatsimStatusFileParser : IStatusFileParser
+	public class VatsimTrafficDataParser : ITrafficDataParser
 	{
 		/// <summary>
 		/// 	Parses the given <see cref="string"/> as a Status File.
@@ -24,12 +24,12 @@
 		///		The raw status file.
 		/// </param>
 		/// <returns>
-		///		The <see cref="StatusFileParseResult"/>.
+		///		The <see cref="TrafficDataParseResult"/>.
 		/// </returns>
-		public StatusFileParseResult Parse(string rawStatusFile)
+		public TrafficDataParseResult Parse(string rawStatusFile)
 		{
 			// Prepare our results
-			StatusFileParseResult result = new StatusFileParseResult();
+			TrafficDataParseResult result = new TrafficDataParseResult();
 
 			// Create a dictionary of each of the section headers along with their corresponding enum value
 			// Will use this to determine what section header we're looking for in the file
@@ -120,7 +120,7 @@
 				}
 				catch (Exception ex)
 				{
-					result.Errors.Add(new StatusFileParseError(currentLine, ex.Message, ex));
+					result.Errors.Add(new TrafficDataParseError(ex.Message, currentLine, ex));
 				}
 			}
 

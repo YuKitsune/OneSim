@@ -15,10 +15,10 @@ namespace OneSim.Map.Infrastructure
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The VATSIM <see cref="IStatusFileProvider"/>
+	/// 	The VATSIM <see cref="ITrafficDataProvider"/>
 	/// </summary>
 	[Network(NetworkType.Vatsim)]
-	public class VatsimStatusFileProvider : IStatusFileProvider
+	public class VatsimTrafficDataProvider : ITrafficDataProvider
 	{
 		/// <summary>
 		/// 	Gets or sets the last URL used to fetch the VATSIM Status data.
@@ -44,21 +44,21 @@ namespace OneSim.Map.Infrastructure
 		private DateTime _lastRootDownloadTime;
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="VatsimStatusFileProvider"/> class.
+		/// 	Initializes a new instance of the <see cref="VatsimTrafficDataProvider"/> class.
 		/// </summary>
 		/// <param name="settings">
 		///		The <see cref="VatsimStatusFileProviderSettings"/>.
 		/// </param>
-		public VatsimStatusFileProvider(VatsimStatusFileProviderSettings settings) =>
+		public VatsimTrafficDataProvider(VatsimStatusFileProviderSettings settings) =>
 			_settings = settings ?? throw new ArgumentNullException(nameof(settings), "The settings cannot be null.");
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="VatsimStatusFileProvider"/> class.
+		/// 	Initializes a new instance of the <see cref="VatsimTrafficDataProvider"/> class.
 		/// </summary>
 		/// <param name="configuration">
 		///		The <see cref="IConfiguration"/>.
 		/// </param>
-		public VatsimStatusFileProvider(IConfiguration configuration)
+		public VatsimTrafficDataProvider(IConfiguration configuration)
 		{
 			// Extract the settings from the configuration
 			VatsimStatusFileProviderSettings settings =
@@ -70,17 +70,17 @@ namespace OneSim.Map.Infrastructure
 		/// 	Gets the status file.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="StatusFileDownloadResult"/>.
+		///		The <see cref="TrafficDataFetchResult"/>.
 		/// </returns>
-		public StatusFileDownloadResult GetStatusFile() => GetStatusFileAsync().GetAwaiter().GetResult();
+		public TrafficDataFetchResult GetTrafficData() => GetTrafficDataAsync().GetAwaiter().GetResult();
 
 		/// <summary>
 		/// 	Gets the status file as an asynchronous operation.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="StatusFileDownloadResult"/>.
+		///		The <see cref="TrafficDataFetchResult"/>.
 		/// </returns>
-		public async Task<StatusFileDownloadResult> GetStatusFileAsync()
+		public async Task<TrafficDataFetchResult> GetTrafficDataAsync()
 		{
 			// If there is no previously used URL, or we need to refresh the URLs then download new URLs
 			if (string.IsNullOrEmpty(LastUsedUrl) ||
@@ -112,7 +112,7 @@ namespace OneSim.Map.Infrastructure
 			LastUsedUrl = url;
 
 			// Return the result
-			return new StatusFileDownloadResult(statusFile, url, downloadTime, stopwatch.Elapsed);
+			return new TrafficDataFetchResult(statusFile, url, downloadTime, stopwatch.Elapsed);
 		}
 
 		/// <summary>

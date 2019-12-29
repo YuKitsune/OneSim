@@ -108,7 +108,7 @@ CONNECTED CLIENTS = 317
 		public void PilotWithFlightPlanCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimTrafficDataParser parser = new VatsimTrafficDataParser();
 			Pilot expectedPilot = new Pilot
 								  {
 									  Callsign = "QFA238",
@@ -148,7 +148,7 @@ CONNECTED CLIENTS = 317
 								  };
 
 			// Act
-			List<StatusFileParseError> errors = new List<StatusFileParseError>();
+			List<TrafficDataParseError> errors = new List<TrafficDataParseError>();
 			Pilot pilot = parser.ParsePilotLine(PilotWithFlightPlan);
 
 			// Assert
@@ -192,7 +192,7 @@ CONNECTED CLIENTS = 317
 		public void PilotWithoutFlightPlanCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimTrafficDataParser parser = new VatsimTrafficDataParser();
 			Pilot expectedPilot = new Pilot
 								  {
 									  Callsign = "SWA6264",
@@ -210,7 +210,7 @@ CONNECTED CLIENTS = 317
 								  };
 
 			// Act
-			List<StatusFileParseError> errors = new List<StatusFileParseError>();
+			List<TrafficDataParseError> errors = new List<TrafficDataParseError>();
 			Pilot pilot = parser.ParsePilotLine(PilotWithoutFlightPlan);
 
 			// Assert
@@ -246,7 +246,7 @@ CONNECTED CLIENTS = 317
 		public void ControllerLineCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimTrafficDataParser parser = new VatsimTrafficDataParser();
 			AirTrafficController expectedController = new AirTrafficController
 													  {
 														  Callsign = "AS_TWR",
@@ -289,7 +289,7 @@ CONNECTED CLIENTS = 317
 		public void PreFileNoticeLineCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimTrafficDataParser parser = new VatsimTrafficDataParser();
 			FlightNotification expectedPreFile = new FlightNotification
 											{
 												Callsign = "JST442",
@@ -352,7 +352,7 @@ CONNECTED CLIENTS = 317
 		public void ServerLineCanParse()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimTrafficDataParser parser = new VatsimTrafficDataParser();
 			Server expectedServer = new Server
 									{
 										NetworkIdentifier = "SYD-1",
@@ -372,16 +372,16 @@ CONNECTED CLIENTS = 317
 		}
 
 		/// <summary>
-		/// 	Ensures the <see cref="VatsimStatusFileParser"/> can parse all required data from a file.
+		/// 	Ensures the <see cref="VatsimTrafficDataParser"/> can parse all required data from a file.
 		/// </summary>
 		[Test]
 		public void ParserCanParseWholeFile()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimTrafficDataParser parser = new VatsimTrafficDataParser();
 
 			// Act
-			StatusFileParseResult result = parser.Parse(StatusFileExample);
+			TrafficDataParseResult result = parser.Parse(StatusFileExample);
 
 			// Assert
 			Assert.AreEqual(0, result.Errors.Count);
@@ -392,13 +392,13 @@ CONNECTED CLIENTS = 317
 		}
 
 		/// <summary>
-		/// 	Ensures the <see cref="VatsimStatusFileParser.ParseFlightPlanAltitude"/> method works given an Altitude.
+		/// 	Ensures the <see cref="VatsimTrafficDataParser.ParseFlightPlanAltitude"/> method works given an Altitude.
 		/// </summary>
 		[Test]
 		public void AltitudeParserWorksWithAltitudes()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimTrafficDataParser parser = new VatsimTrafficDataParser();
 			string altitudeString1 = "A050";
 			string altitudeString2 = "050";
 			string altitudeString3 = "A95";
@@ -418,13 +418,13 @@ CONNECTED CLIENTS = 317
 		}
 
 		/// <summary>
-		/// 	Ensures the <see cref="VatsimStatusFileParser.ParseFlightPlanAltitude"/> method works given a Flight Level.
+		/// 	Ensures the <see cref="VatsimTrafficDataParser.ParseFlightPlanAltitude"/> method works given a Flight Level.
 		/// </summary>
 		[Test]
 		public void AltitudeParserWorksWithFlightLevels()
 		{
 			// Arrange
-			VatsimStatusFileParser parser = new VatsimStatusFileParser();
+			VatsimTrafficDataParser parser = new VatsimTrafficDataParser();
 			string flightLevelString1 = "FL380";
 			string flightLevelString2 = "FL 380";
 			string flightLevelString3 = "F280";

@@ -8,14 +8,14 @@ namespace OneSim.Map.Application.Abstractions
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The Historical Status Database Context containing previously used status files.
+	/// 	The interface representing a database containing previously used traffic data for archival purposes.
 	/// </summary>
 	public interface IHistoricalDbContext
 	{
 		/// <summary>
-		/// 	Gets or sets the <see cref="StatusFileArchiveEntry"/>s <see cref="DbSet{TEntity}"/>.
+		/// 	Gets or sets the <see cref="TrafficDataArchiveEntry"/>s <see cref="DbSet{TEntity}"/>.
 		/// </summary>
-		DbSet<StatusFileArchiveEntry> StatusFiles { get; set; }
+		DbSet<TrafficDataArchiveEntry> TrafficData { get; set; }
 
 		/// <summary>
 		/// 	Persists the changes to the database.

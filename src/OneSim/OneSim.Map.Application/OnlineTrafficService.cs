@@ -13,11 +13,10 @@ namespace OneSim.Map.Application
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The Status Service.
-	/// 	Responsible for parsing the Status files containing information about online ATC and pilots, and maintaining
-	/// 	a database of live, and historical data.
+	/// 	The service responsible for maintaining a database of who's currently connected to a specific Online Flight
+	///  	Simulation Network.
 	/// </summary>
-	public class StatusService
+	public class OnlineTrafficService
 	{
 		/// <summary>
 		/// 	The <see cref="IStatusFileProvider"/>.
@@ -42,10 +41,10 @@ namespace OneSim.Map.Application
 		/// <summary>
 		/// 	The <see cref="Logger{TCategoryName}"/>.
 		/// </summary>
-		private readonly ILogger<StatusService> _logger;
+		private readonly ILogger<OnlineTrafficService> _logger;
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="StatusService"/> class.
+		/// 	Initializes a new instance of the <see cref="OnlineTrafficService"/> class.
 		/// </summary>
 		/// <param name="statusFileProvider">
 		///		The <see cref="IStatusFileProvider"/>.
@@ -62,12 +61,12 @@ namespace OneSim.Map.Application
 		/// <param name="logger">
 		///		The <see cref="ILogger{TCategoryName}"/>.
 		/// </param>
-		public StatusService(
+		public OnlineTrafficService(
 			IStatusFileProvider statusFileProvider,
 			IStatusFileParser statusFileParser,
 			IStatusDbContext statusDbContext,
 			IHistoricalDbContext historicalDbContext,
-			ILogger<StatusService> logger)
+			ILogger<OnlineTrafficService> logger)
 		{
 			_statusFileProvider = statusFileProvider ?? throw new ArgumentNullException(nameof(statusFileProvider), "The Status File Provider cannot be null.");
 			_statusFileParser = statusFileParser ?? throw new ArgumentNullException(nameof(statusFileParser), "The Status File Parser cannot be null.");

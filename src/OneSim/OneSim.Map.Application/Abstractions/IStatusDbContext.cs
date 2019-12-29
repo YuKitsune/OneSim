@@ -8,7 +8,8 @@ namespace OneSim.Map.Application.Abstractions
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The Live Status Database Context containing the most up-to-date status data.
+	/// 	The interface representing a database containing the most up-to-date traffic data for a specific Online
+	/// 	Flight Simulation Network.
 	/// </summary>
 	public interface IStatusDbContext
 	{

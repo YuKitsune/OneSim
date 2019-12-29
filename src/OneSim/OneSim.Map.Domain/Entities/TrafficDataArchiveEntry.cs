@@ -3,9 +3,9 @@ namespace OneSim.Map.Domain.Entities
 	using System;
 
 	/// <summary>
-	/// 	The Status File Archive Entry.
+	/// 	The blah blah // Todo
 	/// </summary>
-	public class StatusFileArchiveEntry
+	public class TrafficDataArchiveEntry
 	{
 		/// <summary>
 		/// 	Gets or sets the ID.
