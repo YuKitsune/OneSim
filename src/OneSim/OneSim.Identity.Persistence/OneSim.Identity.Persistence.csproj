@@ -23,8 +23,8 @@
     <ItemGroup>
       <ProjectReference Include="..\OneSim.Identity.Application\OneSim.Identity.Application.csproj" />
       <ProjectReference Include="..\OneSim.Identity.Domain\OneSim.Identity.Domain.csproj" />
-      <ProjectReference Include="..\OneSim.Map.Application\OneSim.Map.Application.csproj" />
-      <ProjectReference Include="..\OneSim.Map.Domain\OneSim.Map.Domain.csproj" />
+      <ProjectReference Include="..\OneSim.Traffic.Application\OneSim.Traffic.Application.csproj" />
+      <ProjectReference Include="..\OneSim.Traffic.Domain\OneSim.Traffic.Domain.csproj" />
     </ItemGroup>
 
 </Project>

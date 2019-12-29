@@ -200,4 +200,5 @@ https://www.airservicesaustralia.com/naips/briefing-service?wsdl</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=prefile/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=SELCAL/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=VATSIM/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Vref/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Vref/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Whazzup/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OneSim.Traffic.Application\OneSim.Traffic.Application.csproj" />
+      <ProjectReference Include="..\OneSim.Traffic.Domain\OneSim.Traffic.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
