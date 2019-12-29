@@ -83,7 +83,7 @@ namespace OneSim.Map.Application
 		/// <returns>
 		///		The <see cref="Task"/>.
 		/// </returns>
-		public async Task UpdateStatusDataAsync()
+		public async Task UpdateTrafficDataAsync()
 		{
 			using (_logger.BeginScope("Updating Status data"))
 			{

@@ -127,7 +127,7 @@ namespace OneSim.Api.Map
 
 			int dataRefreshMinutes = settings.DataRefreshInterval;
 			RecurringJob.AddOrUpdate<OnlineTrafficService>("UpdateStatusData",
-													s => s.UpdateStatusDataAsync(),
+													s => s.UpdateTrafficDataAsync(),
 													$"*/{dataRefreshMinutes} * * * *");
 		}
 

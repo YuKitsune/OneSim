@@ -28,8 +28,7 @@ namespace OneSim.Map.Domain.Entities
 		public string Name { get; set; }
 
 		/// <summary>
-		///     Gets or sets the name of the server the client has connected to.
-		/// 	(Entities.Server.<see cref="Entities.Server.NetworkIdentifier"/>).
+		///     Gets or sets the <see cref="OneSim.Map.Domain.Entities.Server.NetworkIdentifier"/> of the server the client has connected to.
 		/// </summary>
 		public string Server { get; set; }
 
