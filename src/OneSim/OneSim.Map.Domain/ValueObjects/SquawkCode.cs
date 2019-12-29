@@ -23,7 +23,10 @@ namespace OneSim.Map.Domain.ValueObjects
 		/// </param>
 		public SquawkCode(string code)
 		{
-			// Check the length first
+			// Check for empty string
+			if (string.IsNullOrEmpty(code)) throw new InvalidSquawkCodeException(code, "Squawk codes cannot be null or empty.");
+
+			// Check the length is correct
 			if (code.Length > 4) throw new InvalidSquawkCodeException(code, "Squawk codes cannot be more than 4 characters long.");
 			if (code.Length < 4) throw new InvalidSquawkCodeException(code, "Squawk codes cannot be less than 4 characters long.");
 
@@ -149,19 +152,7 @@ namespace OneSim.Map.Domain.ValueObjects
 		/// <returns>
 		///		Whether or not the object on the left hand side is the same as the one on the right hand side.
 		/// </returns>
-		public static bool operator ==(SquawkCode obj1, SquawkCode obj2)
-		{
-			// ReSharper disable three times ConvertIfStatementToReturnStatement
-			// It looks fucking stupid
-
-			// Check they are not equal by default, or one of them is not null
-			if (ReferenceEquals(obj1, obj2)) return true;
-			if (ReferenceEquals(obj1, null)) return false;
-			if (ReferenceEquals(obj2, null)) return false;
-
-			// Compare the strings
-			return obj1._digits.SequenceEqual(obj2._digits);
-		}
+		public static bool operator ==(SquawkCode obj1, SquawkCode obj2) => obj1.Equals(obj2);
 
 		/// <summary>
 		/// 	Determines if the object on the left hand side is different to the one on the right hand side.
@@ -197,7 +188,7 @@ namespace OneSim.Map.Domain.ValueObjects
 				null => false,
 				string s => (ToString() == s),
 				int i => ((int) this == i),
-				SquawkCode code => _digits.SequenceEqual(code._digits),
+				SquawkCode code => _digits?.SequenceEqual(code._digits) ?? false,
 				_ => false
 			};
 		}

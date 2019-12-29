@@ -36,6 +36,17 @@ namespace OneSim.Map.Tests.Mocks
 		public List<Server> Servers { get; }
 
 		/// <summary>
+		/// 	Initializes a new instance of the <see cref="MockTrafficDataProvider"/> class.
+		/// </summary>
+		public MockTrafficDataProvider()
+		{
+			Pilots = new List<Pilot>();
+			Controllers = new List<AirTrafficController>();
+			FlightNotifications = new List<FlightNotification>();
+			Servers = new List<Server>();
+		}
+
+		/// <summary>
 		/// 	Gets the online traffic data.
 		/// </summary>
 		/// <returns>
