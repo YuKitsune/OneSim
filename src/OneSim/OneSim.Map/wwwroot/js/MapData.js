@@ -18,7 +18,7 @@ class MapDataFeed {
     
     refreshPilots() {
         console.log("Refreshing Pilots...");
-        $.get(this.statusFeedUrl + "/Status/Pilots".replace("//", "/"),
+        $.get(this.statusFeedUrl + "/TrafficData/Pilots".replace("//", "/"),
             function(data) {
                 try {
                     this.pilots = JSON.parse(data);

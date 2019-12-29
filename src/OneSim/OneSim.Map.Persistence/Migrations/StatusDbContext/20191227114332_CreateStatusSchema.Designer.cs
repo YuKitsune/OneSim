@@ -9,7 +9,7 @@ using OneSim.Map.Persistence;
 
 namespace OneSim.Map.Persistence.Migrations.StatusDbContext
 {
-    [DbContext(typeof(Persistence.StatusDbContext))]
+    [DbContext(typeof(Persistence.TrafficDbContext))]
     [Migration("20191227114332_CreateStatusSchema")]
     partial class CreateStatusSchema
     {

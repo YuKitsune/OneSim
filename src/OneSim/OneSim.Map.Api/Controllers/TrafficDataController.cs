@@ -11,41 +11,41 @@
 	using OneSim.Map.Persistence;
 
 	/// <summary>
-	/// 	The Status <see cref="Controller"/>.
+	/// 	The <see cref="Controller"/> serving the data current traffic data.
 	/// </summary>
-	public class StatusController : Controller
+	public class TrafficDataController : Controller
 	{
 		/// <summary>
-		/// 	The <see cref="StatusDbContext"/>.
+		/// 	The <see cref="TrafficDbContext"/>.
 		/// </summary>
-		private readonly StatusDbContext _dbContext;
+		private readonly TrafficDbContext _dbContext;
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="StatusController"/> class.
+		/// 	Initializes a new instance of the <see cref="TrafficDataController"/> class.
 		/// </summary>
 		/// <param name="dbContext">
-		///		The <see cref="StatusDbContext"/>.
+		///		The <see cref="TrafficDbContext"/>.
 		/// </param>
-		public StatusController(StatusDbContext dbContext) => _dbContext = dbContext;
+		public TrafficDataController(TrafficDbContext dbContext) => _dbContext = dbContext;
 
 		/// <summary>
-		/// 	Gets all of the current Status data in the form of a <see cref="CurrentStatus"/> object.
+		/// 	Gets all of the current traffic data in the form of a <see cref="CurrentTraffic"/> object.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="CurrentStatus"/> as a <see cref="JsonResult"/>.
+		///		The <see cref="CurrentTraffic"/> as a <see cref="JsonResult"/>.
 		/// </returns>
 		public async Task<JsonResult> All()
 		{
 			// Get all the data
-			CurrentStatus status = new CurrentStatus
-								   {
-									   Pilots = await _dbContext.Pilots.Include(p => p.FlightPlan).ToListAsync(),
-									   Controllers = await _dbContext.Controllers.ToListAsync(),
-									   FlightNotifications = await _dbContext.FlightNotifications.Include(n => n.FlightPlan).ToListAsync(),
-									   Servers = await _dbContext.Servers.ToListAsync()
-								   };
+			CurrentTraffic traffic = new CurrentTraffic
+									 {
+										 Pilots = await _dbContext.Pilots.ToListAsync(),
+										 Controllers = await _dbContext.Controllers.ToListAsync(),
+										 FlightNotifications = await _dbContext.FlightNotifications.Include(n => n.FlightPlan).ToListAsync(),
+										 Servers = await _dbContext.Servers.ToListAsync()
+									 };
 
-			return Json(status);
+			return Json(traffic);
 		}
 
 		/// <summary>

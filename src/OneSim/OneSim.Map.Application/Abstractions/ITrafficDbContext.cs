@@ -8,10 +8,10 @@ namespace OneSim.Map.Application.Abstractions
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The interface representing a database containing the most up-to-date traffic data for a specific Online
-	/// 	Flight Simulation Network.
+	/// 	The interface representing a database containing the most up-to-date traffic data for a specific traffic
+	/// 	data source.
 	/// </summary>
-	public interface IStatusDbContext
+	public interface ITrafficDbContext
 	{
 		/// <summary>
 		/// 	Gets or sets the <see cref="AirTrafficController"/>s <see cref="DbSet{TEntity}"/>.

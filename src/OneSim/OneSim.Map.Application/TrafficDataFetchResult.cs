@@ -3,7 +3,7 @@ namespace OneSim.Map.Application
 	using System;
 
 	/// <summary>
-	/// 	The results from fetching a set of traffic data from an Online Flight Simulation Network.
+	/// 	The results from fetching a set of traffic data.
 	/// </summary>
 	public class TrafficDataFetchResult
 	{

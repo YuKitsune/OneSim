@@ -7,20 +7,20 @@ namespace OneSim.Map.Persistence.DesignTimeFactories
 	using Microsoft.Extensions.Configuration;
 
 	/// <summary>
-	/// 	The <see cref="StatusDbContext"/>'s <see cref="IDesignTimeDbContextFactory{TContext}"/>.
+	/// 	The <see cref="TrafficDbContext"/>'s <see cref="IDesignTimeDbContextFactory{TContext}"/>.
 	/// </summary>
-	internal class StatusDbContextFactory : IDesignTimeDbContextFactory<StatusDbContext>
+	internal class TrafficDbContextFactory : IDesignTimeDbContextFactory<TrafficDbContext>
 	{
 		/// <summary>
-		/// 	Creates the <see cref="StatusDbContext"/>.
+		/// 	Creates the <see cref="TrafficDbContext"/>.
 		/// </summary>
 		/// <param name="args">
 		///		The arguments.
 		/// </param>
 		/// <returns>
-		///		The <see cref="StatusDbContext"/>.
+		///		The <see cref="TrafficDbContext"/>.
 		/// </returns>
-		public StatusDbContext CreateDbContext(string[] args)
+		public TrafficDbContext CreateDbContext(string[] args)
 		{
 			// Build config
 			IConfiguration config = new ConfigurationBuilder()
@@ -29,10 +29,10 @@ namespace OneSim.Map.Persistence.DesignTimeFactories
 								   .Build();
 
 			// Create options builder
-			DbContextOptionsBuilder<StatusDbContext> optionsBuilder = new DbContextOptionsBuilder<StatusDbContext>();
+			DbContextOptionsBuilder<TrafficDbContext> optionsBuilder = new DbContextOptionsBuilder<TrafficDbContext>();
 			optionsBuilder.UseNpgsql(config.GetConnectionString("StatusConnection"));
 
-			return new StatusDbContext(optionsBuilder.Options);
+			return new TrafficDbContext(optionsBuilder.Options);
 		}
 	}
 }

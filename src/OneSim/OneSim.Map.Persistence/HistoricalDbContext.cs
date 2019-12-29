@@ -6,7 +6,7 @@ namespace OneSim.Map.Persistence
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The Historical Status Database Context containing previously used status files.
+	/// 	The database containing previously used traffic data for archival purposes.
 	/// </summary>
 	public class HistoricalDbContext : DbContext, IHistoricalDbContext
 	{

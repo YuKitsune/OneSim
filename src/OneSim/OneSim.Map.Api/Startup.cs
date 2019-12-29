@@ -51,7 +51,7 @@ namespace OneSim.Api.Map
 		public void ConfigureServices(IServiceCollection services)
 		{
 			// Configure the database context
-			services.AddDbContext<StatusDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("StatusConnection")));
+			services.AddDbContext<TrafficDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("StatusConnection")));
 			services.AddDbContext<HistoricalDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("HistoricalConnection")));
 
 			MapApiSettings settings = Configuration.GetSection("MapApiSettings").Get<MapApiSettings>();
@@ -70,7 +70,7 @@ namespace OneSim.Api.Map
 			services.AddScoped(typeof(ITrafficDataParser), statusFileParserType);
 
 			// Add DbContext Interfaces
-			services.AddScoped<IStatusDbContext, StatusDbContext>();
+			services.AddScoped<ITrafficDbContext, TrafficDbContext>();
 			services.AddScoped<IHistoricalDbContext, HistoricalDbContext>();
 
 			// Add Hangfire services

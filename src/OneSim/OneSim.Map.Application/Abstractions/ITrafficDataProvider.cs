@@ -3,7 +3,7 @@ namespace OneSim.Map.Application.Abstractions
 	using System.Threading.Tasks;
 
 	/// <summary>
-	/// 	The interface for providing (by any means) Online Flight Simulation Network traffic data.
+	/// 	The interface for providing (by any means) traffic data.
 	/// </summary>
 	public interface ITrafficDataProvider
 	{

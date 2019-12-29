@@ -3,7 +3,7 @@ namespace OneSim.Map.Domain.Entities
 	using System;
 
 	/// <summary>
-	/// 	The blah blah // Todo
+	/// 	The object representing an archived set of traffic data.
 	/// </summary>
 	public class TrafficDataArchiveEntry
 	{
@@ -13,24 +13,23 @@ namespace OneSim.Map.Domain.Entities
 		public int Id { get; set; }
 
 		/// <summary>
-		/// 	Gets or sets the <see cref="DateTime"/> at which the <see cref="StatusFile"/> was downloaded.
+		/// 	Gets or sets the <see cref="DateReceived"/> at which the traffic data was downloaded.
 		/// </summary>
 		public DateTime DateReceived { get; set; }
 
 		/// <summary>
-		/// 	Gets or sets the <see cref="TimeSpan"/> representing the amount of time it took to download the
-		/// 	<see cref="StatusFile"/>.
+		/// 	Gets or sets the <see cref="TimeSpan"/> taken to fetch the traffic data.
 		/// </summary>
-		public TimeSpan DownloadTime { get; set; }
+		public TimeSpan FetchTime { get; set; }
 
 		/// <summary>
-		/// 	Gets or sets the URL where the <see cref="StatusFile"/> was downloaded from.
+		/// 	Gets or sets the <see cref="string"/> representing the source of the traffic data.
 		/// </summary>
-		public string SourceUrl { get; set; }
+		public string Source { get; set; }
 
 		/// <summary>
 		/// 	Gets or sets the <see cref="string"/> representing the raw status file.
 		/// </summary>
-		public string StatusFile { get; set; }
+		public string TrafficData { get; set; }
 	}
 }

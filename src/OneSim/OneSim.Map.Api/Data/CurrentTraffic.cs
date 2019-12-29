@@ -5,9 +5,9 @@ namespace OneSim.Api.Map.Data
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The current status data.
+	/// 	The class for presenting all the different elements of traffic data.
 	/// </summary>
-	public class CurrentStatus
+	public class CurrentTraffic
 	{
 		/// <summary>
 		/// 	Gets the <see cref="List{T}"/> of <see cref="Pilot"/>s.

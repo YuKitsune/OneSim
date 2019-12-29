@@ -10,7 +10,7 @@ namespace OneSim.Map.Persistence
 	/// <summary>
 	/// 	The Status <see cref="DbContext"/>
 	/// </summary>
-	public class StatusDbContext : DbContext, IStatusDbContext
+	public class TrafficDbContext : DbContext, ITrafficDbContext
 	{
 		/// <summary>
 		/// 	The <see cref="DbSet{TEntity}"/> of <see cref="AirTrafficController"/>s.
@@ -43,12 +43,12 @@ namespace OneSim.Map.Persistence
 		public DbSet<Server> Servers { get; set; }
 
 		/// <summary>
-		///     Initializes a new instance of the <see cref="StatusDbContext"/> class.
+		///     Initializes a new instance of the <see cref="TrafficDbContext"/> class.
 		/// </summary>
 		/// <param name="options">
 		///     The <see cref="DbContextOptions{TContext}"/>.
 		/// </param>
-		public StatusDbContext(DbContextOptions<StatusDbContext> options)
+		public TrafficDbContext(DbContextOptions<TrafficDbContext> options)
 			: base(options)
 		{
 		}
