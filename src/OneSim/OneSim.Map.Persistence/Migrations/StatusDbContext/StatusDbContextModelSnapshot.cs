@@ -8,9 +8,7 @@ using OneSim.Map.Persistence;
 
 namespace OneSim.Map.Persistence.Migrations.StatusDbContext
 {
-    using StatusDbContext = OneSim.Map.Persistence.StatusDbContext;
-
-    [DbContext(typeof(StatusDbContext))]
+    [DbContext(typeof(TrafficDbContext))]
     partial class StatusDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

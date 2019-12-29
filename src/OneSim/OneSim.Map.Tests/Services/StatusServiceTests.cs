@@ -5,7 +5,7 @@ namespace OneSim.Map.Tests.Services
 	using OneSim.Map.Application;
 
 	/// <summary>
-	/// 	The <see cref="StatusService"/> Tests.
+	/// 	The <see cref="OnlineTrafficService"/> Tests.
 	/// </summary>
 	[TestFixture]
 	public class StatusServiceTests

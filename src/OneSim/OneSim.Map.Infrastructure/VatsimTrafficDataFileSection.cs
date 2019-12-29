@@ -3,9 +3,9 @@ namespace OneSim.Map.Infrastructure
 	using System;
 
 	/// <summary>
-	/// 	The Status File sections found in the VATSIM Status file.
+	/// 	The sections of the VATSIM traffic data file.
 	/// </summary>
-	public enum VatsimStatusFileSection
+	public enum VatsimTrafficDataFileSection
 	{
 		/// <summary>
 		/// 	The general information section.
@@ -15,7 +15,7 @@ namespace OneSim.Map.Infrastructure
 		/// <summary>
 		/// 	The voice servers section.
 		/// </summary>
-		[Obsolete("No networks are using voice servers anymore.")]
+		[Obsolete("VATSIM no longer uses voice servers. However the section still exists.")]
 		VoiceServers,
 
 		/// <summary>
@@ -24,7 +24,7 @@ namespace OneSim.Map.Infrastructure
 		Clients,
 
 		/// <summary>
-		/// 	The server section.
+		/// 	The servers section.
 		/// </summary>
 		Servers,
 

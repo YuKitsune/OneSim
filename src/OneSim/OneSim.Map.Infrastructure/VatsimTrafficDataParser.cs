@@ -12,59 +12,62 @@
 	using OneSim.Map.Infrastructure.Exceptions;
 
 	/// <summary>
-	/// 	The VATSIM Status File Parser.
+	/// 	The <see cref="ITrafficDataParser"/> for parsing data containing online traffic data from the VATSIM network.
 	/// </summary>
 	[Network(NetworkType.Vatsim)]
-	public class VatsimStatusFileParser : IStatusFileParser
+	public class VatsimTrafficDataParser : ITrafficDataParser
 	{
-		/// <summary>
-		/// 	Parses the given <see cref="string"/> as a Status File.
-		/// </summary>
-		/// <param name="rawStatusFile">
-		///		The raw status file.
-		/// </param>
-		/// <returns>
-		///		The <see cref="StatusFileParseResult"/>.
-		/// </returns>
-		public StatusFileParseResult Parse(string rawStatusFile)
+		///  <summary>
+		///  	Parses the given <see cref="string"/> as online traffic data.
+		///  </summary>
+		///  <param name="trafficData">
+		/// 		The online traffic data in the form of a <see cref="string"/>..
+		///  </param>
+		///  <exception cref="NotSupportedException"></exception>
+		///  <returns>
+		/// 		The <see cref="TrafficDataParseResult"/>.
+		///  </returns>
+		public TrafficDataParseResult Parse(string trafficData)
 		{
 			// Prepare our results
-			StatusFileParseResult result = new StatusFileParseResult();
+			TrafficDataParseResult result = new TrafficDataParseResult();
 
 			// Create a dictionary of each of the section headers along with their corresponding enum value
 			// Will use this to determine what section header we're looking for in the file
-			Dictionary<VatsimStatusFileSection, string> sectionHeaders =
-				new Dictionary<VatsimStatusFileSection, string>
+			Dictionary<VatsimTrafficDataFileSection, string> sectionHeaders =
+				new Dictionary<VatsimTrafficDataFileSection, string>
 				{
-					{ VatsimStatusFileSection.General, "!GENERAL" },
+					{ VatsimTrafficDataFileSection.General, "!GENERAL" },
 #pragma warning disable 618
-					{ VatsimStatusFileSection.VoiceServers, "!VOICE SERVERS" },
+					{ VatsimTrafficDataFileSection.VoiceServers, "!VOICE SERVERS" },
 #pragma warning restore 618
-					{ VatsimStatusFileSection.Clients, "!CLIENTS" },
-					{ VatsimStatusFileSection.Servers, "!SERVERS" },
-					{ VatsimStatusFileSection.Prefile, "!PREFILE" },
+					{ VatsimTrafficDataFileSection.Clients, "!CLIENTS" },
+					{ VatsimTrafficDataFileSection.Servers, "!SERVERS" },
+					{ VatsimTrafficDataFileSection.Prefile, "!PREFILE" },
 				};
 
 			// For keeping track of what section we're currently in
-			VatsimStatusFileSection? currentSection = null;
+			VatsimTrafficDataFileSection? currentSection = null;
 
 			// Split the status file by each new line
-			string[] lines = rawStatusFile.Split(new[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+			string[] lines = trafficData.Split(new[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
 			// Loop through ever line (Decided to use a simple for loop for performance)
-			string currentLine = string.Empty;
 			for (int i = 0; i < lines.Length; i++)
 			{
-				currentLine = lines[i];
+				// Track the current line
+				string currentLine = lines[i];
 
 				// Ignore comments and blank lines
 				if (string.IsNullOrEmpty(currentLine) ||
-					currentLine.StartsWith(";", StringComparison.Ordinal))
+					currentLine.StartsWith(";", StringComparison.Ordinal) ||
+					currentLine.StartsWith("#", StringComparison.Ordinal))
 					continue;
 
 				// Check if we've hit a section header
 				if (sectionHeaders.Any(s => currentLine.StartsWith(s.Value, StringComparison.Ordinal)))
 				{
+					// Remember the section so we know how to parse the next line(s)
 					currentSection = sectionHeaders.FirstOrDefault(s => currentLine.StartsWith(s.Value, StringComparison.Ordinal)).Key;
 
 					// Can't read the current line if it's a header
@@ -78,8 +81,8 @@
 				{
 					switch (currentSection)
 					{
-						case VatsimStatusFileSection.Clients:
-							// Parse the current line as a Client
+						// Parse the current line as a Client
+						case VatsimTrafficDataFileSection.Clients:
 							BaseClient client = ParseClientLine(currentLine);
 							switch (client)
 							{
@@ -100,15 +103,15 @@
 
 							break;
 
-						case VatsimStatusFileSection.Servers:
-							// Parse the current line as a Server
+						// Parse the current line as a Server
+						case VatsimTrafficDataFileSection.Servers:
 							Server server = ParseServerLine(currentLine);
 							result.Servers.Add(server);
 
 							break;
 
-						case VatsimStatusFileSection.Prefile:
-							// Parse the current line as a Flight Notification
+						// Parse the current line as a Flight Notification
+						case VatsimTrafficDataFileSection.Prefile:
 							FlightNotification flightNotification = ParseFlightNotificationLine(currentLine);
 							result.FlightNotifications.Add(flightNotification);
 
@@ -120,7 +123,7 @@
 				}
 				catch (Exception ex)
 				{
-					result.Errors.Add(new StatusFileParseError(currentLine, ex.Message, ex));
+					result.Errors.Add(new TrafficDataParseError(ex.Message, currentLine, ex));
 				}
 			}
 
@@ -138,23 +141,17 @@
 		/// </returns>
 		public BaseClient ParseClientLine(string clientLine)
 		{
-			// Make sure we have our 42 fields
 			string[] pilotLineSections = clientLine.Split(':');
-			if (pilotLineSections.Length != 42)
-			{
-				throw new InvalidLineException(clientLine, $"Client line found containing {pilotLineSections.Length} elements. Only parsing Client lines with 42 elements is supported.");
-			}
 
-			// Check what kind type of client we're parsing
+			// Check what kind of client we're parsing
 			string clientType = pilotLineSections[3];
-			switch (clientType)
+
+			return clientType switch
 			{
-				case "PILOT": return ParsePilotLine(clientLine);
-
-				case "ATC": return ParseControllerLine(clientLine);
-
-				default: throw new NotSupportedException($"Unexpected Client Type {clientType}.");
-			}
+				"PILOT" => ParsePilotLine(clientLine),
+				"ATC" => ParseControllerLine(clientLine),
+				_ => throw new NotSupportedException($"Unexpected Client Type {clientType}.")
+			};
 		}
 
 		/// <summary>
@@ -168,12 +165,7 @@
 		/// </returns>
 		public Pilot ParsePilotLine(string pilotLine)
 		{
-			// Make sure we have our 42 fields
 			string[] pilotLineSections = pilotLine.Split(':');
-			if (pilotLineSections.Length != 42)
-			{
-				throw new InvalidLineException(pilotLine, $"Pilot line found containing {pilotLineSections.Length} elements. Only parsing Pilot lines with 42 elements is supported.");
-			}
 
 			// Only looking for pilots
 			string clientType = pilotLineSections[3];
@@ -249,12 +241,7 @@
 		/// </returns>
 		public AirTrafficController ParseControllerLine(string controllerLine)
 		{
-			// Make sure we have our 42 fields
 			string[] controllerLineSections = controllerLine.Split(':');
-			if (controllerLineSections.Length != 42)
-			{
-				throw new InvalidLineException(controllerLine, $"Controller line found containing {controllerLineSections.Length} elements. Only parsing Controller lines with 42 elements is supported.");
-			}
 
 			// Only looking for controllers
 			string clientType = controllerLineSections[3];
@@ -295,10 +282,6 @@
 		{
 			// Make sure we have our 42 fields
 			string[] preFileNoticeLineSections = preFileNoticeLine.Split(':');
-			if (preFileNoticeLineSections.Length != 42)
-			{
-				throw new InvalidLineException(preFileNoticeLine, $"Pre-File Notice line found containing {preFileNoticeLineSections.Length} elements. Only parsing Pre-File Notice lines with 42 elements is supported.");
-			}
 
 			// Create the Pre-File Notice
 			FlightNotification flightNotification = new FlightNotification
@@ -344,12 +327,7 @@
 		/// </returns>
 		public Server ParseServerLine(string serverLine)
 		{
-			// Make sure we have our 6 fields
 			string[] serverFields = serverLine.Split(':');
-			if (serverFields.Length != 6)
-			{
-				throw new InvalidLineException(serverLine, $"Server line found containing {serverFields.Length} elements. Only parsing server lines with 6 elements is supported.");
-			}
 
 			// Create the server
 			Server server = new Server

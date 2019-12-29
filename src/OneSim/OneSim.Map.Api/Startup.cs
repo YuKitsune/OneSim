@@ -51,7 +51,7 @@ namespace OneSim.Api.Map
 		public void ConfigureServices(IServiceCollection services)
 		{
 			// Configure the database context
-			services.AddDbContext<StatusDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("StatusConnection")));
+			services.AddDbContext<TrafficDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("StatusConnection")));
 			services.AddDbContext<HistoricalDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("HistoricalConnection")));
 
 			MapApiSettings settings = Configuration.GetSection("MapApiSettings").Get<MapApiSettings>();
@@ -62,15 +62,15 @@ namespace OneSim.Api.Map
 			NetworkType targetNetwork = settings.TargetNetwork;
 
 			// Get the StatusFileProvider
-			Type statusFileProviderType = GetImplementationFor<IStatusFileProvider>(targetNetwork, "OneSim.Map.Infrastructure");
-			services.AddScoped(typeof(IStatusFileProvider), statusFileProviderType);
+			Type statusFileProviderType = GetImplementationFor<ITrafficDataProvider>(targetNetwork, "OneSim.Map.Infrastructure");
+			services.AddScoped(typeof(ITrafficDataProvider), statusFileProviderType);
 
 			// Get the StatusFileParser
-			Type statusFileParserType = GetImplementationFor<IStatusFileParser>(targetNetwork, "OneSim.Map.Infrastructure");
-			services.AddScoped(typeof(IStatusFileParser), statusFileParserType);
+			Type statusFileParserType = GetImplementationFor<ITrafficDataParser>(targetNetwork, "OneSim.Map.Infrastructure");
+			services.AddScoped(typeof(ITrafficDataParser), statusFileParserType);
 
 			// Add DbContext Interfaces
-			services.AddScoped<IStatusDbContext, StatusDbContext>();
+			services.AddScoped<ITrafficDbContext, TrafficDbContext>();
 			services.AddScoped<IHistoricalDbContext, HistoricalDbContext>();
 
 			// Add Hangfire services
@@ -126,8 +126,8 @@ namespace OneSim.Api.Map
 			if (settings == null) throw new Exception("The MapApiSettings were not found in the configuration file.");
 
 			int dataRefreshMinutes = settings.DataRefreshInterval;
-			RecurringJob.AddOrUpdate<StatusService>("UpdateStatusData",
-													s => s.UpdateStatusDataAsync(),
+			RecurringJob.AddOrUpdate<OnlineTrafficService>("UpdateStatusData",
+													s => s.UpdateTrafficDataAsync(),
 													$"*/{dataRefreshMinutes} * * * *");
 		}
 

@@ -15,81 +15,83 @@ namespace OneSim.Map.Infrastructure
 	using OneSim.Map.Domain.Entities;
 
 	/// <summary>
-	/// 	The VATSIM <see cref="IStatusFileProvider"/>
+	/// 	The <see cref="ITrafficDataProvider"/> for fetching the VATSIM traffic data.
 	/// </summary>
 	[Network(NetworkType.Vatsim)]
-	public class VatsimStatusFileProvider : IStatusFileProvider
+	public class VatsimTrafficDataProvider : ITrafficDataProvider
 	{
 		/// <summary>
-		/// 	Gets or sets the last URL used to fetch the VATSIM Status data.
-		/// </summary>
-		/// <remarks>
-		///		Need to keep track of this so we don't make the same request to the same server too often.
-		/// </remarks>
-		private static string LastUsedUrl { get; set; }
-
-		/// <summary>
-		/// 	The <see cref="VatsimStatusFileProviderSettings"/>.
-		/// </summary>
-		private readonly VatsimStatusFileProviderSettings _settings;
-
-		/// <summary>
-		/// 	The Status file URLs.
+		/// 	The URLs to traffic data files found in the status file.
 		/// </summary>
 		private List<string> _statusUrls;
 
 		/// <summary>
-		/// 	The last <see cref="DateTime"/> at which the root status file was downloaded.
+		/// 	The last <see cref="DateTime"/> at which the status file was downloaded.
 		/// </summary>
 		private DateTime _lastRootDownloadTime;
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="VatsimStatusFileProvider"/> class.
+		/// 	Gets or sets the last URL used to fetch the VATSIM traffic data.
+		/// </summary>
+		/// <remarks>
+		///		Need to keep track of this so we don't make the same request to the same server too often.
+		/// 	If we make a request to the same server multiple times in a row, we may get temporarily IP blocked from
+		/// 	the server.
+		/// </remarks>
+		private static string LastUsedUrl { get; set; }
+
+		/// <summary>
+		/// 	The <see cref="VatsimTrafficDataProviderSettings"/>.
+		/// </summary>
+		private readonly VatsimTrafficDataProviderSettings _settings;
+
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="VatsimTrafficDataProvider"/> class.
 		/// </summary>
 		/// <param name="settings">
-		///		The <see cref="VatsimStatusFileProviderSettings"/>.
+		///		The <see cref="VatsimTrafficDataProviderSettings"/>.
 		/// </param>
-		public VatsimStatusFileProvider(VatsimStatusFileProviderSettings settings) =>
+		public VatsimTrafficDataProvider(VatsimTrafficDataProviderSettings settings) =>
 			_settings = settings ?? throw new ArgumentNullException(nameof(settings), "The settings cannot be null.");
 
 		/// <summary>
-		/// 	Initializes a new instance of the <see cref="VatsimStatusFileProvider"/> class.
+		/// 	Initializes a new instance of the <see cref="VatsimTrafficDataProvider"/> class.
 		/// </summary>
 		/// <param name="configuration">
 		///		The <see cref="IConfiguration"/>.
 		/// </param>
-		public VatsimStatusFileProvider(IConfiguration configuration)
+		public VatsimTrafficDataProvider(IConfiguration configuration)
 		{
 			// Extract the settings from the configuration
-			VatsimStatusFileProviderSettings settings =
-				configuration.GetSection("StatusProviderSettings").Get<VatsimStatusFileProviderSettings>();
-			_settings = settings ?? throw new ArgumentNullException(nameof(settings), "Couldn't find the \"StatusProviderSettings\" section in the configuration.");
+			VatsimTrafficDataProviderSettings settings =
+				configuration.GetSection("TrafficDataProviderSettings").Get<VatsimTrafficDataProviderSettings>();
+			_settings = settings ?? throw new ArgumentNullException(nameof(settings), "Couldn't find the \"TrafficDataProviderSettings\" section in the configuration.");
 		}
 
 		/// <summary>
-		/// 	Gets the status file.
+		/// 	Gets the online traffic data.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="StatusFileDownloadResult"/>.
+		///		The <see cref="TrafficDataFetchResult"/>.
 		/// </returns>
-		public StatusFileDownloadResult GetStatusFile() => GetStatusFileAsync().GetAwaiter().GetResult();
+		public TrafficDataFetchResult GetTrafficData() => GetTrafficDataAsync().GetAwaiter().GetResult();
 
 		/// <summary>
-		/// 	Gets the status file as an asynchronous operation.
+		/// 	Gets the online traffic data as an asynchronous operation.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="StatusFileDownloadResult"/>.
+		///		The <see cref="TrafficDataFetchResult"/>.
 		/// </returns>
-		public async Task<StatusFileDownloadResult> GetStatusFileAsync()
+		public async Task<TrafficDataFetchResult> GetTrafficDataAsync()
 		{
-			// If there is no previously used URL, or we need to refresh the URLs then download new URLs
+			// If there is no previously used URL, or we need to refresh the status file then download new URLs
 			if (string.IsNullOrEmpty(LastUsedUrl) ||
-				DateTime.UtcNow >= _lastRootDownloadTime.AddMinutes(_settings.MinutesBeforeRootRefresh))
+				DateTime.UtcNow >= _lastRootDownloadTime.AddMinutes(_settings.MinutesBeforeStatusRefresh))
 			{
 				string rootStatusFile = await GetRootStatusFileAsync();
 				_statusUrls = GetStatusUrls(rootStatusFile).ToList();
 
-				// If we've run out of URLs, then throw an exception
+				// If we couldn't find ant urls, then throw an exception
 				if (!_statusUrls.Any()) throw new Exception("Could not find any status URLs.");
 
 				// Set the last URL used to the first one
@@ -99,6 +101,8 @@ namespace OneSim.Map.Infrastructure
 			// Get a random URL and convert to a URI
 			string url = GetRandomUrl(_statusUrls, LastUsedUrl);
 			Uri uri = new Uri(url);
+
+			// Todo: If we encounter an error here, we should try a different URL
 
 			// Download the status file and time the duration
 			using WebClient client = new WebClient();
@@ -112,7 +116,7 @@ namespace OneSim.Map.Infrastructure
 			LastUsedUrl = url;
 
 			// Return the result
-			return new StatusFileDownloadResult(statusFile, url, downloadTime, stopwatch.Elapsed);
+			return new TrafficDataFetchResult(statusFile, url, downloadTime, stopwatch.Elapsed);
 		}
 
 		/// <summary>
@@ -124,7 +128,7 @@ namespace OneSim.Map.Infrastructure
 		private async Task<string> GetRootStatusFileAsync()
 		{
 			using WebClient client = new WebClient();
-			Uri rootUri = new Uri(_settings.RootStatusUrl);
+			Uri rootUri = new Uri(_settings.StatusUrl);
 			string rootDataFile = await client.DownloadStringTaskAsync(rootUri);
 
 			_lastRootDownloadTime = DateTime.UtcNow;
@@ -184,8 +188,14 @@ namespace OneSim.Map.Infrastructure
 			{
 				urlList.Remove(excludeUrl);
 
-				// Check we haven't lost all URLs
-				if (!urlList.Any()) throw new Exception($"Asked to exclude \"{excludeUrl}\", but it's the only available URL in the list.");
+				// Todo: Figure out what to do here. It's possible only one URL could be available, and we're asking to
+				// exclude it
+				if (!urlList.Any())
+				{
+					return excludeUrl;
+
+					// throw new Exception($"Asked to exclude \"{excludeUrl}\", but it's the only available URL in the list.");
+				}
 			}
 
 			// Take a random index
