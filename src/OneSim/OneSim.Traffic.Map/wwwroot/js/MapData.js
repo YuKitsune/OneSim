@@ -18,10 +18,15 @@ class MapDataFeed {
     
     refreshPilots() {
         console.log("Refreshing Pilots...");
-        $.get(this.statusFeedUrl + "/TrafficData/Pilots".replace("//", "/"),
+        $.get(this.statusFeedUrl + "/TrafficData/Pilots",
             function(data) {
                 try {
-                    this.pilots = JSON.parse(data);
+                    this.pilots = data;
+                    for (var i = 0; i < this.pilots.length; i++) {
+                        var marker = new mapboxgl.Marker()
+                            .setLngLat([this.pilots[i].Longitude, this.pilots[i].Latitude])
+                            .addTo(map);
+                    }
                 } catch (e){
                     console.error("Failed to download pilots.");
                     console.error(e);
