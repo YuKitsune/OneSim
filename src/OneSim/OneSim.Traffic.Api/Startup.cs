@@ -10,6 +10,7 @@ namespace OneSim.Traffic.Map
 
 	using Microsoft.AspNetCore.Builder;
 	using Microsoft.AspNetCore.Hosting;
+	using Microsoft.AspNetCore.HttpOverrides;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@ namespace OneSim.Traffic.Map
 	using OneSim.Traffic.Application.Abstractions;
 	using OneSim.Traffic.Domain.Attributes;
 	using OneSim.Traffic.Domain.Entities;
+	using OneSim.Traffic.Domain.ValueObjects.Converters;
 	using OneSim.Traffic.Persistence;
 
 	/// <summary>
@@ -83,7 +85,16 @@ namespace OneSim.Traffic.Map
 
 			// Use Newtonsoft.Json for controller actions. Just makes things easier on the client side if we're all
 			// using the same thing.
-			services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+			services.AddControllers()
+					.AddNewtonsoftJson(options =>
+									   {
+										   options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+										   options.SerializerSettings.Converters.Add(new SquawkCodeConverter());
+									   });
+
+			services.AddCors(options => options.AddPolicy("AllowApi",
+														  builder =>
+															  builder.AllowAnyOrigin().AllowAnyHeader()));
 		}
 
 		/// <summary>
@@ -108,12 +119,20 @@ namespace OneSim.Traffic.Map
 				app.UseHsts();
 			}
 
+			// Add these things for some reverse proxy thing that i don't understand
+			app.UseForwardedHeaders(new ForwardedHeadersOptions
+									{
+										ForwardedHeaders =
+											ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+									});
+
 			// TODO: Add authentication with the Identity server over the hangfire dashboard
 			app.UseHangfireServer();
 			app.UseHangfireDashboard();
 
 			app.UseHttpsRedirection();
 			app.UseRouting();
+			app.UseCors("AllowApi");
 			app.UseEndpoints(endpoints =>
 								 endpoints.MapControllerRoute(name: "default",
 															  pattern: "{controller=TrafficData}/{action=All}/{id?}"));
