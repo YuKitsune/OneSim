@@ -41,6 +41,11 @@ namespace OneSim.Traffic.Application
 		private readonly IHistoricalDbContext _historicalDbContext;
 
 		/// <summary>
+		/// 	The <see cref="ITrafficNotifier"/>.
+		/// </summary>
+		private readonly ITrafficNotifier _notifier;
+
+		/// <summary>
 		/// 	The <see cref="Logger{TCategoryName}"/>.
 		/// </summary>
 		private readonly ILogger<OnlineTrafficService> _logger;
@@ -60,6 +65,9 @@ namespace OneSim.Traffic.Application
 		/// <param name="historicalDbContext">
 		///		The <see cref="IHistoricalDbContext"/>.
 		/// </param>
+		/// <param name="notifier">
+		///		The <see cref="ITrafficNotifier"/>.
+		/// </param>
 		/// <param name="logger">
 		///		The <see cref="ILogger{TCategoryName}"/>.
 		/// </param>
@@ -68,12 +76,14 @@ namespace OneSim.Traffic.Application
 			ITrafficDataParser statusFileParser,
 			ITrafficDbContext trafficDbContext,
 			IHistoricalDbContext historicalDbContext,
+			ITrafficNotifier notifier,
 			ILogger<OnlineTrafficService> logger)
 		{
 			_statusFileProvider = statusFileProvider ?? throw new ArgumentNullException(nameof(statusFileProvider), "The Traffic Data Provider cannot be null.");
 			_statusFileParser = statusFileParser ?? throw new ArgumentNullException(nameof(statusFileParser), "The Traffic Data Parser cannot be null.");
 			_trafficDbContext = trafficDbContext ?? throw new ArgumentNullException(nameof(trafficDbContext), "The Traffic DbContext cannot be null.");
 			_historicalDbContext = historicalDbContext ?? throw new ArgumentNullException(nameof(historicalDbContext), "The Historical DbContext cannot be null.");
+			_notifier = notifier ?? throw new ArgumentNullException(nameof(notifier), "The Traffic Notifier cannot be null.");
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger), "The Logger cannot be null.");
 		}
 
@@ -122,6 +132,9 @@ namespace OneSim.Traffic.Application
 
 					_logger.LogInformation("Database update complete.");
 				}
+
+				// Notify the subscribers to new traffic info
+				await _notifier.NewTrafficDataAvailableAsync();
 			}
 		}
 

@@ -15,6 +15,12 @@ class MapDataFeed {
         this.pilots = [];
         this.markers = [];
         this.controllers = [];
+
+        // Connect SignalR
+        this.connection = new signalR.HubConnectionBuilder().withUrl(statusFeedUrl + "/TrafficDataHub").build();
+
+        // Setup the messages
+        this.connection.on("NewTrafficDataAvailable", this.refreshPilots);
     }
     
     refreshPilots() {

@@ -23,6 +23,7 @@ namespace OneSim.Traffic.Map
 	using OneSim.Traffic.Domain.Attributes;
 	using OneSim.Traffic.Domain.Entities;
 	using OneSim.Traffic.Domain.ValueObjects.Converters;
+	using OneSim.Traffic.Infrastructure;
 	using OneSim.Traffic.Persistence;
 
 	/// <summary>
@@ -74,6 +75,9 @@ namespace OneSim.Traffic.Map
 			services.AddScoped<ITrafficDbContext, TrafficDbContext>();
 			services.AddScoped<IHistoricalDbContext, HistoricalDbContext>();
 
+			// Add TrafficNotifier Interface
+			services.AddTransient<ITrafficNotifier, SignalRTrafficNotifier>();
+
 			// Add Hangfire services
 			services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
 															   .UseSimpleAssemblyNameTypeSerializer()
@@ -95,6 +99,9 @@ namespace OneSim.Traffic.Map
 			services.AddCors(options => options.AddPolicy("AllowApi",
 														  builder =>
 															  builder.AllowAnyOrigin().AllowAnyHeader()));
+
+			// Add SignalR
+			services.AddSignalR();
 		}
 
 		/// <summary>
@@ -134,8 +141,14 @@ namespace OneSim.Traffic.Map
 			app.UseRouting();
 			app.UseCors("AllowApi");
 			app.UseEndpoints(endpoints =>
+							 {
+								 // Map controller endpoints
 								 endpoints.MapControllerRoute(name: "default",
-															  pattern: "{controller=TrafficData}/{action=All}/{id?}"));
+															  pattern: "{controller=TrafficData}/{action=All}/{id?}");
+
+								 // Map SignalR hub
+								 endpoints.MapHub<SignalRTrafficNotifier>("/TrafficDataHub");
+							 });
 
 			// Setup the Traffic Data Refresh job
 			TrafficApiSettings settings = Configuration.GetSection("TrafficApiSettings").Get<TrafficApiSettings>();
