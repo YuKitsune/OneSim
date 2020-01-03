@@ -1,13 +1,16 @@
-﻿using System;
-
-namespace OneSim.Traffic.ConsoleClient
+﻿namespace OneSim.Traffic.ConsoleClient
 {
+	using System;
+	using System.Net;
+	using System.Net.Http;
 	using System.Threading.Tasks;
 
 	using Microsoft.AspNetCore.SignalR.Client;
 
-	class Program
+	public class Program
 	{
+		public static HubConnection Connection { get; set; }
+
 		static void Main(string[] args)
 		{
 			Console.WriteLine("Hello World!");
@@ -17,24 +20,34 @@ namespace OneSim.Traffic.ConsoleClient
 
 			string url = domainName + "/TrafficDataHub";
 			Console.WriteLine($"Building connection for \"{url}\".");
+			Connection = new HubConnectionBuilder()
+						.WithUrl(url,
+								 conf => conf.HttpMessageHandlerFactory = (x) => new HttpClientHandler
+																				 {
+																					 ServerCertificateCustomValidationCallback
+																						 = HttpClientHandler
+																							.DangerousAcceptAnyServerCertificateValidator,
+																				 })
+						.Build();
 
-			try
-			{
+			Connection.StartAsync()
+					  .ContinueWith(task =>
+									{
+										if (task.IsFaulted)
+										{
+											Console.WriteLine($"There was an error opening the connection:{task.Exception.GetBaseException()}");
+										}
+										else
+										{
+											Console.WriteLine("Connected");
+										}
+									})
+					  .Wait();
 
-				HubConnection = connection = new HubConnectionBuilder()
-											.WithUrl(url)
-											.Build();
+			Connection.On("NewTrafficDataAvailable", () => Console.WriteLine("New Traffic Data Available."));
 
-				connection.Closed += async (error) =>
-									 {
-										 await Task.Delay(new Random().Next(0,5) * 1000);
-										 await connection.StartAsync();
-									 };
-			}
-			catch (Exception ex)
-			{
-				
-			}
+			Console.Read();
+			Connection.StopAsync();
 		}
 	}
 }

@@ -1,5 +1,6 @@
 namespace OneSim.Traffic.Infrastructure
 {
+	using System;
 	using System.Threading.Tasks;
 
 	using Microsoft.AspNetCore.SignalR;
@@ -10,8 +11,22 @@ namespace OneSim.Traffic.Infrastructure
 	/// 	The SignalR <see cref="ITrafficNotifier"/> implementation for sending traffic data notifications over a
 	/// 	SignalR connection.
 	/// </summary>
-	public class SignalRTrafficNotifier : Hub, ITrafficNotifier
+	public class SignalRTrafficNotifier : ITrafficNotifier
 	{
+		/// <summary>
+		/// 	The <see cref="IHubContext{THub}"/> for the <see cref="TrafficDataHub"/>.
+		/// </summary>
+		private readonly IHubContext<TrafficDataHub> _hubContext;
+
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="SignalRTrafficNotifier"/> class.
+		/// </summary>
+		/// <param name="hubContext">
+		///		The <see cref="IHubContext{THub}"/> for the <see cref="TrafficDataHub"/>.
+		/// </param>
+		public SignalRTrafficNotifier(IHubContext<TrafficDataHub> hubContext) => _hubContext = hubContext ??
+																							   throw new ArgumentNullException(nameof(hubContext), "The HubContext cannot be null");
+
 		/// <summary>
 		/// 	Notifies the subscribers that there is new traffic data available.
 		/// </summary>
@@ -20,6 +35,9 @@ namespace OneSim.Traffic.Infrastructure
 		/// <summary>
 		/// 	Notifies the subscribers that there is new traffic data available as an asynchronous operation.
 		/// </summary>
-		public async Task NewTrafficDataAvailableAsync() => await Clients.All.SendAsync("NewTrafficDataAvailable");
+		public async Task NewTrafficDataAvailableAsync()
+		{
+			await _hubContext.Clients.All.SendAsync("NewTrafficDataAvailable");
+		}
 	}
 }
