@@ -11,6 +11,7 @@ namespace OneSim.Traffic.Map
 	using Microsoft.AspNetCore.Builder;
 	using Microsoft.AspNetCore.Hosting;
 	using Microsoft.AspNetCore.HttpOverrides;
+	using Microsoft.AspNetCore.SignalR;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,7 @@ namespace OneSim.Traffic.Map
 	using OneSim.Traffic.Domain.Attributes;
 	using OneSim.Traffic.Domain.Entities;
 	using OneSim.Traffic.Domain.ValueObjects.Converters;
+	using OneSim.Traffic.Infrastructure;
 	using OneSim.Traffic.Persistence;
 
 	/// <summary>
@@ -73,6 +75,10 @@ namespace OneSim.Traffic.Map
 			// Add DbContext Interfaces
 			services.AddScoped<ITrafficDbContext, TrafficDbContext>();
 			services.AddScoped<IHistoricalDbContext, HistoricalDbContext>();
+
+			// Add SignalR and the TrafficNotifier Interface
+			services.AddSignalR();
+			services.AddTransient<ITrafficNotifier, SignalRTrafficNotifier>();
 
 			// Add Hangfire services
 			services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -134,8 +140,14 @@ namespace OneSim.Traffic.Map
 			app.UseRouting();
 			app.UseCors("AllowApi");
 			app.UseEndpoints(endpoints =>
+							 {
+								 // Map controller endpoints
 								 endpoints.MapControllerRoute(name: "default",
-															  pattern: "{controller=TrafficData}/{action=All}/{id?}"));
+															  pattern: "{controller=TrafficData}/{action=All}/{id?}");
+
+								 // Map SignalR hub
+								 endpoints.MapHub<TrafficDataHub>("/TrafficDataHub");
+							 });
 
 			// Setup the Traffic Data Refresh job
 			TrafficApiSettings settings = Configuration.GetSection("TrafficApiSettings").Get<TrafficApiSettings>();

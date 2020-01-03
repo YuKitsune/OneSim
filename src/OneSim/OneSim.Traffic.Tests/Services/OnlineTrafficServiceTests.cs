@@ -2,6 +2,7 @@ namespace OneSim.Traffic.Tests.Services
 {
 	using System;
 	using System.Linq;
+	using System.Reflection;
 	using System.Threading.Tasks;
 
 	using Microsoft.EntityFrameworkCore;
@@ -151,10 +152,12 @@ namespace OneSim.Traffic.Tests.Services
 			ITrafficDataParser parser = new MockTrafficDataParser();
 			ITrafficDbContext trafficDbContext = MockHelpers.GetTrafficDbContext();
 			IHistoricalDbContext historicalDbContext = MockHelpers.GetHistoricalDbContext();
+			MockTrafficNotifier notifier = new MockTrafficNotifier();
 			OnlineTrafficService service = new OnlineTrafficService(provider,
 																	parser,
 																	trafficDbContext,
 																	historicalDbContext,
+																	notifier,
 																	new Mock<ILogger<OnlineTrafficService>>().Object);
 
 			// Seed the initial data
@@ -174,6 +177,7 @@ namespace OneSim.Traffic.Tests.Services
 			Assert.AreEqual(2, trafficDbContext.FlightPlans.Count());
 			Assert.AreEqual(1, trafficDbContext.Controllers.Count());
 			Assert.AreEqual(1, trafficDbContext.Servers.Count());
+			Assert.AreEqual(1, notifier.NotificationCount);
 
 			// Check our pilots have the correct history records
 			Pilot pilotWithPlan = await trafficDbContext.Pilots
@@ -224,6 +228,7 @@ namespace OneSim.Traffic.Tests.Services
 											   parser,
 											   trafficDbContext,
 											   historicalDbContext,
+											   notifier,
 											   new Mock<ILogger<OnlineTrafficService>>().Object);
 			await service.UpdateTrafficDataAsync();
 
@@ -234,6 +239,7 @@ namespace OneSim.Traffic.Tests.Services
 			Assert.AreEqual(2, trafficDbContext.FlightPlans.Count());
 			Assert.AreEqual(1, trafficDbContext.Controllers.Count());
 			Assert.AreEqual(1, trafficDbContext.Servers.Count());
+			Assert.AreEqual(2, notifier.NotificationCount);
 
 			// Check our pilots have the correct history records
 			pilotWithPlan = await trafficDbContext.Pilots
@@ -279,10 +285,12 @@ namespace OneSim.Traffic.Tests.Services
 			ITrafficDataParser parser = new MockTrafficDataParser();
 			ITrafficDbContext trafficDbContext = MockHelpers.GetTrafficDbContext();
 			IHistoricalDbContext historicalDbContext = MockHelpers.GetHistoricalDbContext();
+			MockTrafficNotifier notifier = new MockTrafficNotifier();
 			OnlineTrafficService service = new OnlineTrafficService(provider,
 																	parser,
 																	trafficDbContext,
 																	historicalDbContext,
+																	notifier,
 																	new Mock<ILogger<OnlineTrafficService>>().Object);
 
 			// Seed the initial data
@@ -306,6 +314,7 @@ namespace OneSim.Traffic.Tests.Services
 											   parser,
 											   trafficDbContext,
 											   historicalDbContext,
+											   notifier,
 											   new Mock<ILogger<OnlineTrafficService>>().Object);
 			await service.UpdateTrafficDataAsync();
 
@@ -330,10 +339,12 @@ namespace OneSim.Traffic.Tests.Services
 			ITrafficDataParser parser = new MockTrafficDataParser();
 			ITrafficDbContext trafficDbContext = MockHelpers.GetTrafficDbContext();
 			IHistoricalDbContext historicalDbContext = MockHelpers.GetHistoricalDbContext();
+			MockTrafficNotifier notifier = new MockTrafficNotifier();
 			OnlineTrafficService service = new OnlineTrafficService(provider,
 																	parser,
 																	trafficDbContext,
 																	historicalDbContext,
+																	notifier,
 																	new Mock<ILogger<OnlineTrafficService>>().Object);
 
 			// Seed the initial data
@@ -356,6 +367,7 @@ namespace OneSim.Traffic.Tests.Services
 											   parser,
 											   trafficDbContext,
 											   historicalDbContext,
+											   notifier,
 											   new Mock<ILogger<OnlineTrafficService>>().Object);
 			await service.UpdateTrafficDataAsync();
 
