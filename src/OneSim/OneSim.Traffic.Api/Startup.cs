@@ -12,6 +12,7 @@ namespace OneSim.Traffic.Map
 	using Microsoft.AspNetCore.Hosting;
 	using Microsoft.AspNetCore.HttpOverrides;
 	using Microsoft.AspNetCore.SignalR;
+	using Microsoft.AspNetCore.WebSockets;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
@@ -76,10 +77,6 @@ namespace OneSim.Traffic.Map
 			services.AddScoped<ITrafficDbContext, TrafficDbContext>();
 			services.AddScoped<IHistoricalDbContext, HistoricalDbContext>();
 
-			// Add SignalR and the TrafficNotifier Interface
-			services.AddSignalR();
-			services.AddTransient<ITrafficNotifier, SignalRTrafficNotifier>();
-
 			// Add Hangfire services
 			services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
 															   .UseSimpleAssemblyNameTypeSerializer()
@@ -100,7 +97,15 @@ namespace OneSim.Traffic.Map
 
 			services.AddCors(options => options.AddPolicy("AllowApi",
 														  builder =>
-															  builder.AllowAnyOrigin().AllowAnyHeader()));
+															  builder
+																 .WithOrigins("https://localhost:5001")
+																 .AllowAnyHeader()
+																 .WithMethods("GET", "POST")
+																 .AllowCredentials()));
+
+			// Add SignalR and the TrafficNotifier Interface
+			services.AddSignalR();
+			services.AddTransient<ITrafficNotifier, SignalRTrafficNotifier>();
 		}
 
 		/// <summary>

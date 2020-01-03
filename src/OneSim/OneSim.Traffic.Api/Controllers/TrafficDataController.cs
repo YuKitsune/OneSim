@@ -3,21 +3,16 @@
 	using System.Collections.Generic;
 	using System.Threading.Tasks;
 
-	using Microsoft.AspNetCore.Cors;
 	using Microsoft.AspNetCore.Mvc;
 	using Microsoft.EntityFrameworkCore;
 
-	using Newtonsoft.Json;
-
 	using OneSim.Traffic.Domain.Entities;
-	using OneSim.Traffic.Domain.ValueObjects.Converters;
 	using OneSim.Traffic.Map.Data;
 	using OneSim.Traffic.Persistence;
 
 	/// <summary>
 	/// 	The <see cref="Controller"/> serving the data current traffic data.
 	/// </summary>
-	[EnableCors("AllowApi")]
 	public class TrafficDataController : Controller
 	{
 		/// <summary>
