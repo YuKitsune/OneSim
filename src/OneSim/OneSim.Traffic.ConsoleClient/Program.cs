@@ -10,15 +10,16 @@
 	public class Program
 	{
 		public static HubConnection Connection { get; set; }
+		public static string DomainName { get; set; }
 
 		static void Main(string[] args)
 		{
 			Console.WriteLine("Hello World!");
 
 			Console.WriteLine("Traffic API server domain: ");
-			string domainName = Console.ReadLine();
+			DomainName = Console.ReadLine();
 
-			string url = domainName + "/TrafficDataHub";
+			string url = DomainName + "/TrafficDataHub";
 			Console.WriteLine($"Building connection for \"{url}\".");
 			Connection = new HubConnectionBuilder()
 						.WithUrl(url,
@@ -45,9 +46,17 @@
 					  .Wait();
 
 			Connection.On("NewTrafficDataAvailable", () => Console.WriteLine("New Traffic Data Available."));
+			Connection.On("PilotSelected", (string callsign) => GetPilotInfo(callsign));
 
 			Console.Read();
 			Connection.StopAsync();
+		}
+
+		static async void GetPilotInfo(string callsign)
+		{
+			using WebClient client = new WebClient();
+			string pilotJson = await client.DownloadStringTaskAsync(DomainName + "/TrafficData/Pilot?callsign=" + callsign);
+			Console.WriteLine(pilotJson);
 		}
 	}
 }

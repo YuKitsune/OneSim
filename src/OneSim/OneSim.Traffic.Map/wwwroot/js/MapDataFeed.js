@@ -15,24 +15,29 @@ class MapDataFeed {
         this.pilots = [];
         this.markers = [];
         this.controllers = [];
+        
+        // Prepare some events
+        this.onNewTrafficDataAvailable = (conn) => { this.refreshPilots(); };
+        this.onPilotClicked = (e) => { this.pilotClicked(e); };
 
         // Connect SignalR
         this.connection = new signalR.HubConnectionBuilder().withUrl(statusFeedUrl + "/TrafficDataHub").withAutomaticReconnect().build();
         
         // Setup the messages
-        this.connection.on("NewTrafficDataAvailable", () => this.refreshPilots(this));
+        this.connection.on("NewTrafficDataAvailable", this.onNewTrafficDataAvailable);
         
         // Start the connection
         this.connection.start({ withCredentials: false });
     }
     
-    refreshPilots(dataFeed = null) {
-        if (dataFeed == null) dataFeed = this;
+    // Downloads and then processes the pilot data
+    refreshPilots() {
         console.log("Refreshing Pilots...");
-        $.get(dataFeed.statusFeedUrl + "/TrafficData/Pilots",
+        let self = this;
+        $.get(this.statusFeedUrl + "/TrafficData/Pilots",
             function(data) {
                 try {
-                    dataFeed.processNewPilots(data, dataFeed);
+                    self.processNewPilots(data);
                 } catch (e){
                     console.error("Failed to process pilots.");
                     console.error(e);
@@ -40,27 +45,27 @@ class MapDataFeed {
             });
     }
     
-    processNewPilots(data, dataFeed = null) {
-        if (dataFeed == null) dataFeed = this;
+    // Processes the pilot data, removing old markers and events, and making new markers and events
+    processNewPilots(data) {
         
         // Clean up old markers
-        for (let i = 0; i < dataFeed.markers.length; i++) {
+        for (let i = 0; i < this.markers.length; i++) {
                         
             // Remove from map
-            dataFeed.markers[i].remove();
+            this.markers[i].remove();
             
             // Remove event listeners
-            dataFeed.markers[i].getElement().removeEventListener("click", dataFeed.pilotClicked);
+            this.markers[i].getElement().removeEventListener("click", this.onPilotClicked);
         }
         
         // Clear the markers array
-        dataFeed.markers = [];
+        this.markers = [];
         
         // Add our new pilots
         for (let i = 0; i < data.length; i++) {
 
             // Create the element
-            let element = dataFeed.createMarkerElementFor(data[i].Callsign, dataFeed.pilotClicked);
+            let element = this.createMarkerElementFor(data[i].Callsign, this.onPilotClicked);
 
             // Create the marker and add to the map
             let marker = new mapboxgl.Marker(element)
@@ -69,13 +74,14 @@ class MapDataFeed {
                 .addTo(map);
             
             // Add the marker
-            dataFeed.markers.push(marker);
+            this.markers.push(marker);
         }
 
         // Update the pilots list after all the processing
-        dataFeed.pilots = data;
+        this.pilots = data;
     }
     
+    // Creates a HTML element for the marker for a specific pilot
     createMarkerElementFor(callsign, pilotClickCallback) {
         
         // Create the HTML element
@@ -90,10 +96,10 @@ class MapDataFeed {
         
         return el;
     }
-    
+
+    // Method called when a pilot has been clicked on by the user
     pilotClicked(element) {
         let callsign = element.currentTarget.getAttribute("data-callsign");
-                
-        console.log("User clicked " + callsign);
+        this.connection.invoke("pilotSelected", callsign);
     }
 }
