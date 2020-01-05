@@ -1,5 +1,7 @@
 namespace OneSim.Identity.Api
 {
+    using System;
+
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Hosting;
@@ -89,11 +91,14 @@ namespace OneSim.Identity.Api
                                                                     };
                                   });
 
-            // Add Dependencies
+            // Determine which EmailSender to use
+            Type emailSenderType = GetEmailSenderType();
+            services.AddScoped(typeof(IEmailSender), emailSenderType);
+
+            // Add other Dependencies
             services.AddScoped<IIdentityDbContext, ApplicationIdentityDbContext>();
             services.AddScoped<ITokenFactory, JwtFactory>();
             services.AddScoped<IUrlHelper, UrlHelper>();
-            services.AddScoped<IEmailSender, SmtpEmailSender>();
             services.AddScoped<AuthenticationService>();
             services.AddScoped<UserService>();
 
@@ -145,9 +150,30 @@ namespace OneSim.Identity.Api
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseIdentityServer();
             app.UseEndpoints(endpoints => endpoints.MapControllerRoute(name: "default",
                                                                        pattern:
                                                                        "{controller=Authentication}/{action=LogIn}"));
+        }
+
+        /// <summary>
+        ///     Gets the <see cref="Type"/> of <see cref="IEmailSender"/> in use.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="Type"/> of <see cref="IEmailSender"/> to use.
+        /// </returns>
+        private Type GetEmailSenderType()
+        {
+            // Todo: Refactor this to use Reflection or something, means less effort later when we add new mail providers.
+            SmtpSettings smtpSettings = Configuration.GetSection("SmtpSettings").Get<SmtpSettings>();
+
+            if (smtpSettings != null) return typeof(SmtpEmailSender);
+
+            MailgunSettings mailgunSettings = Configuration.GetSection("MailgunSettings").Get<MailgunSettings>();
+
+            if (mailgunSettings != null) return typeof(MailgunEmailSender);
+
+            throw new Exception("No email sender found.");
         }
     }
 }

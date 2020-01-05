@@ -1,7 +1,7 @@
 namespace OneSim.Identity.Infrastructure
 {
 	/// <summary>
-	/// 	The MailGun settings.
+	/// 	The Mailgun settings.
 	/// </summary>
 	public class MailgunSettings
 	{

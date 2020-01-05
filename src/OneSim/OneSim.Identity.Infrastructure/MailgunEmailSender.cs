@@ -1,6 +1,7 @@
 namespace OneSim.Identity.Infrastructure
 {
 	using System;
+	using System.IO;
 	using System.Net.Http;
 	using System.Net.Http.Headers;
 	using System.Text;
@@ -9,6 +10,9 @@ namespace OneSim.Identity.Infrastructure
 	using Microsoft.Extensions.Configuration;
 
 	using OneSim.Identity.Application.Abstractions;
+
+	using RestSharp;
+	using RestSharp.Authenticators;
 
 	/// <summary>
 	/// 	The Mailgun <see cref="IEmailSender"/> implementation.
@@ -59,20 +63,23 @@ namespace OneSim.Identity.Infrastructure
 		/// </returns>
 		public async Task SendEmailAsync(string recipientEmail, string subject, string message)
 		{
-			// Todo: Need to test this works
-			using HttpClient httpClient = new HttpClient();
-			using MultipartFormDataContent content = new MultipartFormDataContent();
+			// Todo: Swap out RestSharp for something native
+			RestClient client = new RestClient
+								{
+									BaseUrl = new Uri("https://api.mailgun.net/v3"),
+									Authenticator = new HttpBasicAuthenticator("api", _settings.ApiKey)
+								};
+			RestRequest request = new RestRequest();
+			request.AddParameter("domain", _settings.DomainName, ParameterType.UrlSegment);
+			request.Resource = "{domain}/messages";
+			request.AddParameter("from", $"OneSim <mailgun@{_settings.DomainName}>");
+			request.AddParameter("to", recipientEmail);
+			request.AddParameter("subject", subject);
+			request.AddParameter("text", message);
+			request.Method = Method.POST;
 
-			// Add the API key
-			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", $"api:{_settings.ApiKey}");
-
-			// Add the parameters?
-			content.Add(new StringContent($"OneSim No-Reply <mailgun@{_settings.DomainName}>"), "from");
-			content.Add(new StringContent(recipientEmail), "to");
-			content.Add(new StringContent(subject), "subject");
-			content.Add(new StringContent(message), "text");
-
-			await httpClient.PostAsync(new Uri($"{_settings.ApiUrl}/{_settings.DomainName}/messages"), content);
+			// Todo: Log response
+			IRestResponse response = await client.ExecuteTaskAsync(request);
 		}
 	}
 }
