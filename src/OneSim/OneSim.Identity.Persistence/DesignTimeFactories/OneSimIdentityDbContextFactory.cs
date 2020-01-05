@@ -30,7 +30,7 @@ namespace OneSim.Identity.Persistence.DesignTimeFactories
 
 			// Create options builder
 			DbContextOptionsBuilder<ApplicationIdentityDbContext> optionsBuilder = new DbContextOptionsBuilder<ApplicationIdentityDbContext>();
-			optionsBuilder.UseNpgsql(config.GetConnectionString("HistoricalConnection"));
+			optionsBuilder.UseNpgsql(config.GetConnectionString("IdentityConnection"));
 
 			return new ApplicationIdentityDbContext(optionsBuilder.Options);
 		}
