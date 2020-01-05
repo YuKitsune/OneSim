@@ -83,16 +83,16 @@ namespace OneSim.Identity.Api.Controllers
 		}
 
 		/// <summary>
-		/// 	Attempts to create a new user.
+		/// 	Attempts to register a new user.
 		/// </summary>
 		/// <param name="request">
-		///		The <see cref="CreateUserRequest"/>.
+		///		The <see cref="RegisterRequest"/>.
 		/// </param>
 		/// <returns>
 		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> CreateUser([FromBody] CreateUserRequest request)
+		public async Task<ActionResult> Register([FromBody] RegisterRequest request)
 		{
 			try
 			{
@@ -117,7 +117,67 @@ namespace OneSim.Identity.Api.Controllers
 				ApplicationUser user = new ApplicationUser { Email = request.Email, UserName = request.UserName };
 
 				// Register the user
-				await _userService.CreateUser(user, request.Password, _urlHelper, HttpContext.Request.Scheme, _emailSender);
+				await _userService.RegisterUser(user, request.Password);
+
+				return Json(new BaseResponse(ResponseStatus.Success, $"Successfully registered a user with username {request.UserName}."));
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"An error has occurred registering a user with username \"{request.UserName}\".");
+
+				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Register request."));
+			}
+		}
+
+		/// <summary>
+		/// 	Attempts to create a new user.
+		/// </summary>
+		/// <param name="request">
+		///		The <see cref="CreateUserRequest"/>.
+		/// </param>
+		/// <returns>
+		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		/// </returns>
+		[HttpPost, Authorize]
+		public async Task<ActionResult> CreateUser([FromBody] CreateUserRequest request)
+		{
+			try
+			{
+				// Ensure the current user is allowed to complete this action
+				// Note: Administrators cannot delete users on their behalf
+				if (!await RequestMatchesUser(request, false))
+					return Json(new BaseResponse(ResponseStatus.Unauthorized, "Not allowed to delete other users."));
+
+				// Ensure the current user is an admin
+				ApplicationUser currentUser = await this.GetCurrentUserAsync(_dbContext);
+				if (currentUser.Type != UserType.Administrator)
+				{
+					return Json(new BaseResponse(ResponseStatus.Unauthorized,
+												 "Only administrators may create new users"));
+				}
+
+				// Check no conflicting users exist
+				ApplicationUser existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.NewUsersEmail);
+
+				if (existingUser != null)
+				{
+					return Json(new BaseResponse(ResponseStatus.Failure,
+												 "The given email address is already registered to an account."));
+				}
+
+				existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
+
+				if (existingUser != null)
+				{
+					return Json(new BaseResponse(ResponseStatus.Failure,
+												 "The given username is already registered to an account."));
+				}
+
+				// Create a new user
+				ApplicationUser user = new ApplicationUser { Email = request.NewUsersEmail, UserName = request.UserName };
+
+				// Register the user
+				await _userService.CreateUser(user, _emailSender, HttpContext.Request.Scheme, _urlHelper);
 
 				return Json(new BaseResponse(ResponseStatus.Success, $"Successfully created a user with username {request.UserName}."));
 			}

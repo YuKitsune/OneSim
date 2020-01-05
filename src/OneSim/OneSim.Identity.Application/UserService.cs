@@ -44,7 +44,7 @@ namespace OneSim.Identity.Application
 		}
 
 		/// <summary>
-		/// 	Creates a new user.
+		/// 	Registers a new user with a password.
 		/// </summary>
 		/// <param name="user">
 		///		The <see cref="ApplicationUser"/> to create.
@@ -55,7 +55,7 @@ namespace OneSim.Identity.Application
 		/// <returns>
 		///		The <see cref="Task"/>
 		/// </returns>
-		public async Task CreateUser(ApplicationUser user, string password)
+		public async Task RegisterUser(ApplicationUser user, string password)
 		{
 			// Check the inputs
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null or empty.");
@@ -65,12 +65,54 @@ namespace OneSim.Identity.Application
 			IdentityResult result = await UserManager.CreateAsync(user, password);
 			if (result.Succeeded)
 			{
+				_logger.LogInformation($"A new user has registered with the username \"{user.UserName}\".");
+			}
+			else if (result.Errors.Any())
+			{
+				throw new IdentityException(result.Errors, "One or more errors occurred when attempting to register a new user.");
+			}
+		}
+
+		/// <summary>
+		/// 	Creates a new user without a password, but sends a password reset email to the new user.
+		/// </summary>
+		/// <param name="user">
+		/// 	The <see cref="ApplicationUser"/>.
+		/// </param>
+		/// <param name="emailSender">
+		/// 	The <see cref="IEmailSender"/>.
+		/// </param>
+		/// <param name="requestScheme">
+		/// 	The Request Scheme.
+		/// </param>
+		/// <param name="urlHelper">
+		/// 	The <see cref="IUrlHelper"/>.
+		/// </param>
+		/// <returns>
+		/// 	The <see cref="Task"/>.
+		/// </returns>
+		public async Task CreateUser(
+			ApplicationUser user,
+			IEmailSender emailSender,
+			string requestScheme,
+			IUrlHelper urlHelper)
+		{
+			// Check the inputs
+			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null or empty.");
+
+			// Create the user
+			IdentityResult result = await UserManager.CreateAsync(user);
+			if (result.Succeeded)
+			{
 				_logger.LogInformation($"A new user has been created with the username \"{user.UserName}\".");
 			}
 			else if (result.Errors.Any())
 			{
 				throw new IdentityException(result.Errors, "One or more errors occurred when attempting to create a new user.");
 			}
+
+			// Send a password reset email
+			await SendPasswordResetEmail(user, emailSender, requestScheme, urlHelper, true);
 		}
 
 		/// <summary>
@@ -162,6 +204,11 @@ namespace OneSim.Identity.Application
 		/// <param name="urlHelper">
 		/// 	The <see cref="IUrlHelper"/>.
 		/// </param>
+		/// <param name="overrideEmailConfirmation">
+		///		The flag indicating whether or not to check if the <paramref name="user"/>'s email address has been
+		/// 	confirmed before sending.
+		/// 	By default, this is set to <c>false</c>, so the email confirmation check will be performed.
+		/// </param>
 		/// <returns>
 		/// 	The <see cref="Task"/>.
 		/// </returns>
@@ -169,7 +216,8 @@ namespace OneSim.Identity.Application
 			ApplicationUser user,
 			IEmailSender emailSender,
 			string requestScheme,
-			IUrlHelper urlHelper)
+			IUrlHelper urlHelper,
+			bool overrideEmailConfirmation = false)
 		{
 			// Check the inputs
 			if (urlHelper == null) throw new ArgumentNullException(nameof(urlHelper), "The URL Helper cannot be null.");
@@ -178,7 +226,8 @@ namespace OneSim.Identity.Application
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null.");
 
 			// Can't reset a password for an unconfirmed email address
-			if (!await UserManager.IsEmailConfirmedAsync(user))
+			if (!overrideEmailConfirmation &&
+				!await UserManager.IsEmailConfirmedAsync(user))
 				throw new EmailUnconfirmedException(user, $"Cannot send password reset email when email address is unconfirmed.");
 
 			// Get the reset token
@@ -190,7 +239,7 @@ namespace OneSim.Identity.Application
 			// Send the password reset email
 			// Todo: Use HTML email
 			_logger.LogInformation($"{user.UserName} has requested a password reset.");
-			await emailSender.SendEmailAsync(user.Email, "Reset Password", $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+			await emailSender.SendEmailAsync(user.Email, "Reset Password", $"Reset token: {resetToken}");
 		}
 
 		/// <summary>
@@ -321,7 +370,7 @@ namespace OneSim.Identity.Application
 			// Todo: Use HTML email
 			await emailSender.SendEmailAsync(user.Email,
 											 "Confirm Email",
-											 $"Please confirm your email address by clicking here: <a href='{callbackUrl}'>link</a>");
+											 $"Confirmation code: {code}");
 
 			// Log
 			_logger.LogInformation($"A verification email has been sent to {user.UserName} at \"{user.Email}\".");
