@@ -23,6 +23,28 @@ namespace OneSim.Identity.Tests
         public const string DefaultRequestScheme = "HTTPS";
 
         /// <summary>
+        ///     Ensures a new user can register.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="Task"/>.
+        /// </returns>
+        [Test]
+        public async Task UserCanRegister()
+        {
+            // Arrange
+            MockSet<UserService> mocks = new MockSet<UserService>();
+            ApplicationUser userToRegister = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
+            string password = "MySecurePassword123";
+
+            // Act
+            UserService service = new UserService(mocks.UserManager, mocks.Logger);
+            await service.RegisterUser(userToRegister, password);
+
+            // Assert
+            Assert.IsTrue(mocks.DbContext.Users.Any(u => u.UserName == userToRegister.UserName));
+        }
+
+        /// <summary>
         ///     Ensures a new user can be created.
         /// </summary>
         /// <returns>
@@ -34,14 +56,14 @@ namespace OneSim.Identity.Tests
             // Arrange
             MockSet<UserService> mocks = new MockSet<UserService>();
             ApplicationUser userToCreate = new ApplicationUser { UserName = "TestUser", Email = "test@test.com" };
-            string password = "MySecurePassword123";
 
             // Act
             UserService service = new UserService(mocks.UserManager, mocks.Logger);
-            await service.CreateUser(userToCreate, password);
+            await service.CreateUser(userToCreate, mocks.EmailSender, DefaultRequestScheme, mocks.UrlHelper);
 
             // Assert
             Assert.IsTrue(mocks.DbContext.Users.Any(u => u.UserName == userToCreate.UserName));
+            Assert.IsTrue(mocks.EmailSender.SentMessages.Count == 1);
         }
 
         /// <summary>
