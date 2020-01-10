@@ -72,8 +72,4 @@
       <ProjectReference Include="..\OneSim.Identity.Persistence\OneSim.Identity.Persistence.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Data" />
-    </ItemGroup>
-
 </Project>
