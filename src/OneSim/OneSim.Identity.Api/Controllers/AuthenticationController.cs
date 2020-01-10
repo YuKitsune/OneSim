@@ -1,208 +1,245 @@
 namespace OneSim.Identity.Web.Controllers
 {
-    using System;
-    using System.Threading.Tasks;
+	using System;
+	using System.Security.Claims;
+	using System.Threading.Tasks;
 
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Logging;
+	using IdentityModel;
 
-    using OneSim.Api.Data.Requests;
-    using OneSim.Api.Data.Responses;
-    using OneSim.Identity.Application;
-    using OneSim.Identity.Application.Abstractions;
-    using OneSim.Identity.Domain.Entities;
-    using OneSim.Identity.Persistence;
+	using IdentityServer4;
+	using IdentityServer4.Models;
+	using IdentityServer4.Services;
 
-    /// <summary>
-    ///     The Authentication <see cref="Controller"/>.
-    /// </summary>
-    public class AuthenticationController : Controller
-    {
-        /// <summary>
-        ///     The <see cref="ApplicationIdentityDbContext"/>.
-        /// </summary>
-        private readonly ApplicationIdentityDbContext _dbContext;
+	using Microsoft.AspNetCore.Authentication;
+	using Microsoft.AspNetCore.Identity;
+	using Microsoft.AspNetCore.Mvc;
+	using Microsoft.EntityFrameworkCore;
+	using Microsoft.Extensions.Configuration;
+	using Microsoft.Extensions.Logging;
 
-        /// <summary>
-        ///     The <see cref="AuthenticationService"/>.
-        /// </summary>
-        private readonly AuthenticationService _authenticationService;
+	using OneSim.Identity.Domain.Entities;
+	using OneSim.Identity.Persistence;
+	using OneSim.Identity.Web.Models.ViewModels.Authentication;
 
-        /// <summary>
-        ///     The <see cref="ILogger{TCategoryName}"/>.
-        /// </summary>
-        private readonly ILogger<AuthenticationController> _logger;
+	using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 
-        /// <summary>
-        ///     The <see cref="ITokenFactory"/>.
-        /// </summary>
-        private readonly ITokenFactory _tokenFactory;
+	/// <summary>
+	/// 	The Authentication <see cref="Controller"/>.
+	/// </summary>
+	public class AuthenticationController : Controller
+	{
+		/// <summary>
+		///     The <see cref="ApplicationIdentityDbContext"/>.
+		/// </summary>
+		private readonly ApplicationIdentityDbContext _dbContext;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="AuthenticationController"/> class.
-        /// </summary>
-        /// <param name="service">
-        ///     The <see cref="AuthenticationService"/>.
-        /// </param>
-        /// <param name="dbContext">
-        ///     The <see cref="ApplicationIdentityDbContext"/>.
-        /// </param>
-        /// <param name="logger">
-        ///    The <see cref="ILogger{TCategoryName}"/>.
-        /// </param>
-        /// <param name="tokenFactory">
-        ///    The <see cref="ITokenFactory"/>.
-        /// </param>
-        public AuthenticationController(
-            AuthenticationService service,
-            ApplicationIdentityDbContext dbContext,
-            ILogger<AuthenticationController> logger,
-            ITokenFactory tokenFactory)
-        {
-            _authenticationService = service;
-            _dbContext = dbContext;
-            _logger = logger;
-            _tokenFactory = tokenFactory;
-        }
+		/// <summary>
+		///     The <see cref="AuthenticationService"/>.
+		/// </summary>
+		private readonly AuthenticationService _authenticationService;
 
-        /// <summary>
-        ///     Attempts to log the user in.
-        /// </summary>
-        /// <param name="request">
-        ///     The <see cref="LogInRequest"/>.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="ActionResult"/> containing the <see cref="LogInResponse"/>, or <see cref="BaseResponse"/>
-        ///     in the event of an error.
-        /// </returns>
-        [HttpPost]
-        public async Task<ActionResult> LogIn([FromBody] LogInRequest request)
-        {
-            try
-            {
-                // Find the user
-                ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
+		/// <summary>
+		/// 	The <see cref="IIdentityServerInteractionService"/>.
+		/// </summary>
+		private readonly IIdentityServerInteractionService _interactionService;
 
-                if (user == null) return Json(new BaseResponse(ResponseStatus.Failure, "User with the given email and password not found."));
+		/// <summary>
+		/// 	The <see cref="IConfiguration"/>.
+		/// </summary>
+		private readonly IConfiguration _configuration;
 
-                // Log in
-                Microsoft.AspNetCore.Identity.SignInResult result = await _authenticationService.LogIn(user, request.Password);
+		/// <summary>
+		///     The <see cref="ILogger"/>.
+		/// </summary>
+		private readonly ILogger<AuthenticationController> _logger;
 
-                // Reject if failed
-                if (!result.Succeeded) return Json(new BaseResponse(ResponseStatus.Failure, "User with the given email and password not found."));
+		/// <summary>
+		///     Initializes a new instance of the <see cref="AuthenticationController"/> class.
+		/// </summary>
+		/// <param name="service">
+		///     The <see cref="AuthenticationService"/>.
+		/// </param>
+		/// <param name="dbContext">
+		///     The <see cref="ApplicationIdentityDbContext"/>.
+		/// </param>
+		/// <param name="identityService">
+		///		The <see cref="IIdentityServerInteractionService"/>.
+		/// </param>
+		/// <param name="configuration">
+		///		The <see cref="IConfiguration"/>.
+		/// </param>
+		/// <param name="logger">
+		///    The <see cref="ILogger{TCategoryName}"/>.
+		/// </param>
+		public AuthenticationController(
+			AuthenticationService service,
+			ApplicationIdentityDbContext dbContext,
+			IIdentityServerInteractionService identityService,
+			IConfiguration configuration,
+			ILogger<AuthenticationController> logger)
+		{
+			_authenticationService = service;
+			_dbContext = dbContext;
+			_interactionService = identityService;
+			_configuration = configuration;
+			_logger = logger;
+		}
 
-                // Alert client if two-factor is required
-                if (result.RequiresTwoFactor)
-                {
-                    return Json(new LogInResponse(ResponseStatus.Success, "Two-Factor Authentication Token required.")
-                                {
-                                    TwoFactorAuthenticationRequired = true
-                                });
-                }
+		/// <summary>
+		/// 	Returns the LogIn view.
+		/// </summary>
+		[HttpGet]
+		public async Task<IActionResult> Login(string returnUrl)
+		{
+			// Get the authorization request
+			AuthorizationRequest context = await _interactionService.GetAuthorizationContextAsync(returnUrl);
 
-                // Generate JWT
-                string token = _tokenFactory.GenerateToken(user);
-                LogInResponse response = new LogInResponse(ResponseStatus.Success, "Log in successful.")
-                                         {
-                                             Token = token
-                                         };
+			if (context?.IdP != null) throw new NotImplementedException("External login is not implemented!");
 
-                return Json(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"An error has occurred logging in a user with username \"{request.UserName}\".");
+			// Create the ViewModel
+			LoginViewModel viewModel = new LoginViewModel { ReturnUrl = returnUrl, Email = context?.LoginHint };
 
-                return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Log In request."));
-            }
-        }
+			ViewData["ReturnUrl"] = returnUrl;
 
-        /// <summary>
-        ///     Attempts to log the user in using Two-Factor Authentication.
-        /// </summary>
-        /// <param name="request">
-        ///     The <see cref="TwoFactorAuthenticationLogInRequest"/>.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="ActionResult"/> containing the <see cref="LogInResponse"/>, or <see cref="BaseResponse"/>
-        ///     in the event of an error.
-        /// </returns>
-        [HttpPost]
-        public async Task<ActionResult> TwoFactorAuthenticationLogIn(
-            [FromBody] TwoFactorAuthenticationLogInRequest request)
-        {
-            try
-            {
-                // Find the user
-                ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
+			return View(viewModel);
+		}
 
-                if (user == null) return Json(new BaseResponse(ResponseStatus.Failure, "User not found."));
+		/// <summary>
+		/// 	Handles the LogIn request.
+		/// </summary>
+		/// <param name="model">
+		///		The <see cref="LoginViewModel"/>.
+		/// </param>
+		[HttpPost, ValidateAntiForgeryToken]
+		public async Task<IActionResult> Login(LoginViewModel model)
+		{
+			// If the model is valid, continue with the login
+			if (ModelState.IsValid)
+			{
+				// Get the user
+				ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
 
-                // Log in
-                Microsoft.AspNetCore.Identity.SignInResult result = await _authenticationService.TwoFactorAuthenticationLogIn(user, request.Token);
+				// Check if the user and their credentials are valid
+				if (user != null &&
+					await _authenticationService.ValidateCredentials(user, model.Password))
+				{
+					// Get the token lifetime from the configuration file
+					int tokenLifetime = _configuration.GetValue("TokenLifetimeMinutes", 120);
 
-                // Reject if failed
-                if (!result.Succeeded) return Json(new BaseResponse(ResponseStatus.Failure, "Two-Factor Authentication token rejected."));
+					AuthenticationProperties props = new AuthenticationProperties
+													 {
+														 ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(tokenLifetime),
+														 AllowRefresh = true,
+														 RedirectUri = model.ReturnUrl
+													 };
 
-                // Generate JWT
-                string token = _tokenFactory.GenerateToken(user);
-                LogInResponse response = new LogInResponse(ResponseStatus.Success, "Two-Factor Authentication token accepted.")
-                                         {
-                                             Token = token
-                                         };
+					// If requested to remember the login, then configure the persistent login 
+					if (model.RememberMe)
+					{
+						int permanentTokenLifetime = _configuration.GetValue("PermanentTokenLifetimeDays", 365);
 
-                return Json(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"An error has occurred logging in user using 2FA with username \"{request.UserName}\".");
+						props.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(permanentTokenLifetime);
+						props.IsPersistent = true;
+					}
 
-                return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Two-Factor Authentication Log In request."));
-            }
-        }
+					// Sign the user in
+					// Todo: Redirect for 2FA
+					SignInResult result = await _authenticationService.SignInAsync(user, props);
 
-        /// <summary>
-        ///     Attempts to log the user in using a Two-Factor Authentication Recovery Code.
-        /// </summary>
-        /// <param name="request">
-        ///     The <see cref="TwoFactorAuthenticationLogInRequest"/>.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="ActionResult"/> containing the <see cref="LogInResponse"/>, or <see cref="BaseResponse"/>
-        ///     in the event of an error.
-        /// </returns>
-        [HttpPost]
-        public async Task<ActionResult> RecoveryCodeLogIn([FromBody] TwoFactorAuthenticationLogInRequest request)
-        {
-            try
-            {
-                // Find the user
-                ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
+					// Make sure the returnUrl is still valid, and if so, redirect back to authorize endpoint
+					return Redirect(_interactionService.IsValidReturnUrl(model.ReturnUrl) ? model.ReturnUrl : "~/");
+				}
 
-                if (user == null) return Json(new BaseResponse(ResponseStatus.Failure, "User not found."));
+				// Throw a generic error if invalid
+				ModelState.AddModelError("", "Invalid username or password.");
+			}
 
-                // Log in
-                Microsoft.AspNetCore.Identity.SignInResult result = await _authenticationService.RecoveryCodeLogIn(user, request.Token);
+			// Something went wrong, show form with error
+			LoginViewModel vm = await BuildLoginViewModelAsync(model);
 
-                // Reject if failed
-                if (!result.Succeeded) return Json(new BaseResponse(ResponseStatus.Failure, "Two-Factor Authentication recovery code rejected."));
+			ViewData["ReturnUrl"] = model.ReturnUrl;
 
-                // Generate JWT
-                string token = _tokenFactory.GenerateToken(user);
-                LogInResponse response = new LogInResponse(ResponseStatus.Success, "Recovery Code accepted.")
-                                         {
-                                             Token = token
-                                         };
+			return View(vm);
+		}
 
-                return Json(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"An error has occurred logging in user using 2FA recovery code with username \"{request.UserName}\".");
+		/// <summary>
+		/// 	Returns the Logout view.
+		/// </summary>
+		[HttpGet]
+		public async Task<IActionResult> Logout(string logoutId)
+		{
+			// If the user is not authenticated, then just show logged out page
+			if (!User.Identity.IsAuthenticated)
+			{
+				return await Logout(new LogoutViewModel { LogoutId = logoutId });
+			}
 
-                return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Two-Factor Authentication Recovery Code Log In request."));
-            }
-        }
-    }
+			// Test for Xamarin
+			LogoutRequest context = await _interactionService.GetLogoutContextAsync(logoutId);
+			if (context?.ShowSignoutPrompt == false)
+			{
+				// It's safe to automatically sign-out
+				return await Logout(new LogoutViewModel { LogoutId = logoutId });
+			}
+
+			// Show the logout prompt.
+			// This prevents attacks where the user is automatically signed out by another malicious web page.
+			LogoutViewModel vm = new LogoutViewModel
+								 {
+									 LogoutId = logoutId
+								 };
+
+			return View(vm);
+		}
+
+		/// <summary>
+		/// 	Handles the LogOut request.
+		/// </summary>
+		[HttpPost, ValidateAntiForgeryToken]
+		public async Task<IActionResult> Logout(LogoutViewModel model)
+		{
+			// Get the identity provider
+			string identityProvider = User?.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
+
+			// Check if the provider matches the local provider
+			if (!string.IsNullOrEmpty(identityProvider) &&
+				identityProvider != IdentityServerConstants.LocalIdentityProvider)
+			{
+				if (model.LogoutId == null)
+				{
+					// if there's no current logout context, we need to create one
+					// this captures necessary info from the current logged in user
+					// before we sign out and redirect away to the external IdP for sign out
+					model.LogoutId = await _interactionService.CreateLogoutContextAsync();
+				}
+
+				// Todo: Update this URL
+				string url = "/Account/Logout?logoutId=" + model.LogoutId;
+
+				try
+				{
+					// Hack: try/catch to handle social providers that throw
+					await HttpContext.SignOutAsync(identityProvider,
+												   new AuthenticationProperties { RedirectUri = url });
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError(ex, "LOGOUT ERROR: {ExceptionMessage}", ex.Message);
+				}
+			}
+
+			// Delete authentication cookie
+			await HttpContext.SignOutAsync();
+
+			await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+
+			// Set this so UI rendering sees an anonymous user
+			HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity());
+
+			// Get context information (client name, post logout redirect URI and iframe for federated sign out)
+			LogoutRequest logout = await _interactionService.GetLogoutContextAsync(model.LogoutId);
+
+			return Redirect(logout?.PostLogoutRedirectUri);
+		}
+	}
 }
