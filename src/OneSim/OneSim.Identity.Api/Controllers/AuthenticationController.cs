@@ -1,4 +1,4 @@
-namespace OneSim.Accounts.Api.Controllers
+namespace OneSim.Identity.Web.Controllers
 {
     using System;
     using System.Threading.Tasks;

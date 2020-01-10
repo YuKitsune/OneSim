@@ -5,6 +5,8 @@
         <UserSecretsId>aspnet-OneSim.Api.Identity-EE8651B8-C8E1-4FBD-A26F-1B948E91408F</UserSecretsId>
         <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
         <LangVersion>8</LangVersion>
+        <AssemblyName>OneSim.Identity.Web</AssemblyName>
+        <RootNamespace>OneSim.Identity.Web</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

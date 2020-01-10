@@ -1,4 +1,4 @@
-﻿namespace OneSim.Accounts.Api
+﻿namespace OneSim.Identity.Web
 {
     using System;
     using System.Linq;
