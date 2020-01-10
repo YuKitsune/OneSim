@@ -1,4 +1,4 @@
-namespace OneSim.Identity.Api.Controllers
+namespace OneSim.Accounts.Api.Controllers
 {
 	using System;
 	using System.Collections.Generic;
@@ -11,7 +11,6 @@ namespace OneSim.Identity.Api.Controllers
 
 	using OneSim.Api.Data.Requests;
 	using OneSim.Api.Data.Responses;
-	using OneSim.Identity.Api.Data;
 	using OneSim.Identity.Application;
 	using OneSim.Identity.Application.Abstractions;
 	using OneSim.Identity.Domain.Entities;

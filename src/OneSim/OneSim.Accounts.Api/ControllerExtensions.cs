@@ -1,4 +1,4 @@
-namespace OneSim.Identity.Api
+namespace OneSim.Accounts.Api
 {
 	using System.Threading.Tasks;
 
@@ -6,7 +6,7 @@ namespace OneSim.Identity.Api
 	using Microsoft.EntityFrameworkCore;
 
 	using OneSim.Identity.Application.Exceptions;
-    using OneSim.Identity.Domain.Entities;
+	using OneSim.Identity.Domain.Entities;
 	using OneSim.Identity.Persistence;
 
 	/// <summary>

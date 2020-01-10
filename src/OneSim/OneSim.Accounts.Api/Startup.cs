@@ -1,27 +1,23 @@
-namespace OneSim.Identity.Api
+namespace OneSim.Accounts.Api
 {
     using System;
+    using System.Text;
 
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-
-    using System.Text;
-
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.IdentityModel.Tokens;
 
     using Newtonsoft.Json.Serialization;
 
-    using OneSim.Identity.Api.Data;
     using OneSim.Identity.Application;
     using OneSim.Identity.Application.Abstractions;
-    using OneSim.Identity.Domain;
     using OneSim.Identity.Domain.Entities;
     using OneSim.Identity.Infrastructure;
     using OneSim.Identity.Persistence;

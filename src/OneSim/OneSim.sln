@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{7B2C07C6-98F0-42D9-86CF-94BB9DD77F06}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Identity.Api", "OneSim.Identity.Api\OneSim.Identity.Api.csproj", "{212B15FC-AA79-467F-A98B-9F90D94CDABA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Accounts.Api", "OneSim.Accounts.Api\OneSim.Accounts.Api.csproj", "{212B15FC-AA79-467F-A98B-9F90D94CDABA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Identity.Infrastructure", "OneSim.Identity.Infrastructure\OneSim.Identity.Infrastructure.csproj", "{BB612000-F80F-4245-BAAA-8C41980B3DEA}"
 EndProject
