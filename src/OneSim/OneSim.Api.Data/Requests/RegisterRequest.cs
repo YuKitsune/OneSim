@@ -3,7 +3,7 @@ namespace OneSim.Api.Data.Requests
 	/// <summary>
 	/// 	The Register Request.
 	/// </summary>
-	public class RegisterRequest // : BaseRequest
+	public class RegisterRequest
 	{
 		/// <summary>
 		/// 	Gets or sets the email address of the new user

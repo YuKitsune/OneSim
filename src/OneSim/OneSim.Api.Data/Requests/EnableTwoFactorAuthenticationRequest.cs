@@ -3,7 +3,7 @@ namespace OneSim.Api.Data.Requests
 	/// <summary>
 	/// 	The Enable Two Factor Authentication Request.
 	/// </summary>
-	public class EnableTwoFactorAuthenticationRequest : BaseRequest
+	public class EnableTwoFactorAuthenticationRequest
 	{
 		/// <summary>
 		/// 	Gets or sets the verification code.

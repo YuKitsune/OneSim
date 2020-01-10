@@ -3,12 +3,12 @@ namespace OneSim.Api.Data.Requests
 	/// <summary>
 	/// 	The Create User Request.
 	/// </summary>
-	public class CreateUserRequest : BaseRequest
+	public class CreateUserRequest
 	{
 		/// <summary>
 		/// 	Gets or sets the email of the user to create.
 		/// </summary>
-		public string NewUsersEmail { get; set; }
+		public string Email { get; set; }
 
 		/// <summary>
 		/// 	Gets or sets the UserName.

@@ -3,7 +3,7 @@ namespace OneSim.Api.Data.Requests
 	/// <summary>
 	/// 	The Two-Factor Authentication Log In Request.
 	/// </summary>
-	public class TwoFactorAuthenticationLogInRequest : BaseRequest
+	public class TwoFactorAuthenticationLogInRequest
 	{
 		/// <summary>
 		/// 	Gets or sets the UserName.

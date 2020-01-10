@@ -3,7 +3,7 @@ namespace OneSim.Api.Data.Requests
 	/// <summary>
 	/// 	The Confirm Email Request.
 	/// </summary>
-	public class ConfirmEmailRequest : BaseRequest
+	public class ConfirmEmailRequest
 	{
 		/// <summary>
 		/// 	Gets or sets the confirmation token.
