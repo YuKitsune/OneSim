@@ -9,7 +9,6 @@ namespace OneSim.Identity.Web.Controllers
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.Extensions.Logging;
 
-	using OneSim.Api.Data.Requests;
 	using OneSim.Api.Data.Responses;
 	using OneSim.Identity.Application;
 	using OneSim.Identity.Application.Abstractions;
