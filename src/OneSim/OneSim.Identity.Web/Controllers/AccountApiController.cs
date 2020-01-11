@@ -22,7 +22,7 @@ namespace OneSim.Identity.Web.Controllers
 	/// 	The user account management <see cref="Controller"/>.
 	/// </summary>
 	[Authorize]
-	public class AccountController : Controller
+	public class AccountApiController : Controller
 	{
 		/// <summary>
 		///     The <see cref="ApplicationIdentityDbContext"/>.
@@ -37,7 +37,7 @@ namespace OneSim.Identity.Web.Controllers
 		/// <summary>
 		///     The <see cref="ILogger{TCategoryName}"/>.
 		/// </summary>
-		private readonly ILogger<AccountController> _logger;
+		private readonly ILogger<AccountApiController> _logger;
 
 		/// <summary>
 		/// 	The <see cref="IUrlHelper"/>.
@@ -50,7 +50,7 @@ namespace OneSim.Identity.Web.Controllers
 		private readonly IEmailSender _emailSender;
 
 		/// <summary>
-		///     Initializes a new instance of the <see cref="AccountController"/> class.
+		///     Initializes a new instance of the <see cref="AccountApiController"/> class.
 		/// </summary>
 		/// <param name="service">
 		///     The <see cref="UserService"/>.
@@ -67,10 +67,10 @@ namespace OneSim.Identity.Web.Controllers
 		/// <param name="emailSender">
 		///    The <see cref="IEmailSender"/>.
 		/// </param>
-		public AccountController(
+		public AccountApiController(
 			UserService service,
 			ApplicationIdentityDbContext dbContext,
-			ILogger<AccountController> logger,
+			ILogger<AccountApiController> logger,
 			IUrlHelper urlHelper,
 			IEmailSender emailSender)
 		{
