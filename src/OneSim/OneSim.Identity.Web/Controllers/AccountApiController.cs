@@ -14,14 +14,15 @@ namespace OneSim.Identity.Web.Controllers
 	using OneSim.Identity.Application.Abstractions;
 	using OneSim.Identity.Domain.Entities;
 	using OneSim.Identity.Persistence;
+	using OneSim.Identity.Web.Models.ViewModels.Account;
 
 	using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 
 	/// <summary>
-	/// 	The user account management <see cref="Controller"/>.
+	/// 	The user account management API <see cref="Controller"/>.
 	/// </summary>
 	[Authorize]
-	public class AccountApiController : Controller
+	public class AccountApiController : Controller, IAccountController
 	{
 		/// <summary>
 		///     The <see cref="ApplicationIdentityDbContext"/>.
@@ -81,21 +82,21 @@ namespace OneSim.Identity.Web.Controllers
 		}
 
 		/// <summary>
-		/// 	Attempts to register a new user.
+		/// 	Handles the request to register a new account.
 		/// </summary>
-		/// <param name="request">
-		///		The <see cref="RegisterRequest"/>.
+		/// <param name="viewModel">
+		///		The <see cref="RegisterViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> Register([FromBody] RegisterRequest request)
+		public async Task<IActionResult> Register([FromBody] RegisterViewModel viewModel)
 		{
 			try
 			{
 				// Check no conflicting users exist
-				ApplicationUser existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+				ApplicationUser existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
 
 				if (existingUser != null)
 				{
@@ -103,7 +104,7 @@ namespace OneSim.Identity.Web.Controllers
 												 "The given email address is already registered to an account."));
 				}
 
-				existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
+				existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == viewModel.UserName);
 
 				if (existingUser != null)
 				{
@@ -112,89 +113,32 @@ namespace OneSim.Identity.Web.Controllers
 				}
 
 				// Create a new user
-				ApplicationUser user = new ApplicationUser { Email = request.Email, UserName = request.UserName };
+				ApplicationUser user = new ApplicationUser { Email = viewModel.Email, UserName = viewModel.UserName };
 
 				// Register the user
-				await _userService.RegisterUser(user, request.Password);
+				await _userService.RegisterUser(user, viewModel.Password);
 
-				return Json(new BaseResponse(ResponseStatus.Success, $"Successfully registered a user with username {request.UserName}."));
+				return Json(new BaseResponse(ResponseStatus.Success, $"Successfully registered a user with username {viewModel.UserName}."));
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, $"An error has occurred registering a user with username \"{request.UserName}\".");
+				_logger.LogError(ex, $"An error has occurred registering a user with username \"{viewModel.UserName}\".");
 
 				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Register request."));
 			}
 		}
 
 		/// <summary>
-		/// 	Attempts to create a new user.
+		/// 	Handles the request to delete an account.
 		/// </summary>
-		/// <param name="request">
-		///		The <see cref="CreateUserRequest"/>.
+		/// <param name="viewModel">
+		///		The <see cref="DeleteAccountViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
-		/// </returns>
-		[HttpPost, Authorize]
-		public async Task<ActionResult> CreateUser([FromBody] CreateUserRequest request)
-		{
-			// Get the current user
-			ApplicationUser currentUser = await this.GetCurrentUserAsync(_dbContext);
-
-			try
-			{
-				// Ensure the current user is an admin
-				if (currentUser.Type != UserType.Administrator)
-				{
-					return Json(new BaseResponse(ResponseStatus.Unauthorized,
-												 "Only administrators may create new users"));
-				}
-
-				// Check no conflicting users exist
-				ApplicationUser existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-
-				if (existingUser != null)
-				{
-					return Json(new BaseResponse(ResponseStatus.Failure,
-												 "The given email address is already registered to an account."));
-				}
-
-				existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
-
-				if (existingUser != null)
-				{
-					return Json(new BaseResponse(ResponseStatus.Failure,
-												 "The given username is already registered to an account."));
-				}
-
-				// Create a new user
-				ApplicationUser user = new ApplicationUser { Email = request.Email, UserName = request.UserName };
-
-				// Register the user
-				await _userService.CreateUser(user, _emailSender, HttpContext.Request.Scheme, _urlHelper);
-
-				return Json(new BaseResponse(ResponseStatus.Success, $"Successfully created a user with username {request.UserName}."));
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, $"An error has occurred creating a user with username \"{request.UserName}\".");
-
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Create User request."));
-			}
-		}
-
-		/// <summary>
-		/// 	Attempts to delete the current user.
-		/// </summary>
-		/// <param name="request">
-		///		The <see cref="DeleteUserRequest"/>.
-		/// </param>
-		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> DeleteUser([FromBody] DeleteUserRequest request)
+		public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountViewModel viewModel)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -202,7 +146,7 @@ namespace OneSim.Identity.Web.Controllers
 			try
 			{
 				// Check the password is correct
-				bool passwordMatches = await _userService.UserManager.CheckPasswordAsync(user, request.Password);
+				bool passwordMatches = await _userService.UserManager.CheckPasswordAsync(user, viewModel.Password);
 				if (passwordMatches)
 				{
 					await _userService.DeleteUser(user);
@@ -216,20 +160,20 @@ namespace OneSim.Identity.Web.Controllers
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, $"An error has occurred deleting a user with username \"{request.UserName}\".");
+				_logger.LogError(ex, $"An error has occurred deleting a user with username \"{user.UserName}\".");
 
 				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Delete User request."));
 			}
 		}
 
 		/// <summary>
-		/// 	Attempts to send an Email Confirmation email to the currently logged in user.
+		/// 	Handles the request to send an email confirmation email.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> SendEmailConfirmationEmail()
+		public async Task<IActionResult> SendEmailConfirmationEmail()
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -250,17 +194,16 @@ namespace OneSim.Identity.Web.Controllers
 		}
 
 		/// <summary>
-		/// 	Attempts to confirm the email address of the currently logged in user using the
-		/// 	<see cref="ConfirmEmailRequest.ConfirmationCode"/>.
+		/// 	Handles the request to confirm an email address.
 		/// </summary>
-		/// <param name="request">
-		///		The <see cref="ConfirmEmailRequest"/>.
+		/// <param name="confirmationCode">
+		///		The confirmation code contained in the email confirmation email.
 		/// </param>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
+		public async Task<IActionResult> ConfirmEmail([FromBody] string confirmationCode)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -268,7 +211,7 @@ namespace OneSim.Identity.Web.Controllers
 			try
 			{
 				// Confirm email
-				await _userService.ConfirmEmail(user, request.ConfirmationCode);
+				await _userService.ConfirmEmail(user, confirmationCode);
 
 				return Json(new BaseResponse(ResponseStatus.Success, "Email confirmed."));
 			}
@@ -281,44 +224,53 @@ namespace OneSim.Identity.Web.Controllers
 		}
 
 		/// <summary>
-		/// 	Attempts to send a password reset email to the currently logged in user.
+		/// 	Handles the request to send a password reset email.
 		/// </summary>
+		/// <param name="viewModel">
+		///		The <see cref="SendPasswordResetEmailViewModel"/>.
+		/// </param>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> SendPasswordResetEmail()
+		public async Task<IActionResult> SendPasswordResetEmail(SendPasswordResetEmailViewModel viewModel)
 		{
-			// Get the current user
-			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
+			// Get the user
+			ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
 
-			try
+			if (user != null)
 			{
-				// Send the email
-				await _userService.SendPasswordResetEmail(user, _emailSender, HttpContext.Request.Scheme, _urlHelper);
+				try
+				{
+					// Send the email
+					await _userService.SendPasswordResetEmail(user, _emailSender, HttpContext.Request.Scheme, _urlHelper);
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError(ex, $"An error has occurred sending a Password Reset email to user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Password Reset email sent."));
+					return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Send Password Reset Email request."));
+				}
 			}
-			catch (Exception ex)
+			else
 			{
-				_logger.LogError(ex, $"An error has occurred sending a Password Reset email to user with email \"{user.Email}\".");
-
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Send Password Reset Email request."));
+				_logger.LogWarning($"Password reset requested for user with email \"{viewModel.Email}\", but no user with that email exists.");
 			}
+
+			return Json(new BaseResponse(ResponseStatus.Success, "Password Reset email sent."));
 		}
 
 		/// <summary>
-		/// 	Resets the password for the currently logged in user using the
-		/// 	<see cref="ResetPasswordRequest.ResetToken"/>.
+		/// 	Handles the request to reset the users password.
 		/// </summary>
-		/// <param name="request">
-		///		The <see cref="ResetPasswordRequest"/>.
+		/// <param name="viewModel">
+		///		The <see cref="ResetPasswordViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel viewModel)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -326,7 +278,7 @@ namespace OneSim.Identity.Web.Controllers
 			try
 			{
 				// Reset the password
-				await _userService.ResetPassword(user, request.NewPassword, request.ResetToken);
+				await _userService.ResetPassword(user, viewModel.NewPassword, viewModel.ResetToken);
 
 				return Json(new BaseResponse(ResponseStatus.Success, "Password reset."));
 			}
@@ -339,16 +291,16 @@ namespace OneSim.Identity.Web.Controllers
 		}
 
 		/// <summary>
-		/// 	Attempts to change the password for the currently logged in user.
+		/// 	Handles the request to change the current users password.
 		/// </summary>
-		/// <param name="request">
-		///		The <see cref="ChangePasswordRequest"/>.
+		/// <param name="viewModel">
+		///		The <see cref="ChangePasswordViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel viewModel)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -356,7 +308,7 @@ namespace OneSim.Identity.Web.Controllers
 			try
 			{
 				// Change the password
-				await _userService.ChangePassword(user, request.OldPassword, request.NewPassword);
+				await _userService.ChangePassword(user, viewModel.OldPassword, viewModel.NewPassword);
 
 				return Json(new BaseResponse(ResponseStatus.Success, "Password changed."));
 			}
@@ -369,18 +321,18 @@ namespace OneSim.Identity.Web.Controllers
 		}
 
 		/// <summary>
-		/// 	Attempts to enable Two-Factor Authentication for the currently logged in user.
+		/// 	Handles the request to enable Two-Factor Authentication.
 		/// </summary>
-		/// <param name="request">
-		///		The <see cref="EnableTwoFactorAuthenticationRequest"/>.
+		/// <param name="viewModel">
+		///		The <see cref="EnableTwoFactorAuthenticationViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="EnableTwoFactorAuthenticationResponse"/>, or
+		///		The <see cref="IActionResult"/> containing the <see cref="EnableTwoFactorAuthenticationResponse"/>, or
 		/// 	<see cref="BaseResponse"/> in the event of an error.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> EnableTwoFactorAuthentication(
-			[FromBody] EnableTwoFactorAuthenticationRequest request)
+		public async Task<IActionResult> EnableTwoFactorAuthentication(
+			[FromBody] EnableTwoFactorAuthenticationViewModel viewModel)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -388,7 +340,7 @@ namespace OneSim.Identity.Web.Controllers
 			try
 			{
 				// Enable 2FA
-				IEnumerable<string> recoveryCodes = await _userService.EnableTwoFactorAuthentication(user, request.VerificationCode);
+				IEnumerable<string> recoveryCodes = await _userService.EnableTwoFactorAuthentication(user, viewModel.VerificationCode);
 
 				return Json(new EnableTwoFactorAuthenticationResponse(ResponseStatus.Success, "Two-Factor Authentication Enabled")
 							{
@@ -404,13 +356,13 @@ namespace OneSim.Identity.Web.Controllers
 		}
 
 		/// <summary>
-		/// 	Attempts to reset Two-Factor Authentication for the currently logged in user.
+		/// 	Handles the request to reset Two-Factor Authentication.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> ResetTwoFactorAuthentication()
+		public async Task<IActionResult> ResetTwoFactorAuthentication()
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -434,13 +386,13 @@ namespace OneSim.Identity.Web.Controllers
 		}
 
 		/// <summary>
-		/// 	Attempts to disable Two-Factor Authentication for the currently logged in user.
+		/// 	Handles the request to disable Two-Factor Authentication.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="ActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<ActionResult> DisableTwoFactorAuthentication()
+		public async Task<IActionResult> DisableTwoFactorAuthentication()
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);

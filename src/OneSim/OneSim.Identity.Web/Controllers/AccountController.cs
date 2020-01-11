@@ -19,7 +19,7 @@ namespace OneSim.Identity.Web.Controllers
 	using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 
 	/// <summary>
-	/// 	The user account management <see cref="Controller"/>.
+	/// 	The user account management MVC <see cref="Controller"/>.
 	/// </summary>
 	[Authorize]
 	public class AccountController : Controller, IAccountController
