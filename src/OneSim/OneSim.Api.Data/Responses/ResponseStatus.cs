@@ -23,6 +23,11 @@ namespace OneSim.Api.Data.Responses
 		/// <summary>
 		/// 	The user is not authorized to perform the request.
 		/// </summary>
-		Unauthorized
+		Unauthorized,
+
+		/// <summary>
+		/// 	The request didn't necessarily fail, error out, and the user was not unauthorized, just not quite right.
+		/// </summary>
+		Invariant
 	}
 }

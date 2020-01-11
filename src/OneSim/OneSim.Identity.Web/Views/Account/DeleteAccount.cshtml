@@ -1,0 +1,22 @@
+@using OneSim.Identity.Web
+@using OneSim.Identity.Web.Controllers
+@{
+    ViewData["Title"] = "Delete Account";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<form id="deleteAccountForm" class="ui large form" asp-action="@nameof(AccountController.DeleteAccount)" asp-controller="@Utils.GetControllerName(nameof(AccountController))" method="post">
+    <div class="ui stacked segment">
+        
+        <p>
+            You will not be able to recover your account once it has been deleted.
+            Are you sure you wish to delete your account?
+        </p>
+
+        @* Anti-forgery token *@
+        @Html.AntiForgeryToken()
+
+        @* Delete button *@
+        <button class="ui fluid large negative button" type="submit">Delete Account</button>
+    </div>
+</form>

@@ -15,6 +15,7 @@ namespace OneSim.Identity.Web.Controllers
 	using OneSim.Identity.Domain.Entities;
 	using OneSim.Identity.Persistence;
 	using OneSim.Identity.Web.Models.ViewModels.Account;
+	using OneSim.Identity.Web.Models.ViewModels.Authentication;
 
 	using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 
@@ -82,34 +83,55 @@ namespace OneSim.Identity.Web.Controllers
 		}
 
 		/// <summary>
+		/// 	Returns the index view.
+		/// </summary>
+		/// <param name="viewModel">
+		///		The <see cref="IndexViewModel"/>.
+		/// </param>
+		/// <returns>
+		///		The <see cref="IActionResult"/>.
+		/// </returns>
+		[HttpGet]
+		public IActionResult Index(IndexViewModel viewModel = null) => View(viewModel ?? new IndexViewModel());
+
+		/// <summary>
+		/// 	Returns the account registration view.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/>.
+		/// </returns>
+		[HttpGet, AllowAnonymous]
+		public IActionResult Register() => View();
+
+		/// <summary>
 		/// 	Handles the request to register a new account.
 		/// </summary>
 		/// <param name="viewModel">
 		///		The <see cref="RegisterViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
-		[HttpPost]
-		public async Task<IActionResult> Register([FromBody] RegisterViewModel viewModel)
+		[HttpPost, AllowAnonymous]
+		public async Task<IActionResult> Register(RegisterViewModel viewModel)
 		{
 			try
 			{
 				// Check no conflicting users exist
 				ApplicationUser existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
-
 				if (existingUser != null)
 				{
-					return Json(new BaseResponse(ResponseStatus.Failure,
-												 "The given email address is already registered to an account."));
+					ModelState.AddModelError(string.Empty, "The given email address is already registered to an account.");
+
+					return View();
 				}
 
 				existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == viewModel.UserName);
-
 				if (existingUser != null)
 				{
-					return Json(new BaseResponse(ResponseStatus.Failure,
-												 "The given username is already registered to an account."));
+					ModelState.AddModelError(string.Empty, "The given username is already registered to an account.");
+
+					return View();
 				}
 
 				// Create a new user
@@ -118,15 +140,25 @@ namespace OneSim.Identity.Web.Controllers
 				// Register the user
 				await _userService.RegisterUser(user, viewModel.Password);
 
-				return Json(new BaseResponse(ResponseStatus.Success, $"Successfully registered a user with username {viewModel.UserName}."));
+				return RedirectToAction(nameof(Index));
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, $"An error has occurred registering a user with username \"{viewModel.UserName}\".");
+				_logger.LogError(ex, $"An error has occurred registering an account with email \"{viewModel.Email}\" and username \"{viewModel.UserName}\".");
+				ModelState.AddModelError(string.Empty, $"An error has occurred registering an account with email \"{viewModel.Email}\" and username \"{viewModel.UserName}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Register request."));
+				return View();
 			}
 		}
+
+		/// <summary>
+		/// 	Returns the account deletion view.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		/// </returns>
+		[HttpGet]
+		public IActionResult DeleteAccount() => View();
 
 		/// <summary>
 		/// 	Handles the request to delete an account.
@@ -135,10 +167,10 @@ namespace OneSim.Identity.Web.Controllers
 		///		The <see cref="DeleteAccountViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountViewModel viewModel)
+		public async Task<IActionResult> DeleteAccount(DeleteAccountViewModel viewModel)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -151,28 +183,29 @@ namespace OneSim.Identity.Web.Controllers
 				{
 					await _userService.DeleteUser(user);
 
-					return Json(new BaseResponse(ResponseStatus.Success, "User has been deleted."));
+					return View("AccountDeleted");
 				}
 
 				// Todo: Log security stuff separately, and also keep in mind the amount of failed attempts
 				// 	Might pose a security issue
-				return Json(new BaseResponse(ResponseStatus.Unauthorized, "Incorrect password."));
+				ModelState.AddModelError(string.Empty, "Unable to delete account.");
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, $"An error has occurred deleting a user with username \"{user.UserName}\".");
-
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Delete User request."));
+				_logger.LogError(ex, $"An error has occurred deleting an account with email \"{user.Email}\".");
+				ModelState.AddModelError(string.Empty, "An error occurred while attempting to delete the account.");
 			}
+
+			return View();
 		}
 
 		/// <summary>
 		/// 	Handles the request to send an email confirmation email.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
-		[HttpPost]
+		[HttpGet]
 		public async Task<IActionResult> SendEmailConfirmationEmail()
 		{
 			// Get the current user
@@ -183,13 +216,22 @@ namespace OneSim.Identity.Web.Controllers
 				// Send the email confirmation email
 				await _userService.SendEmailConfirmationEmail(user, _emailSender, HttpContext.Request.Scheme, _urlHelper);
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Email Confirmation email sent."));
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = $"An Email Confirmation email has been sent to \"{user.Email}\"."
+										});
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred sending an Email Confirmation email to user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Send Email Confirmation Email request."));
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = "An error occurred while attempting to send the Email Confirmation email.",
+											MessageIsError = true
+										});
 			}
 		}
 
@@ -200,10 +242,10 @@ namespace OneSim.Identity.Web.Controllers
 		///		The confirmation code contained in the email confirmation email.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
-		[HttpPost]
-		public async Task<IActionResult> ConfirmEmail([FromBody] string confirmationCode)
+		[HttpGet]
+		public async Task<IActionResult> ConfirmEmail(string confirmationCode)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -213,15 +255,33 @@ namespace OneSim.Identity.Web.Controllers
 				// Confirm email
 				await _userService.ConfirmEmail(user, confirmationCode);
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Email confirmed."));
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = "Email address confirmed."
+										});
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred confirming the email for user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Confirm Email request."));
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = "An error occurred while attempting to confirm the email address.",
+											MessageIsError = true
+										});
 			}
 		}
+
+		/// <summary>
+		/// 	Returns the password reset view.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/>.
+		/// </returns>
+		[HttpGet, AllowAnonymous]
+		public IActionResult SendPasswordResetEmail() => View();
 
 		/// <summary>
 		/// 	Handles the request to send a password reset email.
@@ -232,7 +292,7 @@ namespace OneSim.Identity.Web.Controllers
 		/// <returns>
 		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
-		[HttpPost]
+		[HttpPost, AllowAnonymous]
 		public async Task<IActionResult> SendPasswordResetEmail(SendPasswordResetEmailViewModel viewModel)
 		{
 			// Get the user
@@ -248,8 +308,9 @@ namespace OneSim.Identity.Web.Controllers
 				catch (Exception ex)
 				{
 					_logger.LogError(ex, $"An error has occurred sending a Password Reset email to user with email \"{user.Email}\".");
+					ModelState.AddModelError(string.Empty, "An error occurred while sending the Password Reset email.");
 
-					return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Send Password Reset Email request."));
+					return View();
 				}
 			}
 			else
@@ -257,8 +318,17 @@ namespace OneSim.Identity.Web.Controllers
 				_logger.LogWarning($"Password reset requested for user with email \"{viewModel.Email}\", but no user with that email exists.");
 			}
 
-			return Json(new BaseResponse(ResponseStatus.Success, "Password Reset email sent."));
+			return View("PasswordResetEmailSent");
 		}
+
+		/// <summary>
+		/// 	Returns the password reset view.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/>.
+		/// </returns>
+		[HttpGet, AllowAnonymous]
+		public IActionResult ResetPassword(string token) => View(new ResetPasswordViewModel { ResetToken = token });
 
 		/// <summary>
 		/// 	Handles the request to reset the users password.
@@ -267,28 +337,44 @@ namespace OneSim.Identity.Web.Controllers
 		///		The <see cref="ResetPasswordViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
-		[HttpPost]
-		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel viewModel)
+		[HttpPost, AllowAnonymous]
+		public async Task<IActionResult> ResetPassword(ResetPasswordViewModel viewModel)
 		{
-			// Get the current user
-			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
+			// Get the user
+			ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
 
 			try
 			{
 				// Reset the password
 				await _userService.ResetPassword(user, viewModel.NewPassword, viewModel.ResetToken);
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Password reset."));
+				return RedirectToAction(nameof(AuthenticationController.Login),
+										Utils.GetControllerName(nameof(AuthenticationController)),
+										new LoginViewModel { Message = "Password has been reset." });
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred resetting the password for user with email \"{user.Email}\".");
+				ModelState.AddModelError(string.Empty, "An error occurred while attempting to reset the password.");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Reset Password request."));
+				return View(new ResetPasswordViewModel
+							{
+								Email = viewModel.Email,
+								ResetToken = viewModel.ResetToken
+							});
 			}
 		}
+
+		/// <summary>
+		/// 	Returns the change password view.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/>.
+		/// </returns>
+		[HttpGet]
+		public IActionResult ChangePassword() => View();
 
 		/// <summary>
 		/// 	Handles the request to change the current users password.
@@ -297,10 +383,10 @@ namespace OneSim.Identity.Web.Controllers
 		///		The <see cref="ChangePasswordViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
 		[HttpPost]
-		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel viewModel)
+		public async Task<IActionResult> ChangePassword(ChangePasswordViewModel viewModel)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -310,13 +396,68 @@ namespace OneSim.Identity.Web.Controllers
 				// Change the password
 				await _userService.ChangePassword(user, viewModel.OldPassword, viewModel.NewPassword);
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Password changed."));
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = "Password has been changed."
+										});
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred changing the password for user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Change Password request."));
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = "An error occurred while attempting to change password.",
+											MessageIsError = true
+										});
+			}
+		}
+
+		/// <summary>
+		/// 	Returns the enable Two-Factor Authentication view.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/>.
+		/// </returns>
+		[HttpGet]
+		public async Task<IActionResult> EnableTwoFactorAuthentication()
+		{
+			// Get the current user
+			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
+
+			// Check if 2FA is enabled
+			if (user.TwoFactorEnabled)
+			{
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = "Two-Factor Authentication is already enabled."
+										});
+			}
+
+			try
+			{
+				// Get the key and URI
+				(string key, string qrCodeUri) = await _userService.GetSharedKeyAndQrCodeUriAsync(user);
+
+				return View(new EnableTwoFactorAuthenticationViewModel
+							{
+								SharedKey = key,
+								AuthenticatorUri = qrCodeUri
+							});
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"An error has occurred enabling Two-Factor Authentication for user with email \"{user.Email}\".");
+
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = "An error occurred while attempting to enable Two-Factor Authentication.",
+											MessageIsError = true
+										});
 			}
 		}
 
@@ -327,12 +468,11 @@ namespace OneSim.Identity.Web.Controllers
 		///		The <see cref="EnableTwoFactorAuthenticationViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="EnableTwoFactorAuthenticationResponse"/>, or
-		/// 	<see cref="BaseResponse"/> in the event of an error.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
 		[HttpPost]
 		public async Task<IActionResult> EnableTwoFactorAuthentication(
-			[FromBody] EnableTwoFactorAuthenticationViewModel viewModel)
+			EnableTwoFactorAuthenticationViewModel viewModel)
 		{
 			// Get the current user
 			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
@@ -342,26 +482,37 @@ namespace OneSim.Identity.Web.Controllers
 				// Enable 2FA
 				IEnumerable<string> recoveryCodes = await _userService.EnableTwoFactorAuthentication(user, viewModel.VerificationCode);
 
-				return Json(new EnableTwoFactorAuthenticationResponse(ResponseStatus.Success, "Two-Factor Authentication Enabled")
-							{
-								RecoveryCodes = recoveryCodes
-							});
+				return View("RecoveryCodes", new RecoveryCodesViewModel { RecoveryCodes = recoveryCodes });
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred enabling Two-Factor Authentication for user with email \"{user.Email}\".");
+				ModelState.AddModelError(string.Empty, "An error occurred while attempting to enable Two-Factor Authentication.");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Enable Two-Factor Authentication request."));
+				return View(new EnableTwoFactorAuthenticationViewModel
+							{
+								SharedKey = viewModel.SharedKey,
+								AuthenticatorUri = viewModel.AuthenticatorUri
+							});
 			}
 		}
+
+		/// <summary>
+		/// 	Returns the Two-Factor Authentication reset warning view.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/>.
+		/// </returns>
+		[HttpGet]
+		public IActionResult ResetTwoFactorAuthenticationWarning() => View();
 
 		/// <summary>
 		/// 	Handles the request to reset Two-Factor Authentication.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
-		[HttpPost]
+		[HttpGet]
 		public async Task<IActionResult> ResetTwoFactorAuthentication()
 		{
 			// Get the current user
@@ -369,29 +520,37 @@ namespace OneSim.Identity.Web.Controllers
 
 			try
 			{
-				throw new NotImplementedException("Need to investigate reset vs Enable / Disable.");
-
 				// Reset 2FA
-				// Todo: Shouldn't i be getting codes here?
 				await _userService.ResetTwoFactorAuthentication(user);
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Two-Factor Authentication reset."));
+				// Redirect to Enable 2FA
+				return RedirectToAction(nameof(EnableTwoFactorAuthentication));
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred resetting Two-Factor Authentication for user with email \"{user.Email}\".");
+				ModelState.AddModelError(string.Empty, "An error occurred while attempting to reset Two-Factor Authentication.");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Reset Two-Factor Authentication request."));
+				return RedirectToAction(nameof(ResetTwoFactorAuthenticationWarning));
 			}
 		}
+
+		/// <summary>
+		/// 	Returns the Two-Factor Authentication disable warning view.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/>.
+		/// </returns>
+		[HttpGet]
+		public IActionResult DisableTwoFactorAuthenticationWarning() => View();
 
 		/// <summary>
 		/// 	Handles the request to disable Two-Factor Authentication.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
+		///		The <see cref="IActionResult"/>.
 		/// </returns>
-		[HttpPost]
+		[HttpGet]
 		public async Task<IActionResult> DisableTwoFactorAuthentication()
 		{
 			// Get the current user
@@ -402,13 +561,18 @@ namespace OneSim.Identity.Web.Controllers
 				// Disable 2FA
 				await _userService.DisableTwoFactorAuthentication(user);
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Two-Factor Authentication disabled."));
+				return RedirectToAction(nameof(Index),
+										new IndexViewModel
+										{
+											Message = "Two-Factor Authentication disabled."
+										});
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred disabling Two-Factor Authentication for user with email \"{user.Email}\".");
+				ModelState.AddModelError(string.Empty, "An error occurred while attempting to disable Two-Factor Authentication.");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Disable Two-Factor Authentication request."));
+				return RedirectToAction(nameof(DisableTwoFactorAuthenticationWarning));
 			}
 		}
 	}

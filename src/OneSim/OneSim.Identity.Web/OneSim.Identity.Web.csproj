@@ -67,6 +67,9 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.map" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\LICENSE.txt" />
+      <_ContentIncludedByDefault Remove="Views\Account\DeleteAccount.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Account\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Account\Register.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -75,10 +78,6 @@
       <ProjectReference Include="..\OneSim.Identity.Domain\OneSim.Identity.Domain.csproj" />
       <ProjectReference Include="..\OneSim.Identity.Infrastructure\OneSim.Identity.Infrastructure.csproj" />
       <ProjectReference Include="..\OneSim.Identity.Persistence\OneSim.Identity.Persistence.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Views\AccountApi" />
     </ItemGroup>
 
 </Project>

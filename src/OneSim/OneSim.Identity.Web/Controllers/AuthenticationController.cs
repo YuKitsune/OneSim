@@ -17,6 +17,8 @@ namespace OneSim.Identity.Web.Controllers
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.Logging;
 
+	using MimeKit.Text;
+
 	using OneSim.Identity.Application;
 	using OneSim.Identity.Domain.Entities;
 	using OneSim.Identity.Persistence;
@@ -154,7 +156,15 @@ namespace OneSim.Identity.Web.Controllers
 					// If successful, make sure the callback URI is still valid,
 					// and if so, redirect back to authorize endpoint
 					if (result.Succeeded)
-						return Redirect(_interactionService.IsValidReturnUrl(viewModel.CallbackUri) ? viewModel.CallbackUri : "~/");
+					{
+						if (_interactionService.IsValidReturnUrl(viewModel.CallbackUri))
+						{
+							return Redirect(viewModel.CallbackUri);
+						}
+
+						return RedirectToAction(nameof(AccountController.Index),
+												Utils.GetControllerName(nameof(AccountController)));
+					}
 
 					// If 2FA is enabled, then redirect to the 2FA login view
 					if (result.RequiresTwoFactor)
@@ -226,7 +236,15 @@ namespace OneSim.Identity.Web.Controllers
 				// If successful, make sure the callback URI is still valid,
 				// and if so, redirect back to authorize endpoint
 				if (result.Succeeded)
-					return Redirect(_interactionService.IsValidReturnUrl(viewModel.CallbackUri) ? viewModel.CallbackUri : "~/");
+				{
+					if (_interactionService.IsValidReturnUrl(viewModel.CallbackUri))
+					{
+						return Redirect(viewModel.CallbackUri);
+					}
+
+					return RedirectToAction(nameof(AccountController.Index),
+											Utils.GetControllerName(nameof(AccountController)));
+				}
 
 				// If locked out, then redirect to the lockout view
 				if (result.IsLockedOut) return RedirectToAction(nameof(Lockout));
@@ -303,7 +321,15 @@ namespace OneSim.Identity.Web.Controllers
 				// If successful, make sure the callback URI is still valid,
 				// and if so, redirect back to authorize endpoint
 				if (result.Succeeded)
-					return Redirect(_interactionService.IsValidReturnUrl(viewModel.CallbackUri) ? viewModel.CallbackUri : "~/");
+				{
+					if (_interactionService.IsValidReturnUrl(viewModel.CallbackUri))
+					{
+						return Redirect(viewModel.CallbackUri);
+					}
+
+					return RedirectToAction(nameof(AccountController.Index),
+											Utils.GetControllerName(nameof(AccountController)));
+				}
 
 				// If locked out, then redirect to the lockout view
 				if (result.IsLockedOut) return RedirectToAction(nameof(Lockout));

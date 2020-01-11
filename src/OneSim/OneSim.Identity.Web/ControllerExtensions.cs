@@ -28,11 +28,11 @@ namespace OneSim.Identity.Web
 		/// </returns>
 		public static async Task<ApplicationUser> GetCurrentUserAsync(this Controller controller, ApplicationIdentityDbContext dbContext)
 		{
-            // Get the user from the user ID
-			string userId = controller.HttpContext.User.Identity.Name;
-			ApplicationUser user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+			// Get the user from the username
+			string username = controller.HttpContext.User.Identity.Name;
+			ApplicationUser user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
 
-			if (user == null) throw new UserNotFoundException(userId, $"Unable to find user with ID \"{userId}\".");
+			if (user == null) throw new UserNotFoundException(username, $"Unable to find user with username \"{username}\".");
 
 			return user;
 		}

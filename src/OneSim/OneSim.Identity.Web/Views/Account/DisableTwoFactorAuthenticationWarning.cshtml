@@ -1,0 +1,21 @@
+@using OneSim.Identity.Web
+@using OneSim.Identity.Web.Controllers
+@{
+    ViewData["Title"] = "Disable Two-Factor Authentication";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<div class="ui stacked segment">
+    <form id="warningForm" action="@Url.Action(nameof(AccountController.DisableTwoFactorAuthentication), Utils.GetControllerName(nameof(AccountController)))" method="get" class="ui warning form">
+        <div class="ui warning message">
+            <div class="header">
+                <i class="exclamation triangle icon"></i>This action only disables 2FA.
+            </div>
+            Disabling 2FA does not change the keys used in authenticator apps. 
+            If you wish to change the key used in an authenticator app you should 
+            @Html.ActionLink("reset your authenticator keys", nameof(AccountController.ResetTwoFactorAuthenticationWarning), Utils.GetControllerName(nameof(AccountController)))
+        </div>
+        
+        <button class="ui fluid negative button" type="submit">Disable 2FA</button>
+    </form>
+</div>

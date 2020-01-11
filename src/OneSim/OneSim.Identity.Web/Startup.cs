@@ -144,6 +144,8 @@ namespace OneSim.Identity.Web
                 app.UseHsts();
             }
 
+            app.UseStaticFiles();
+
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseIdentityServer();

@@ -90,14 +90,13 @@ namespace OneSim.Identity.Web.Controllers
 		/// <returns>
 		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
-		[HttpPost]
+		[HttpPost, AllowAnonymous]
 		public async Task<IActionResult> Register([FromBody] RegisterViewModel viewModel)
 		{
 			try
 			{
 				// Check no conflicting users exist
 				ApplicationUser existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
-
 				if (existingUser != null)
 				{
 					return Json(new BaseResponse(ResponseStatus.Failure,
@@ -105,7 +104,6 @@ namespace OneSim.Identity.Web.Controllers
 				}
 
 				existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == viewModel.UserName);
-
 				if (existingUser != null)
 				{
 					return Json(new BaseResponse(ResponseStatus.Failure,
@@ -118,13 +116,13 @@ namespace OneSim.Identity.Web.Controllers
 				// Register the user
 				await _userService.RegisterUser(user, viewModel.Password);
 
-				return Json(new BaseResponse(ResponseStatus.Success, $"Successfully registered a user with username {viewModel.UserName}."));
+				return Json(new BaseResponse(ResponseStatus.Success, $"Account with email \"{user.Email}\" and username \"{user.UserName}\" successfully registered."));
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, $"An error has occurred registering a user with username \"{viewModel.UserName}\".");
+				_logger.LogError(ex, $"An error has occurred registering an account with email \"{viewModel.Email}\" and username \"{viewModel.UserName}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Register request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to register the account."));
 			}
 		}
 
@@ -151,18 +149,18 @@ namespace OneSim.Identity.Web.Controllers
 				{
 					await _userService.DeleteUser(user);
 
-					return Json(new BaseResponse(ResponseStatus.Success, "User has been deleted."));
+					return Json(new BaseResponse(ResponseStatus.Success, "Account has been deleted."));
 				}
 
 				// Todo: Log security stuff separately, and also keep in mind the amount of failed attempts
 				// 	Might pose a security issue
-				return Json(new BaseResponse(ResponseStatus.Unauthorized, "Incorrect password."));
+				return Json(new BaseResponse(ResponseStatus.Unauthorized, "Unable to delete account."));
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, $"An error has occurred deleting a user with username \"{user.UserName}\".");
+				_logger.LogError(ex, $"An error has occurred deleting an account with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Delete User request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to delete the account."));
 			}
 		}
 
@@ -189,7 +187,7 @@ namespace OneSim.Identity.Web.Controllers
 			{
 				_logger.LogError(ex, $"An error has occurred sending an Email Confirmation email to user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Send Email Confirmation Email request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to send the Email Confirmation email."));
 			}
 		}
 
@@ -213,13 +211,13 @@ namespace OneSim.Identity.Web.Controllers
 				// Confirm email
 				await _userService.ConfirmEmail(user, confirmationCode);
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Email confirmed."));
+				return Json(new BaseResponse(ResponseStatus.Success, "Email address confirmed."));
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred confirming the email for user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Confirm Email request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to confirm the email address."));
 			}
 		}
 
@@ -232,7 +230,7 @@ namespace OneSim.Identity.Web.Controllers
 		/// <returns>
 		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
-		[HttpPost]
+		[HttpPost, AllowAnonymous]
 		public async Task<IActionResult> SendPasswordResetEmail(SendPasswordResetEmailViewModel viewModel)
 		{
 			// Get the user
@@ -249,7 +247,7 @@ namespace OneSim.Identity.Web.Controllers
 				{
 					_logger.LogError(ex, $"An error has occurred sending a Password Reset email to user with email \"{user.Email}\".");
 
-					return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Send Password Reset Email request."));
+					return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while sending the Password Reset email."));
 				}
 			}
 			else
@@ -269,11 +267,11 @@ namespace OneSim.Identity.Web.Controllers
 		/// <returns>
 		///		The <see cref="IActionResult"/> containing the <see cref="BaseResponse"/>.
 		/// </returns>
-		[HttpPost]
+		[HttpPost, AllowAnonymous]
 		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel viewModel)
 		{
-			// Get the current user
-			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
+			// Get the user
+			ApplicationUser user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
 
 			try
 			{
@@ -286,7 +284,7 @@ namespace OneSim.Identity.Web.Controllers
 			{
 				_logger.LogError(ex, $"An error has occurred resetting the password for user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Reset Password request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to reset the password."));
 			}
 		}
 
@@ -316,7 +314,43 @@ namespace OneSim.Identity.Web.Controllers
 			{
 				_logger.LogError(ex, $"An error has occurred changing the password for user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Change Password request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to change password."));
+			}
+		}
+
+		/// <summary>
+		/// 	Handles the request for the key and URI required to enable Two-Factor Authentication.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="IActionResult"/> containing the <see cref="EnableTwoFactorAuthenticationResponse"/>, or
+		/// 	<see cref="BaseResponse"/> in the event of an error.
+		/// </returns>
+		[HttpPost]
+		public async Task<IActionResult> EnableTwoFactorAuthentication()
+		{
+			// Get the current user
+			ApplicationUser user = await this.GetCurrentUserAsync(_dbContext);
+
+			// Check if 2FA is enabled
+			if (user.TwoFactorEnabled)
+				return Json(new BaseResponse(ResponseStatus.Invariant, "Two-Factor Authentication is already enabled."));
+
+			try
+			{
+				// Get the key and URI
+				(string key, string qrCodeUri) = await _userService.GetSharedKeyAndQrCodeUriAsync(user);
+
+				return Json(new EnableTwoFactorAuthenticationResponse(ResponseStatus.Invariant, "Ready to enable Two-Factor Authentication")
+							{
+								SharedKey = key,
+								AuthenticatorUri = qrCodeUri
+							});
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"An error has occurred enabling Two-Factor Authentication for user with email \"{user.Email}\".");
+
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to enable Two-Factor Authentication."));
 			}
 		}
 
@@ -327,7 +361,7 @@ namespace OneSim.Identity.Web.Controllers
 		///		The <see cref="EnableTwoFactorAuthenticationViewModel"/>.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/> containing the <see cref="EnableTwoFactorAuthenticationResponse"/>, or
+		///		The <see cref="IActionResult"/> containing the <see cref="RecoveryCodeResponse"/>, or
 		/// 	<see cref="BaseResponse"/> in the event of an error.
 		/// </returns>
 		[HttpPost]
@@ -342,7 +376,7 @@ namespace OneSim.Identity.Web.Controllers
 				// Enable 2FA
 				IEnumerable<string> recoveryCodes = await _userService.EnableTwoFactorAuthentication(user, viewModel.VerificationCode);
 
-				return Json(new EnableTwoFactorAuthenticationResponse(ResponseStatus.Success, "Two-Factor Authentication Enabled")
+				return Json(new RecoveryCodeResponse(ResponseStatus.Success, "Two-Factor Authentication Enabled")
 							{
 								RecoveryCodes = recoveryCodes
 							});
@@ -351,7 +385,7 @@ namespace OneSim.Identity.Web.Controllers
 			{
 				_logger.LogError(ex, $"An error has occurred enabling Two-Factor Authentication for user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Enable Two-Factor Authentication request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to enable Two-Factor Authentication."));
 			}
 		}
 
@@ -369,19 +403,17 @@ namespace OneSim.Identity.Web.Controllers
 
 			try
 			{
-				throw new NotImplementedException("Need to investigate reset vs Enable / Disable.");
-
 				// Reset 2FA
-				// Todo: Shouldn't i be getting codes here?
 				await _userService.ResetTwoFactorAuthentication(user);
 
-				return Json(new BaseResponse(ResponseStatus.Success, "Two-Factor Authentication reset."));
+				// Revert to whatever the Enable method does
+				return await EnableTwoFactorAuthentication();
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"An error has occurred resetting Two-Factor Authentication for user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Reset Two-Factor Authentication request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to reset Two-Factor Authentication."));
 			}
 		}
 
@@ -408,7 +440,7 @@ namespace OneSim.Identity.Web.Controllers
 			{
 				_logger.LogError(ex, $"An error has occurred disabling Two-Factor Authentication for user with email \"{user.Email}\".");
 
-				return Json(new BaseResponse(ResponseStatus.Error, "An error has occurred processing the Disable Two-Factor Authentication request."));
+				return Json(new BaseResponse(ResponseStatus.Error, "An error occurred while attempting to disable Two-Factor Authentication."));
 			}
 		}
 	}

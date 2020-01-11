@@ -16,101 +16,101 @@ namespace OneSim.Identity.Web.Controllers
 		/// 	Handles the request to register a new account.
 		/// </summary>
 		/// <param name="viewModel">
-		///		The <see cref="RegisterViewModel"/>.
+		/// 	The <see cref="RegisterViewModel" />.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> Register(RegisterViewModel viewModel);
+		public Task<IActionResult> Register(RegisterViewModel viewModel);
 
 		/// <summary>
 		/// 	Handles the request to delete an account.
 		/// </summary>
 		/// <param name="viewModel">
-		///		The <see cref="DeleteAccountViewModel"/>.
+		/// 	The <see cref="DeleteAccountViewModel" />.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> DeleteAccount(DeleteAccountViewModel viewModel);
+		public Task<IActionResult> DeleteAccount(DeleteAccountViewModel viewModel);
 
 		/// <summary>
 		/// 	Handles the request to send an email confirmation email.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> SendEmailConfirmationEmail();
+		public Task<IActionResult> SendEmailConfirmationEmail();
 
 		/// <summary>
 		/// 	Handles the request to confirm an email address.
 		/// </summary>
 		/// <param name="confirmationCode">
-		///		The confirmation code contained in the email confirmation email.
+		/// 	The confirmation code contained in the email confirmation email.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> ConfirmEmail(string confirmationCode);
+		public Task<IActionResult> ConfirmEmail(string confirmationCode);
 
 		/// <summary>
 		/// 	Handles the request to send a password reset email.
 		/// </summary>
 		/// <param name="viewModel">
-		///		The <see cref="SendPasswordResetEmailViewModel"/>.
+		/// 	The <see cref="SendPasswordResetEmailViewModel" />.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> SendPasswordResetEmail(SendPasswordResetEmailViewModel viewModel);
+		public Task<IActionResult> SendPasswordResetEmail(SendPasswordResetEmailViewModel viewModel);
 
 		/// <summary>
 		/// 	Handles the request to reset the users password.
 		/// </summary>
 		/// <param name="viewModel">
-		///		The <see cref="ResetPasswordViewModel"/>.
+		/// 	The <see cref="ResetPasswordViewModel" />.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> ResetPassword(ResetPasswordViewModel viewModel);
+		public Task<IActionResult> ResetPassword(ResetPasswordViewModel viewModel);
 
 		/// <summary>
 		/// 	Handles the request to change the current users password.
 		/// </summary>
 		/// <param name="viewModel">
-		///		The <see cref="ChangePasswordViewModel"/>.
+		/// 	The <see cref="ChangePasswordViewModel" />.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> ChangePassword(ChangePasswordViewModel viewModel);
+		public Task<IActionResult> ChangePassword(ChangePasswordViewModel viewModel);
 
 		/// <summary>
 		/// 	Handles the request to enable Two-Factor Authentication.
 		/// </summary>
 		/// <param name="viewModel">
-		///		The <see cref="EnableTwoFactorAuthenticationViewModel"/>.
+		/// 	The <see cref="EnableTwoFactorAuthenticationViewModel" />.
 		/// </param>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> EnableTwoFactorAuthentication(EnableTwoFactorAuthenticationViewModel viewModel);
+		public Task<IActionResult> EnableTwoFactorAuthentication(EnableTwoFactorAuthenticationViewModel viewModel);
 
 		/// <summary>
 		/// 	Handles the request to reset Two-Factor Authentication.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> ResetTwoFactorAuthentication();
+		public Task<IActionResult> ResetTwoFactorAuthentication();
 
 		/// <summary>
 		/// 	Handles the request to disable Two-Factor Authentication.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="IActionResult"/>.
+		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		Task<IActionResult> DisableTwoFactorAuthentication();
+		public Task<IActionResult> DisableTwoFactorAuthentication();
 	}
 }

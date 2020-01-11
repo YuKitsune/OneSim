@@ -29,5 +29,10 @@ namespace OneSim.Identity.Web.Models.ViewModels.Authentication
 		/// 	Gets or sets the URL to direct the user back to after login
 		/// </summary>
 		public string CallbackUri { get; set; }
+
+		/// <summary>
+		/// 	Gets or sets the message.
+		/// </summary>
+		public string Message { get; set; }
 	}
 }

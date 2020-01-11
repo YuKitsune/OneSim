@@ -8,7 +8,7 @@
     List<ModelError> errors = Utils.GetModelErrors(ViewData).ToList();
 }
 
-<form id="loginForm" class="ui large form @(errors.Any() ? "error" : string.Empty)" asp-action="@nameof(AuthenticationController.Login)" asp-controller="@Utils.GetControllerName(nameof(AccountApiController))" method="post">
+<form id="loginForm" class="ui large form @(errors.Any() ? "error" : string.Empty)" asp-action="@nameof(AuthenticationController.Login)" asp-controller="@Utils.GetControllerName(nameof(AuthenticationController))" method="post">
     <div class="ui stacked segment">
 
         @* Validation message *@
@@ -53,7 +53,5 @@
 
 @* Forgot password *@
 <div class="ui message">
-    @* Todo: *@
-    Gonna put Password Reset URL here.
-    @*@Html.ActionLink("Forgot your password?", nameof(AccountController.ForgotPassword), Utils.GetCleanControllerName(nameof(AccountController)))*@
+    @Html.ActionLink("Forgot your password?", nameof(AccountController.SendPasswordResetEmail), Utils.GetControllerName(nameof(AccountController)))
 </div>
