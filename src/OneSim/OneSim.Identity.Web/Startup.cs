@@ -1,9 +1,10 @@
 namespace OneSim.Identity.Web
 {
     using System;
-    using System.Text;
+    using System.Reflection;
 
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using IdentityServer4.Services;
+
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -12,7 +13,6 @@ namespace OneSim.Identity.Web
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.IdentityModel.Tokens;
 
     using Newtonsoft.Json.Serialization;
 
@@ -21,6 +21,7 @@ namespace OneSim.Identity.Web
     using OneSim.Identity.Domain.Entities;
     using OneSim.Identity.Infrastructure;
     using OneSim.Identity.Persistence;
+    using OneSim.Identity.Web.Services;
 
     using IUrlHelper = OneSim.Identity.Application.Abstractions.IUrlHelper;
 
@@ -58,45 +59,11 @@ namespace OneSim.Identity.Web
                                                     });
 
             // Configure the database context
-            services.AddDbContext<ApplicationIdentityDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("IdentityConnection")));
+            string connectionString = Configuration.GetConnectionString("IdentityConnection");
+            services.AddDbContext<ApplicationIdentityDbContext>(options => options.UseNpgsql(connectionString));
 
             // Assign the database context for identity
             services.AddDefaultIdentity<ApplicationUser>().AddEntityFrameworkStores<ApplicationIdentityDbContext>();
-
-            // Get the JWT settings
-            IConfigurationSection tokenSettingsSection = Configuration.GetSection("TokenSettings");
-            TokenSettings tokenSettings = tokenSettingsSection.Get<TokenSettings>();
-            byte[] secret = Encoding.ASCII.GetBytes(tokenSettings.Secret);
-
-            // Configure JWT authentication
-            services.AddAuthentication(x =>
-                                       {
-                                           x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                                           x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                                       })
-                    .AddJwtBearer(x =>
-                                  {
-                                      x.RequireHttpsMetadata = false;
-                                      x.SaveToken = true;
-                                      x.TokenValidationParameters = new TokenValidationParameters
-                                                                    {
-                                                                        ValidateIssuerSigningKey = true,
-                                                                        IssuerSigningKey = new SymmetricSecurityKey(secret),
-                                                                        ValidateIssuer = false,
-                                                                        ValidateAudience = false
-                                                                    };
-                                  });
-
-            // Determine which EmailSender to use
-            Type emailSenderType = GetEmailSenderType();
-            services.AddScoped(typeof(IEmailSender), emailSenderType);
-
-            // Add other Dependencies
-            services.AddScoped<IIdentityDbContext, ApplicationIdentityDbContext>();
-            services.AddScoped<ITokenFactory, JwtFactory>();
-            services.AddScoped<IUrlHelper, UrlHelper>();
-            services.AddScoped<AuthenticationService>();
-            services.AddScoped<UserService>();
 
             // Configure password and username requirements
             services.Configure<IdentityOptions>(options =>
@@ -114,6 +81,41 @@ namespace OneSim.Identity.Web
                                                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                                                     options.User.RequireUniqueEmail = false;
                                                 });
+
+            // Add IdentityServer
+            string currentAssemblyName = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            services.AddIdentityServer(x =>
+                                       {
+                                           x.IssuerUri = "null";
+                                           x.Authentication.CookieLifetime = TimeSpan.FromHours(2);
+                                       })
+
+                     // Todo: .AddSigningCredential(Certificate.Get())
+                    .AddDeveloperSigningCredential()
+                    .AddAspNetIdentity<ApplicationUser>()
+
+                     // ConfigurationStoreDbContext
+                     // dotnet ef migrations add CreateIdentityConfigSchema --context ConfigurationDbContext -o Data/Migrations/IdentityServer/Configuration
+                    .AddConfigurationStore(options => options.ConfigureDbContext =
+                                                          builder => builder.UseNpgsql(connectionString,
+                                                                                       sqlOptions => sqlOptions.MigrationsAssembly(currentAssemblyName)))
+
+                     // PersistedGrantDbContext
+                     // dotnet ef migrations add CreateIdentityPersistedGrantSchema --context PersistedGrantDbContext -o Data/Migrations/IdentityServer/PersistedGrant
+                    .AddOperationalStore(options => options.ConfigureDbContext =
+                                                        builder => builder.UseNpgsql(connectionString,
+                                                                                     sqlOptions => sqlOptions.MigrationsAssembly(currentAssemblyName)))
+                    .Services.AddTransient<IProfileService, ProfileService>();
+
+            // Determine which EmailSender to use
+            Type emailSenderType = GetEmailSenderType();
+            services.AddScoped(typeof(IEmailSender), emailSenderType);
+
+            // Add other Dependencies
+            services.AddScoped<IIdentityDbContext, ApplicationIdentityDbContext>();
+            services.AddScoped<IUrlHelper, UrlHelper>();
+            services.AddScoped<AuthenticationService>();
+            services.AddScoped<UserService>();
 
             // Use Newtonsoft.Json for controller actions. Just makes things easier on the client side if we're all
             // using the same thing.
@@ -144,6 +146,7 @@ namespace OneSim.Identity.Web
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => endpoints.MapControllerRoute(name: "default",

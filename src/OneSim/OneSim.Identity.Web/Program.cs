@@ -33,24 +33,7 @@
             {
                 // Get the service provider
                 IServiceProvider services = scope.ServiceProvider;
-
-                // Check if the seed user exists
-                ApplicationIdentityDbContext dbContext = services.GetService<ApplicationIdentityDbContext>();
-                ApplicationUser seedUser = new ApplicationUser
-                                           {
-                                               UserName = "SeedySally101",
-                                               Email = "eoinmoth@yahoo.ie",
-                                               Type = UserType.Administrator
-                                           };
-                ApplicationUser existingUser = dbContext.Users.FirstOrDefault(u => u.Email == seedUser.Email);
-
-                // If the doesn't exist, then create a new one
-                if (existingUser == null)
-                {
-                    UserService userService = services.GetService<UserService>();
-                    IUrlHelper urlHelper = services.GetService<IUrlHelper>();
-                    userService.RegisterUser(seedUser, "Password123456789!@#$%^&*(").GetAwaiter().GetResult();
-                }
+                DataSeeder.SeedDataAsync(services).GetAwaiter().GetResult();
             }
 
             // Run
