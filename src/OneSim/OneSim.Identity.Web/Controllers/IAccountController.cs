@@ -57,12 +57,12 @@ namespace OneSim.Identity.Web.Controllers
 		/// 	Handles the request to send a password reset email.
 		/// </summary>
 		/// <param name="viewModel">
-		/// 	The <see cref="SendPasswordResetEmailViewModel" />.
+		/// 	The <see cref="ForgotPasswordViewModel" />.
 		/// </param>
 		/// <returns>
 		/// 	The <see cref="IActionResult" />.
 		/// </returns>
-		public Task<IActionResult> SendPasswordResetEmail(SendPasswordResetEmailViewModel viewModel);
+		public Task<IActionResult> ForgotPassword(ForgotPasswordViewModel viewModel);
 
 		/// <summary>
 		/// 	Handles the request to reset the users password.

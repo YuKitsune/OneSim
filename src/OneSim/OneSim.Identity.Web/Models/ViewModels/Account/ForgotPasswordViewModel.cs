@@ -5,7 +5,7 @@ namespace OneSim.Identity.Web.Models.ViewModels.Account
 	/// <summary>
 	/// 	The View Model to use for sending a password reset email
 	/// </summary>
-	public class SendPasswordResetEmailViewModel
+	public class ForgotPasswordViewModel
 	{
 		/// <summary>
 		/// 	Gets or sets the email address.
