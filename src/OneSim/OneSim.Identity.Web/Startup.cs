@@ -84,9 +84,12 @@ namespace OneSim.Identity.Web
 
             // Add IdentityServer
             string currentAssemblyName = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+
+            // Todo: Move to settings
+            string issuerUri = "http://localhost:5000";
             services.AddIdentityServer(x =>
                                        {
-                                           x.IssuerUri = "null";
+                                           x.IssuerUri = issuerUri;
                                            x.Authentication.CookieLifetime = TimeSpan.FromHours(2);
                                        })
 
@@ -146,7 +149,7 @@ namespace OneSim.Identity.Web
 
             app.UseStaticFiles();
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseRouting();
             app.UseIdentityServer();
             app.UseAuthentication();

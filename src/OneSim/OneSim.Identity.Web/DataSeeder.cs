@@ -153,6 +153,41 @@ namespace OneSim.Identity.Web
 											   },
 											   AccessTokenLifetime = (int) TimeSpan.FromDays(1).TotalSeconds,
 											   IdentityTokenLifetime = (int) TimeSpan.FromDays(1).TotalSeconds
+										   },
+										   new Client
+										   {
+											   ClientId = "desktop",
+											   ClientName = "Desktop Application Client",
+
+											   // Todo: Generate better ones
+											   ClientSecrets = { new Secret("secret".Sha256()) },
+
+											   // Todo: Store URLs for each client somewhere
+											   ClientUri = "",
+											   AllowedGrantTypes = GrantTypes.Hybrid,
+											   AllowAccessTokensViaBrowser = false,
+											   RequireConsent = false,
+											   AllowOfflineAccess = true,
+											   AlwaysIncludeUserClaimsInIdToken = true,
+											   RedirectUris =
+											   {
+												   // Todo: Store redirect URIs
+												   ""
+											   },
+											   PostLogoutRedirectUris =
+											   {
+												   // Todo: Store redirect URIs
+												   ""
+											   },
+											   AllowedScopes =
+											   {
+												   IdentityServerConstants.StandardScopes.OpenId,
+												   IdentityServerConstants.StandardScopes.Profile,
+												   "identity",
+												   "traffic"
+											   },
+											   AccessTokenLifetime = (int) TimeSpan.FromDays(1).TotalSeconds,
+											   IdentityTokenLifetime = (int) TimeSpan.FromDays(1).TotalSeconds
 										   }
 									   };
 				await context.Clients.AddRangeAsync(clients.Select(c => c.ToEntity()));
