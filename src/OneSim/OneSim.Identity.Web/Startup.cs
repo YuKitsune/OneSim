@@ -2,17 +2,20 @@ namespace OneSim.Identity.Web
 {
     using System;
     using System.Reflection;
+    using System.Security.Cryptography.X509Certificates;
 
     using IdentityServer4.Services;
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.IdentityModel.Tokens;
 
     using Newtonsoft.Json.Serialization;
 
@@ -85,16 +88,18 @@ namespace OneSim.Identity.Web
             // Add IdentityServer
             string currentAssemblyName = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            // Todo: Move to settings
-            string issuerUri = "http://localhost:5000";
+            // Get the issuer URI and key
+            string issuerUri = Configuration.GetSection("IdentitySettings")["IssuerUri"];
+            string signingKeyPath = Configuration.GetSection("IdentitySettings")["CertificateFile"];
             services.AddIdentityServer(x =>
                                        {
                                            x.IssuerUri = issuerUri;
                                            x.Authentication.CookieLifetime = TimeSpan.FromHours(2);
+                                           x.PublicOrigin = issuerUri;
                                        })
+                    .AddSigningCredential(new X509Certificate2(signingKeyPath))
 
-                     // Todo: .AddSigningCredential(Certificate.Get())
-                    .AddDeveloperSigningCredential()
+                     // .AddDeveloperSigningCredential()
                     .AddAspNetIdentity<ApplicationUser>()
 
                      // ConfigurationStoreDbContext
@@ -147,9 +152,23 @@ namespace OneSim.Identity.Web
                 app.UseHsts();
             }
 
+            ForwardedHeadersOptions forwardOptions = new ForwardedHeadersOptions
+                                                     {
+                                                         ForwardedHeaders =
+                                                             ForwardedHeaders.XForwardedFor |
+                                                             ForwardedHeaders.XForwardedProto,
+                                                         RequireHeaderSymmetry = false
+                                                     };
+
+            forwardOptions.KnownNetworks.Clear();
+            forwardOptions.KnownProxies.Clear();
+
+            // ref: https://github.com/aspnet/Docs/issues/2384
+            app.UseForwardedHeaders(forwardOptions);
+
             app.UseStaticFiles();
 
-            // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseIdentityServer();
             app.UseAuthentication();
