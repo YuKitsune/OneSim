@@ -56,6 +56,7 @@ namespace OneSim.Identity.Web
 			ApplicationIdentityDbContext dbContext,
 			UserService userService)
 		{
+			await dbContext.Database.MigrateAsync();
 			ApplicationUser seedUser = new ApplicationUser
 									   {
 										   UserName = "SeedySally101",
@@ -82,6 +83,7 @@ namespace OneSim.Identity.Web
 		/// </returns>
 		private static async Task SeedDataAsync(ConfigurationDbContext context)
 		{
+			await context.Database.MigrateAsync();
 			if (!context.Clients.Any())
 			{
 				Console.WriteLine("Seeding Clients.");
