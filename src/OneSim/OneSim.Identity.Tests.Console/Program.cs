@@ -77,16 +77,16 @@
             string redirectUri = string.Format($"http://127.0.0.1:{browser.Port}");
 
             var options = new OidcClientOptions
-            {
-                Authority = _authority,
-                ClientId = "desktop",
-                RedirectUri = redirectUri,
-                Scope = "openid profile identity traffic",
-                FilterClaims = false,
-                Browser = browser,
-                Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
-                ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect
-            };
+                          {
+                              Authority = _authority,
+                              ClientId = "desktop",
+                              RedirectUri = redirectUri,
+                              Scope = "openid profile identity traffic",
+                              FilterClaims = false,
+                              Browser = browser,
+                              Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
+                              ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
+                          };
 
             _oidcClient = new OidcClient(options);
             var result = await _oidcClient.LoginAsync(new LoginRequest());
