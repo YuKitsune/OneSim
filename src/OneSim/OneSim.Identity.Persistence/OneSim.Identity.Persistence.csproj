@@ -28,4 +28,8 @@
       <ProjectReference Include="..\OneSim.Traffic.Domain\OneSim.Traffic.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Migrations\Keys" />
+    </ItemGroup>
+
 </Project>
