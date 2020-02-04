@@ -2,9 +2,9 @@ namespace OneSim.Identity.Web
 {
     using System;
     using System.Reflection;
-    using System.Security.Cryptography.X509Certificates;
 
     using IdentityServer4.Services;
+    using IdentityServer4.Stores;
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -15,7 +15,6 @@ namespace OneSim.Identity.Web
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.IdentityModel.Tokens;
 
     using Newtonsoft.Json.Serialization;
 
@@ -61,9 +60,12 @@ namespace OneSim.Identity.Web
                                                         options.MinimumSameSitePolicy = SameSiteMode.None;
                                                     });
 
-            // Configure the database context
-            string connectionString = Configuration.GetConnectionString("IdentityConnection");
-            services.AddDbContext<ApplicationIdentityDbContext>(options => options.UseNpgsql(connectionString));
+            // Configure the database contexts
+            string identityConnectionString = Configuration.GetConnectionString("IdentityConnection");
+            services.AddDbContext<ApplicationIdentityDbContext>(options => options.UseNpgsql(identityConnectionString));
+
+            string keysConnectionString = Configuration.GetConnectionString("KeysConnection");
+            services.AddDbContext<KeysDbContext>(options => options.UseNpgsql(keysConnectionString));
 
             // Assign the database context for identity
             services.AddDefaultIdentity<ApplicationUser>().AddEntityFrameworkStores<ApplicationIdentityDbContext>();
@@ -90,36 +92,44 @@ namespace OneSim.Identity.Web
 
             // Get the issuer URI and key
             string issuerUri = Configuration.GetSection("IdentitySettings")["IssuerUri"];
-            string signingKeyPath = Configuration.GetSection("IdentitySettings")["CertificateFile"];
-            services.AddIdentityServer(x =>
-                                       {
-                                           x.IssuerUri = issuerUri;
-                                           x.Authentication.CookieLifetime = TimeSpan.FromHours(2);
-                                           x.PublicOrigin = issuerUri;
-                                       })
-                    .AddSigningCredential(new X509Certificate2(signingKeyPath))
+            IIdentityServerBuilder identityServerBuilder =
+                services.AddIdentityServer(x =>
+                                           {
+                                               x.IssuerUri = issuerUri;
+                                               x.Authentication.CookieLifetime = TimeSpan.FromHours(2);
+                                               x.PublicOrigin = issuerUri;
+                                           })
+                        .AddAspNetIdentity<ApplicationUser>()
 
-                     // .AddDeveloperSigningCredential()
-                    .AddAspNetIdentity<ApplicationUser>()
+                         // ConfigurationStoreDbContext
+                         // dotnet ef migrations add CreateIdentityConfigSchema --context ConfigurationDbContext -o Data/Migrations/IdentityServer/Configuration
+                        .AddConfigurationStore(options =>
+                                                   options.ConfigureDbContext =
+                                                       builder => builder.UseNpgsql(identityConnectionString,
+                                                                                    sqlOptions =>
+                                                                                        sqlOptions
+                                                                                           .MigrationsAssembly(currentAssemblyName)))
 
-                     // ConfigurationStoreDbContext
-                     // dotnet ef migrations add CreateIdentityConfigSchema --context ConfigurationDbContext -o Data/Migrations/IdentityServer/Configuration
-                    .AddConfigurationStore(options => options.ConfigureDbContext =
-                                                          builder => builder.UseNpgsql(connectionString,
-                                                                                       sqlOptions => sqlOptions.MigrationsAssembly(currentAssemblyName)))
-
-                     // PersistedGrantDbContext
-                     // dotnet ef migrations add CreateIdentityPersistedGrantSchema --context PersistedGrantDbContext -o Data/Migrations/IdentityServer/PersistedGrant
-                    .AddOperationalStore(options => options.ConfigureDbContext =
-                                                        builder => builder.UseNpgsql(connectionString,
-                                                                                     sqlOptions => sqlOptions.MigrationsAssembly(currentAssemblyName)))
-                    .Services.AddTransient<IProfileService, ProfileService>();
+                         // PersistedGrantDbContext
+                         // dotnet ef migrations add CreateIdentityPersistedGrantSchema --context PersistedGrantDbContext -o Data/Migrations/IdentityServer/PersistedGrant
+                        .AddOperationalStore(options =>
+                                                 options.ConfigureDbContext =
+                                                     builder =>
+                                                         builder
+                                                            .UseNpgsql(identityConnectionString,
+                                                                       sqlOptions =>
+                                                                           sqlOptions
+                                                                              .MigrationsAssembly(currentAssemblyName)));
 
             // Determine which EmailSender to use
             Type emailSenderType = GetEmailSenderType();
             services.AddScoped(typeof(IEmailSender), emailSenderType);
 
             // Add other Dependencies
+            identityServerBuilder.Services.AddTransient<IKeysDbContext, KeysDbContext>();
+            identityServerBuilder.Services.AddTransient<ISecurityKeyProvider, RsaKeyProvider>();
+            identityServerBuilder.Services.AddTransient<IProfileService, ProfileService>();
+            identityServerBuilder.Services.AddTransient<ISigningCredentialStore, SigningCredentialStore>();
             services.AddScoped<IIdentityDbContext, ApplicationIdentityDbContext>();
             services.AddScoped<IUrlHelper, UrlHelper>();
             services.AddScoped<AuthenticationService>();
