@@ -80,6 +80,7 @@
                           {
                               Authority = _authority,
                               ClientId = "desktop",
+                              ClientSecret = "secret",
                               RedirectUri = redirectUri,
                               Scope = "openid profile identity traffic",
                               FilterClaims = false,
