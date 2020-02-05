@@ -173,8 +173,7 @@ namespace OneSim.Identity.Web
 											   AlwaysIncludeUserClaimsInIdToken = true,
 											   RedirectUris =
 											   {
-												   // Todo: Store redirect URIs
-												   ""
+												   "http://127.0.0.1:6969"
 											   },
 											   PostLogoutRedirectUris =
 											   {

@@ -128,8 +128,9 @@ namespace OneSim.Identity.Web
             // Add other Dependencies
             identityServerBuilder.Services.AddTransient<IKeysDbContext, KeysDbContext>();
             identityServerBuilder.Services.AddTransient<ISecurityKeyProvider, RsaKeyProvider>();
-            identityServerBuilder.Services.AddTransient<IProfileService, ProfileService>();
             identityServerBuilder.Services.AddTransient<ISigningCredentialStore, SigningCredentialStore>();
+            identityServerBuilder.Services.AddTransient<IValidationKeysStore, ValidationKeysStore>();
+            identityServerBuilder.Services.AddTransient<IProfileService, ProfileService>();
             services.AddScoped<IIdentityDbContext, ApplicationIdentityDbContext>();
             services.AddScoped<IUrlHelper, UrlHelper>();
             services.AddScoped<AuthenticationService>();
