@@ -166,7 +166,7 @@ namespace OneSim.Identity.Web
 
 											   // Todo: Store URLs for each client somewhere
 											   ClientUri = "",
-											   AllowedGrantTypes = GrantTypes.Hybrid,
+											   AllowedGrantTypes = GrantTypes.Code,
 											   AllowAccessTokensViaBrowser = false,
 											   RequireConsent = false,
 											   AllowOfflineAccess = true,
