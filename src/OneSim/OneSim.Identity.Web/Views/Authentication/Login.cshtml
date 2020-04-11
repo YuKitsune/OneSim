@@ -1,0 +1,57 @@
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using OneSim.Identity.Web
+@using OneSim.Identity.Web.Controllers
+@model OneSim.Identity.Web.Models.ViewModels.Authentication.LoginViewModel
+@{
+    ViewData["Title"] = "Log In";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+    List<ModelError> errors = Utils.GetModelErrors(ViewData).ToList();
+}
+
+<form id="loginForm" class="ui large form @(errors.Any() ? "error" : string.Empty)" asp-action="@nameof(AuthenticationController.Login)" asp-controller="@Utils.GetControllerName(nameof(AuthenticationController))" method="post">
+    <div class="ui stacked segment">
+
+        @* Validation message *@
+        <div class="ui error message" style="padding: 5px;">
+            @Html.ValidationSummary()
+        </div>
+
+        @* Email *@
+        <div class="field">
+            <div class="ui left icon input">
+                <i class="envelope icon"></i>
+                @Html.TextBoxFor(m => m.Email, new { placeholder = "Email address" })
+            </div>
+        </div>
+
+        @* Password *@
+        <div class="field">
+            <div class="ui left icon input">
+                <i class="lock icon"></i>
+                @Html.PasswordFor(m => m.Password, new { placeholder = "Password" })
+            </div>
+        </div>
+
+        @* Remember Me *@
+        <div class="field">
+            <div class="ui checkbox">
+                @Html.CheckBoxFor(m => m.RememberMe)
+                <label>Remember me</label>
+            </div>
+        </div>
+
+        @* Anti-forgery token *@
+        @Html.AntiForgeryToken()
+        
+        @* Return URL *@
+        @Html.HiddenFor(m => m.CallbackUri)
+        
+        @* Log In button *@
+        <button class="ui fluid large blue button" type="submit">Log In</button>
+    </div>
+</form>
+
+@* Forgot password *@
+<div class="ui message">
+    @Html.ActionLink("Forgot your password?", nameof(AccountController.ForgotPassword), Utils.GetControllerName(nameof(AccountController)))
+</div>

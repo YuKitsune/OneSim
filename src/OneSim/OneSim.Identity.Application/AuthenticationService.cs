@@ -3,6 +3,7 @@ namespace OneSim.Identity.Application
 	using System;
 	using System.Threading.Tasks;
 
+	using Microsoft.AspNetCore.Authentication;
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.Extensions.Logging;
 
@@ -15,9 +16,9 @@ namespace OneSim.Identity.Application
 	public class AuthenticationService
 	{
 		/// <summary>
-		///     The <see cref="SignInManager{TUser}"/> for the <see cref="ApplicationUser"/>.
+		///     Gets t <see cref="SignInManager{TUser}"/> for the <see cref="ApplicationUser"/>.
 		/// </summary>
-		private readonly SignInManager<ApplicationUser> _signInManager;
+		public SignInManager<ApplicationUser> SignInManager { get; }
 
 		/// <summary>
 		/// 	The <see cref="ILogger{TCategoryName}"/>.
@@ -25,30 +26,20 @@ namespace OneSim.Identity.Application
 		private readonly ILogger<AuthenticationService> _logger;
 
 		/// <summary>
-		///     The <see cref="ITokenFactory"/>.
-		/// </summary>
-		private readonly ITokenFactory _tokenFactory;
-
-		/// <summary>
 		///     Initializes a new instance of the <see cref="AuthenticationService"/> class.
 		/// </summary>
 		/// <param name="signInManager">
 		///     The <see cref="SignInManager{TUser}"/> for the <see cref="ApplicationUser"/>.
-		/// </param>
-		/// <param name="tokenFactory">
-		///     The <see cref="ITokenFactory"/>.
 		/// </param>
 		/// <param name="logger">
 		///		The <see cref="ILogger{TCategoryName}"/>.
 		/// </param>
 		public AuthenticationService(
 			SignInManager<ApplicationUser> signInManager,
-			ITokenFactory tokenFactory,
 			ILogger<AuthenticationService> logger)
 		{
-			_signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager), "The SignInManager cannot be null.");
+			SignInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager), "The SignInManager cannot be null.");
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger), "The Logger cannot be null.");
-			_tokenFactory = tokenFactory ?? throw new ArgumentNullException(nameof(tokenFactory), "The TokenFactory cannot be null.");
 		}
 
 		/// <summary>
@@ -72,7 +63,7 @@ namespace OneSim.Identity.Application
 
 			// This doesn't count login failures towards account lockout
 			// To enable password failures to trigger account lockout, set lockoutOnFailure: true
-			SignInResult result = await _signInManager.PasswordSignInAsync(user,
+			SignInResult result = await SignInManager.PasswordSignInAsync(user,
 																		   password,
 																		   true,
 																		   false);
@@ -107,17 +98,28 @@ namespace OneSim.Identity.Application
 		/// <param name="token">
 		///		The Two-Factor Authentication token.
 		/// </param>
+		/// <param name="isPersistent">
+		///		The value indicating whether or not to remember the user.
+		/// </param>
+		/// <param name="rememberClient">
+		///		The value indicating whether or not to remember the client machine.
+		/// </param>
 		/// <returns>
 		///		The <see cref="Microsoft.AspNetCore.Identity.SignInResult"/>.
 		/// </returns>
-		public async Task<SignInResult> TwoFactorAuthenticationLogIn(ApplicationUser user, string token)
+		public async Task<SignInResult> TwoFactorAuthenticationLogIn(
+			ApplicationUser user,
+			string token,
+			bool isPersistent = true,
+			bool rememberClient = true)
 		{
 			// Check the inputs
 			if (user == null) throw new ArgumentNullException(nameof(user), "The User cannot be null.");
 			if (string.IsNullOrEmpty(token))
 				throw new ArgumentNullException(nameof(token), "The token cannot be null or empty.");
 
-			SignInResult result = await _signInManager.TwoFactorAuthenticatorSignInAsync(token, true, true);
+			SignInResult result =
+				await SignInManager.TwoFactorAuthenticatorSignInAsync(token, isPersistent, rememberClient);
 
 			// Log some data
 			if (result.Succeeded)
@@ -163,7 +165,7 @@ namespace OneSim.Identity.Application
 			recoveryCode = recoveryCode.Replace(" ", string.Empty);
 
 			// Sign in with 2FA recovery code
-			SignInResult result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
+			SignInResult result = await SignInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
 
 			// Log some stuff
 			if (result.Succeeded)
@@ -181,16 +183,5 @@ namespace OneSim.Identity.Application
 
 			return result;
 		}
-
-		/// <summary>
-		///     Gets the for the <paramref name="user"/>.
-		/// </summary>
-		/// <param name="user">
-		///     The <see cref="ApplicationUser"/>.
-		/// </param>
-		/// <returns>
-		///     The token.
-		/// </returns>
-		public string GetToken(ApplicationUser user) => _tokenFactory.GenerateToken(user);
 	}
 }

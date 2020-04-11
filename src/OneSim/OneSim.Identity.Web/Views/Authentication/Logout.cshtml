@@ -1,0 +1,25 @@
+@using OneSim.Identity.Web
+@using OneSim.Identity.Web.Controllers
+@model OneSim.Identity.Web.Models.ViewModels.Authentication.LogoutViewModel
+@{
+    ViewData["Title"] = "Log Out";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<form id="logoutForm" class="ui large form" asp-action="@nameof(AuthenticationController.Logout)" asp-controller="@Utils.GetControllerName(nameof(AuthenticationController))">
+    <div class="ui stacked segment">
+        
+        <p>
+            Do you wish to log out of OneSim?
+        </p>
+
+        @* Anti-forgery token *@
+        @Html.AntiForgeryToken()
+
+        @* Return URL *@
+        @Html.HiddenFor(m => m.LogoutId);
+
+        @* Log In button *@
+        <button class="ui fluid large blue button" type="submit">Yes</button>
+    </div>
+</form>

@@ -1,0 +1,54 @@
+@using OneSim.Identity.Web
+@using OneSim.Identity.Web.Controllers
+@model OneSim.Identity.Web.Models.ViewModels.Authentication.TwoFactorLoginViewModel
+@{
+    ViewData["Title"] = "Two-Factor Authentication";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<form id="loginForm" class="ui large form" asp-action="@nameof(AuthenticationController.LoginWithTwoFactorAuthentication)" asp-controller="@Utils.GetControllerName(nameof(AuthenticationController))" method="post">
+    <div class="ui stacked segment">
+
+        @* Validation message *@
+        <div class="ui error message" style="padding: 5px;">
+            @Html.ValidationSummary()
+        </div>
+        
+        <p>
+            Your login is protected with an authenticator app.<br />
+            Enter your authenticator code below.
+        </p>
+
+        @* 2FA code *@
+        <div class="field">
+            <div class="ui left icon input">
+                <i class="lock icon"></i>
+                @Html.TextBoxFor(m => m.TwoFactorCode, new { placeholder = "Code" })
+            </div>
+        </div>
+
+        @* Remember Me *@
+        <div class="field">
+            <div class="ui checkbox">
+                @Html.CheckBoxFor(m => m.RememberMachine)
+                @Html.HiddenFor(m => m.RememberMe)
+                <label>Remember this computer</label>
+            </div>
+        </div>
+
+        @* Anti-forgery token *@
+        @Html.AntiForgeryToken()
+        
+        @* Return URL *@
+        @Html.HiddenFor(m => m.CallbackUri)
+
+        @* Log In button *@
+        <button class="ui fluid large blue button" type="submit">Log In</button>
+    </div>
+</form>
+
+@* Use recovery codes *@
+<div class="ui message">
+    Don't have access to your authenticator device? You can
+    @Html.ActionLink("log in with a recovery code", nameof(AuthenticationController.LoginWithRecoveryCode), Utils.GetControllerName(nameof(AuthenticationController))).
+</div>

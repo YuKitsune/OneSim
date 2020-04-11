@@ -3,6 +3,8 @@ namespace OneSim.Identity.Application
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Text;
+	using System.Text.Encodings.Web;
 	using System.Threading.Tasks;
 
 	using Microsoft.AspNetCore.Identity;
@@ -18,6 +20,11 @@ namespace OneSim.Identity.Application
 	/// </summary>
 	public class UserService
 	{
+		/// <summary>
+		///		The Two-Factor Authenticator URI format.
+		/// </summary>
+		private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
+
 		/// <summary>
 		/// 	Gets the <see cref="UserManager{TUser}"/> for the <see cref="ApplicationUser"/>.
 		/// </summary>
@@ -523,6 +530,77 @@ namespace OneSim.Identity.Application
 			_logger.LogInformation($"{user.UserName} has generated new 2FA recovery codes.");
 
 			return recoveryCodes;
+		}
+
+		/// <summary>
+		///		Gets the shared Two-Factor Authentication key and QR code URI.
+		/// </summary>
+		/// <param name="user">
+		///		The <see cref="ApplicationUser"/>.
+		/// </param>
+		/// <returns>
+		///		The <see cref="Task"/>.
+		/// </returns>
+		public async Task<(string SharedKey, string AuthenticatorUri)> GetSharedKeyAndQrCodeUriAsync(ApplicationUser user)
+		{
+			// Get the key
+			string unformattedKey = await UserManager.GetAuthenticatorKeyAsync(user);
+
+			// If the key is empty, reset it and try again
+			if (string.IsNullOrEmpty(unformattedKey))
+			{
+				await UserManager.ResetAuthenticatorKeyAsync(user);
+				unformattedKey = await UserManager.GetAuthenticatorKeyAsync(user);
+			}
+
+			// Return the key and URI in a tuple
+			return (FormatKey(unformattedKey), GenerateQrCodeUri(user.Email, unformattedKey));
+		}
+
+		/// <summary>
+		///		Formats the 2FA key.
+		/// </summary>
+		/// <param name="unformattedKey">
+		///		The un-formatted 2FA key.
+		/// </param>
+		/// <returns>
+		///		The formatted 2FA key.
+		/// </returns>
+		private string FormatKey(string unformattedKey)
+		{
+			StringBuilder result = new StringBuilder();
+			int currentPosition = 0;
+			while (currentPosition + 4 < unformattedKey.Length)
+			{
+				result.Append(unformattedKey.Substring(currentPosition, 4)).Append(" ");
+				currentPosition += 4;
+			}
+
+			if (currentPosition < unformattedKey.Length) result.Append(unformattedKey.Substring(currentPosition));
+
+			return result.ToString().ToLowerInvariant();
+		}
+
+		/// <summary>
+		///		Generates the QR code URI.
+		/// </summary>
+		/// <param name="email">
+		///		The email address of the <see cref="ApplicationUser"/>.
+		/// </param>
+		/// <param name="unformattedKey">
+		///		The un-formatted Two-Factor Authentication key.
+		/// </param>
+		/// <returns>
+		///		The QR code URI.
+		/// </returns>
+		private string GenerateQrCodeUri(string email, string unformattedKey)
+		{
+			UrlEncoder urlEncoder = UrlEncoder.Default;
+
+			return string.Format(AuthenticatorUriFormat,
+								 urlEncoder.Encode("OneSim"),
+								 urlEncoder.Encode(email),
+								 unformattedKey);
 		}
 	}
 }

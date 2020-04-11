@@ -1,0 +1,21 @@
+@using OneSim.Identity.Web
+@using OneSim.Identity.Web.Controllers
+@{
+    ViewData["Title"] = "Reset Two-Factor Authentication";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<div class="ui stacked segment">
+    <form id="warningForm" action="@Url.Action(nameof(AccountController.DisableTwoFactorAuthentication), Utils.GetControllerName(nameof(AccountController)))" method="get" class="ui warning form">
+        <div class="ui warning message">
+            <div class="header">
+                <i class="exclamation triangle icon"></i>If you reset your authenticator key your authenticator app will not work until you reconfigure it.
+            </div>
+            This process disables 2FA until you verify your authenticator app and will also reset your 2FA recovery codes.
+            If you do not complete your authenticator app configuration you may lose access to your account.
+        </div>
+        <div>
+            <button class="ui fluid negative button" type="submit">Reset authenticator key</button>
+        </div>
+    </form>
+</div>
