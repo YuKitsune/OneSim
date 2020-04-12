@@ -84,9 +84,11 @@ namespace OneSim.Traffic.ConsoleClient
         /// </param>
         private static async void GetPilotInfo(string callsign)
         {
-            using WebClient client = new WebClient();
-            string pilotJson = await client.DownloadStringTaskAsync(DomainName + "/TrafficData/Pilot?callsign=" + callsign);
-            Console.WriteLine(pilotJson);
+            using (WebClient client = new WebClient())
+            {
+                string pilotJson = await client.DownloadStringTaskAsync(DomainName + "/TrafficData/Pilot?callsign=" + callsign);
+                Console.WriteLine(pilotJson);
+            }
         }
     }
 }
