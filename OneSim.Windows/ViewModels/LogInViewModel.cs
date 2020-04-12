@@ -6,9 +6,10 @@
 
 namespace OneSim.Windows.ViewModels
 {
+    using System.Net.Mime;
     using System.Security;
     using System.Threading.Tasks;
-
+    using System.Windows;
     using Strato.Mvvm;
     using Strato.Mvvm.Commands;
 
@@ -31,16 +32,25 @@ namespace OneSim.Windows.ViewModels
         /// <summary>
         ///     Gets or sets the password in the form of a <see cref="SecureString"/>.
         /// </summary>
-        public SecureString Password
+        public string Password
         {
-            get => Get<SecureString>();
+            get => Get<string>();
+            set => Set(value);
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether or not you should remember the user.
+        /// </summary>
+        public bool RememberMe
+        {
+            get => Get<bool>();
             set => Set(value);
         }
 
         /// <summary>
         ///     Gets a value indicating whether or not the user is allowed to log in.
         /// </summary>
-        public bool CanLogIn => !string.IsNullOrEmpty(Username) && Password.Length > 1;
+        public bool CanLogIn => !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
 
         /// <summary>
         ///     Gets the <see cref="AsyncCommand"/> used to log the user in.
@@ -72,7 +82,7 @@ namespace OneSim.Windows.ViewModels
         /// </summary>
         public void Cancel()
         {
-            // Close other windows
+            // TODO EOIN MUST TEACH KYLE HOW TO CODE
         }
     }
 }

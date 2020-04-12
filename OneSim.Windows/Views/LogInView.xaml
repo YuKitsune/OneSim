@@ -6,13 +6,94 @@
         xmlns:local="clr-namespace:OneSim.Windows"
         xmlns:viewModels="clr-namespace:OneSim.Windows.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="250" Width="200">
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        FontFamily="Segoe UI Light"
+        Title="OneSim" Height="400" Width="300" MinHeight="334" MinWidth="229">
     <Window.DataContext>
         <viewModels:LogInViewModel/>
     </Window.DataContext>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="20" />
+        </Grid.RowDefinitions>
 
-        <!-- Todo: Kyle pls -->
+        <!-- Row 1 -->
+        <TextBlock Grid.Column="1"
+                   Grid.ColumnSpan="2"
+                   Grid.Row="1"
+                   Text="OneSim"
+                   TextAlignment="Center"
+                   FontSize="55"/>
+
+        <!-- Row 3 -->
+        <TextBox Grid.Column="1"
+                 Grid.ColumnSpan="2"
+                 Grid.Row="3"
+                 ui:ControlHelper.PlaceholderText="Username"
+                 Text="{Binding Username}"/>
+
+
+        <!-- Row 5 TODO FIX LATER-->
+        <TextBox Grid.Column="1"
+                 Grid.ColumnSpan="2"
+                 Grid.Row="5"
+                 ui:ControlHelper.PlaceholderText="Password" 
+                 Text="{Binding Password}"/>
+
+        <!-- Remember Me Checkbox -->
+        <CheckBox Grid.Column="1"
+                        Grid.Row="8"
+                        Content="Remember Me"
+                        Grid.ColumnSpan="2"
+                        IsChecked="{Binding RememberMe}"/>
+
+
+        <!-- Cancel Button -->
+        <Button Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Margin="5"
+                Grid.Row="10"
+                Command="{Binding CancelCommand}">Cancel</Button>
+        <!-- SignIn Button -->
+        <Button Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Margin="5"
+                Background="DeepSkyBlue"
+                Foreground="Azure"
+                Grid.Row="10"
+                Command="{Binding LogInCommand}">Sign In</Button>
+
+
+        <!-- Reset Password Button -->
+        <Button Grid.Column="1"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Margin="5"
+                Grid.Row="11"
+                x:Name="ResetPasswordButton">Reset Password</Button>
 
     </Grid>
 </Window>
