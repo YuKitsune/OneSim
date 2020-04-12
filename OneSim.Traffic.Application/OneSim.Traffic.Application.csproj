@@ -6,6 +6,8 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+      <PackageReference Include="Strato.Analyzers" Version="1.0.18" />
+      <PackageReference Include="Strato.Persistence.Abstractions" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>

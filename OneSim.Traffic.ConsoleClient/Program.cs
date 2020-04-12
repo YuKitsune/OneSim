@@ -1,62 +1,92 @@
-﻿namespace OneSim.Traffic.ConsoleClient
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Program.cs" company="Strato Systems Pty. Ltd.">
+//   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace OneSim.Traffic.ConsoleClient
 {
-	using System;
-	using System.Net;
-	using System.Net.Http;
-	using System.Threading.Tasks;
+    using System;
+    using System.Net;
+    using System.Net.Http;
 
-	using Microsoft.AspNetCore.SignalR.Client;
+    using Microsoft.AspNetCore.SignalR.Client;
 
-	public class Program
-	{
-		public static HubConnection Connection { get; set; }
-		public static string DomainName { get; set; }
+    /// <summary>
+    ///     The program.
+    /// </summary>
+    public static class Program
+    {
+        /// <summary>
+        ///     Gets or sets the <see cref="HubConnection"/>.
+        /// </summary>
+        public static HubConnection Connection { get; set; }
 
-		static void Main(string[] args)
-		{
-			Console.WriteLine("Hello World!");
+        /// <summary>
+        ///     Gets or sets the domain name.
+        /// </summary>
+        public static string DomainName { get; set; }
 
-			Console.WriteLine("Traffic API server domain: ");
-			DomainName = Console.ReadLine();
+        /// <summary>
+        ///     The main application entry point.
+        /// </summary>
+        /// <param name="args">
+        ///     The arguments.
+        /// </param>
+        public static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
 
-			string url = DomainName + "/TrafficDataHub";
-			Console.WriteLine($"Building connection for \"{url}\".");
-			Connection = new HubConnectionBuilder()
-						.WithUrl(url,
-								 conf => conf.HttpMessageHandlerFactory = (x) => new HttpClientHandler
-																				 {
-																					 ServerCertificateCustomValidationCallback
-																						 = HttpClientHandler
-																							.DangerousAcceptAnyServerCertificateValidator,
-																				 })
-						.Build();
+            Console.WriteLine("Traffic API server domain: ");
+            DomainName = Console.ReadLine();
 
-			Connection.StartAsync()
-					  .ContinueWith(task =>
-									{
-										if (task.IsFaulted)
-										{
-											Console.WriteLine($"There was an error opening the connection:{task.Exception.GetBaseException()}");
-										}
-										else
-										{
-											Console.WriteLine("Connected");
-										}
-									})
-					  .Wait();
+            string url = DomainName + "/TrafficDataHub";
+            Console.WriteLine($"Building connection for \"{url}\".");
+            Connection = new HubConnectionBuilder()
+                        .WithUrl(
+                             url,
+                             conf => conf.HttpMessageHandlerFactory = (x) => new HttpClientHandler
+                                                                             {
+                                                                                 ServerCertificateCustomValidationCallback
+                                                                                     = HttpClientHandler
+                                                                                        .DangerousAcceptAnyServerCertificateValidator,
+                                                                             })
+                        .Build();
 
-			Connection.On("NewTrafficDataAvailable", () => Console.WriteLine("New Traffic Data Available."));
-			Connection.On("PilotSelected", (string callsign) => GetPilotInfo(callsign));
+            Connection.StartAsync()
+                      .ContinueWith(
+                           task =>
+                           {
+                               if (task.IsFaulted)
+                               {
+                                   Console.WriteLine(
+                                       $"There was an error opening the connection:{task.Exception.GetBaseException()}");
+                               }
+                               else
+                               {
+                                   Console.WriteLine("Connected");
+                               }
+                           })
+                      .Wait();
 
-			Console.Read();
-			Connection.StopAsync();
-		}
+            Connection.On("NewTrafficDataAvailable", () => Console.WriteLine("New Traffic Data Available."));
+            Connection.On("PilotSelected", (string callsign) => GetPilotInfo(callsign));
 
-		static async void GetPilotInfo(string callsign)
-		{
-			using WebClient client = new WebClient();
-			string pilotJson = await client.DownloadStringTaskAsync(DomainName + "/TrafficData/Pilot?callsign=" + callsign);
-			Console.WriteLine(pilotJson);
-		}
-	}
+            Console.Read();
+            Connection.StopAsync();
+        }
+
+        /// <summary>
+        ///     Gets the pilot info.
+        /// </summary>
+        /// <param name="callsign">
+        ///     The callsign.
+        /// </param>
+        private static async void GetPilotInfo(string callsign)
+        {
+            using WebClient client = new WebClient();
+            string pilotJson = await client.DownloadStringTaskAsync(DomainName + "/TrafficData/Pilot?callsign=" + callsign);
+            Console.WriteLine(pilotJson);
+        }
+    }
 }

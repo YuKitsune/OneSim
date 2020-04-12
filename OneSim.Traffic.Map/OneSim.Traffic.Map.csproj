@@ -37,5 +37,9 @@
       <Folder Include="wwwroot\lib\signalr" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Strato.Analyzers" Version="1.0.18" />
+    </ItemGroup>
+
 
 </Project>

@@ -1,3 +1,9 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="FlightPlan.cs" company="Strato Systems Pty. Ltd.">
+//   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace OneSim.Traffic.Domain.Entities
 {
     using System;

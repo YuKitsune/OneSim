@@ -1,14 +1,20 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Pilot.cs" company="Strato Systems Pty. Ltd.">
+//   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace OneSim.Traffic.Domain.Entities
 {
-	using System.Collections.Generic;
+    using System.Collections.Generic;
 
-	using OneSim.Traffic.Domain.ValueObjects;
+    using OneSim.Traffic.Domain.ValueObjects;
 
-	/// <summary>
-	/// 	The Pilot.
-	/// </summary>
-	public class Pilot : BaseClient
-	{
+    /// <summary>
+    ///     The Pilot.
+    /// </summary>
+    public class Pilot : BaseClient
+    {
         /// <summary>
         ///     Gets or sets the Latitude.
         /// </summary>
@@ -52,19 +58,19 @@ namespace OneSim.Traffic.Domain.Entities
         /// </summary>
         public FlightPlan FlightPlan { get; set; }
 
-		/// <summary>
-		/// 	Gets or sets the <see cref="Point3d"/>s representing the current <see cref="Pilot"/>'s previous positions.
-		/// </summary>
-		public virtual ICollection<Point3d> History { get; set; }
-
         /// <summary>
         ///     Gets a value indicating whether or not a <see cref="FlightPlan"/> has been filed.
         /// </summary>
         public bool FlightPlanFiled => FlightPlan != null;
 
-		/// <summary>
-		/// 	Initializes a new instance of the <see cref="Pilot"/> class.
-		/// </summary>
-		public Pilot() => History = new List<Point3d>();
-	}
+        /// <summary>
+        ///     Gets or sets the <see cref="Point3d"/>s representing the current <see cref="Pilot"/>'s previous positions.
+        /// </summary>
+        public ICollection<Point3d> History { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Pilot"/> class.
+        /// </summary>
+        public Pilot() => History = new List<Point3d>();
+    }
 }

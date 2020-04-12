@@ -1,60 +1,60 @@
 ﻿<!DOCTYPE html>
 <html lang="en-AU">
-	<head>
-	    <meta charset="utf-8" />
-	    <title>OneSim Map</title>
-	    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-	    
-	    @* Import jQuery *@
-	    <script src="lib/jquery/dist/jquery.js"></script>
-	    
-	    @* Import Mapbox stuff *@
-	    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
-	    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
-	    
-	    @* Import SignalR *@
-	    <script src="~/lib/signalr/signalr.js"></script>
-	    
-	    @* Import our CSS *@
-	    <link href="~/css/map.css" rel="stylesheet"/>
-	    
-	    @* Import our JS *@
-	    <script src="~/js/site.js"></script>
-	    <script src="~/js/MapDataFeed.js"></script>
-	    
-	    <style>
+    <head>
+        <meta charset="utf-8" />
+        <title>OneSim Map</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+        
+        @* Import jQuery *@
+        <script src="lib/jquery/dist/jquery.js"></script>
+        
+        @* Import Mapbox stuff *@
+        <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
+        <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
+        
+        @* Import SignalR *@
+        <script src="~/lib/signalr/signalr.js"></script>
+        
+        @* Import our CSS *@
+        <link href="~/css/map.css" rel="stylesheet"/>
+        
+        @* Import our JS *@
+        <script src="~/js/site.js"></script>
+        <script src="~/js/MapDataFeed.js"></script>
+        
+        <style>
             body { margin: 0; padding: 0; }
             #map { position: absolute; top: 0; bottom: 0; width: 100%; }
         </style>
     </head>
-	<body>
-		<!-- The map container element -->
-		<div id="map"></div>
-		<script>
-			// Initialize the map
+    <body>
+        <!-- The map container element -->
+        <div id="map"></div>
+        <script>
+            // Initialize the map
 
-			// Todo: Get token from config
-			mapboxgl.accessToken = 'pk.eyJ1IjoiZW9pbmF2aWF0aW9uIiwiYSI6ImNqMHQwN3d2eDA1a2cyd281dXU2YXlkcGMifQ.-oYoUHedsdy4RspYS4_F6g';
-			var map = new mapboxgl.Map({
-				// Set the id of the container
-				container: 'map', 
-				
-				// Set the initial style
-				// Todo: Restore from last state
-				style: 'mapbox://styles/eoinaviation/ck4ozwde529dj1cn73bmoxeij',
-				
-				// Set the starting position [lon, lat],
-				// Todo: Restore from last state
-				center: [-74.5, 40],
-				
-				// Set the zoom level
-				// Todo: Restore from last state
-				zoom: 9
-			});
-			
-			var vatsimMapData = new MapDataFeed("https://traffic.onesim.app");
-			vatsimMapData.refreshPilots();
-		</script>
+            // Todo: Get token from config
+            mapboxgl.accessToken = 'pk.eyJ1IjoiZW9pbmF2aWF0aW9uIiwiYSI6ImNqMHQwN3d2eDA1a2cyd281dXU2YXlkcGMifQ.-oYoUHedsdy4RspYS4_F6g';
+            var map = new mapboxgl.Map({
+                // Set the id of the container
+                container: 'map', 
+                
+                // Set the initial style
+                // Todo: Restore from last state
+                style: 'mapbox://styles/eoinaviation/ck4ozwde529dj1cn73bmoxeij',
+                
+                // Set the starting position [lon, lat],
+                // Todo: Restore from last state
+                center: [-74.5, 40],
+                
+                // Set the zoom level
+                // Todo: Restore from last state
+                zoom: 9
+            });
+            
+            var vatsimMapData = new MapDataFeed("https://traffic.onesim.app");
+            vatsimMapData.refreshPilots();
+        </script>
 
-	</body>
+    </body>
 </html>
