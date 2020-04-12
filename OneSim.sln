@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{5ED826A4-6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{2D9E06F3-B64E-43E1-8641-A224CA17A669}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Windows", "OneSim.Windows\OneSim.Windows.csproj", "{AF978FCB-49D9-491B-A3AA-EF4C2BF9C76F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Windows", "OneSim.Windows\OneSim.Windows.csproj", "{AF978FCB-49D9-491B-A3AA-EF4C2BF9C76F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
