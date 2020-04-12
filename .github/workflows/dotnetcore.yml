@@ -22,8 +22,9 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         
-    - name: Restore Dependencies
-      run: dotnet restore
+    - name: Restore dependencies
+      run: |
+        dotnet restore --source "https://nuget.pkg.github.com/eoinaviation/index.json" --source "https://api.nuget.org/v3/index.json"
       
     - name: Build
       run: dotnet build --configuration Release --no-restore
