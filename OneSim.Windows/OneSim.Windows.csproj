@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Strato.Analyzers" Version="1.0.18" />
+    <PackageReference Include="Strato.Mvvm" Version="1.0.1" />
   </ItemGroup>
 
 </Project>
