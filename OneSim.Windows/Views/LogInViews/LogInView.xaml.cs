@@ -1,21 +1,21 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainWindow.xaml.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="LogInView.xaml.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Windows
+namespace OneSim.Windows.Views.LogInViews
 {
-    using System.Windows;
+    using System.Windows.Controls;
 
     /// <summary>
-    ///     Interaction logic for MainWindow.xaml.
+    ///     Interaction logic for LogInPage.xaml.
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class LogInView : UserControl
     {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MainWindow"/> class.
+        ///     Initializes a new instance of the <see cref="LogInView"/> class.
         /// </summary>
-        public MainWindow() => InitializeComponent();
+        public LogInView() => InitializeComponent();
     }
 }

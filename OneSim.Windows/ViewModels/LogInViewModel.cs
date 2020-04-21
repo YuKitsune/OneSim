@@ -6,12 +6,11 @@
 
 namespace OneSim.Windows.ViewModels
 {
-    using System.Net.Mime;
     using System.Security;
     using System.Threading.Tasks;
-    using System.Windows;
-    using Strato.Mvvm;
+
     using Strato.Mvvm.Commands;
+    using Strato.Mvvm.ViewModels;
 
     // Todo: Move into the Identity domain to make it more common.
 

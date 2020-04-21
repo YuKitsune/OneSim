@@ -4,12 +4,13 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ModernWpfUI" Version="0.8.2" />
+    <PackageReference Include="ModernWpfUI" Version="0.8.3" />
     <PackageReference Include="Strato.Analyzers" Version="1.0.18" />
-    <PackageReference Include="Strato.Mvvm" Version="1.0.1" />
+    <PackageReference Include="Strato.Mvvm" Version="1.0.2" />
   </ItemGroup>
 
 </Project>

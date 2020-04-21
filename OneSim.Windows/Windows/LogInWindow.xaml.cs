@@ -10,14 +10,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace OneSim.Windows.Views
+namespace OneSim.Windows.Windows
 {
+    using ModernWpf;
+
     /// <summary>
-    /// Interaction logic for ResetPasswordView.xaml
+    /// Interaction logic for LogInWindow.xaml
     /// </summary>
-    public partial class ResetPasswordView : Window
+    public partial class LogInWindow : Window
     {
-        public ResetPasswordView()
+        public LogInWindow()
         {
             InitializeComponent();
         }
