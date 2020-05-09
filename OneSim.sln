@@ -9,23 +9,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Traffic", "Traffic", "{E2FD
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{185F145E-275F-4D80-998B-66AEFCFEB205}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Traffic.Domain", "OneSim.Traffic.Domain\OneSim.Traffic.Domain.csproj", "{4133E16B-50F8-4C1A-8E45-F39DAE576942}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Traffic.Domain", "OneSim.Traffic.Domain\OneSim.Traffic.Domain.csproj", "{4133E16B-50F8-4C1A-8E45-F39DAE576942}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Traffic.Tests", "OneSim.Traffic.Tests\OneSim.Traffic.Tests.csproj", "{745F60E5-10D7-405E-8F98-512CF41B5540}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Traffic.Tests", "OneSim.Traffic.Tests\OneSim.Traffic.Tests.csproj", "{745F60E5-10D7-405E-8F98-512CF41B5540}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Traffic.Application", "OneSim.Traffic.Application\OneSim.Traffic.Application.csproj", "{36DF34CD-FB48-42B5-8EA2-EDE9F6434F26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Traffic.Application", "OneSim.Traffic.Application\OneSim.Traffic.Application.csproj", "{36DF34CD-FB48-42B5-8EA2-EDE9F6434F26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Traffic.Infrastructure", "OneSim.Traffic.Infrastructure\OneSim.Traffic.Infrastructure.csproj", "{FD363A17-D72D-4E3F-A2D6-801EBFAC1DE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Traffic.Infrastructure", "OneSim.Traffic.Infrastructure\OneSim.Traffic.Infrastructure.csproj", "{FD363A17-D72D-4E3F-A2D6-801EBFAC1DE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Traffic.Api", "OneSim.Traffic.Api\OneSim.Traffic.Api.csproj", "{437F2403-C7FB-47FF-A464-9EAFA444491F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Traffic.Api", "OneSim.Traffic.Api\OneSim.Traffic.Api.csproj", "{437F2403-C7FB-47FF-A464-9EAFA444491F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Traffic.Persistence", "OneSim.Traffic.Persistence\OneSim.Traffic.Persistence.csproj", "{4915AF49-D69C-4F77-AEFE-8C32E0955680}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Traffic.Persistence", "OneSim.Traffic.Persistence\OneSim.Traffic.Persistence.csproj", "{4915AF49-D69C-4F77-AEFE-8C32E0955680}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Traffic.Map", "OneSim.Traffic.Map\OneSim.Traffic.Map.csproj", "{8CAF6189-B130-4B4E-8368-DDA11C3E7877}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Traffic.Map", "OneSim.Traffic.Map\OneSim.Traffic.Map.csproj", "{8CAF6189-B130-4B4E-8368-DDA11C3E7877}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{6C3DF098-18EF-4FA1-BF90-2DC1809A5481}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Traffic.ConsoleClient", "OneSim.Traffic.ConsoleClient\OneSim.Traffic.ConsoleClient.csproj", "{AF620FE3-6977-4068-AB9E-D8BEA23073D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Traffic.ConsoleClient", "OneSim.Traffic.ConsoleClient\OneSim.Traffic.ConsoleClient.csproj", "{AF620FE3-6977-4068-AB9E-D8BEA23073D9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A5CBA8CB-F6C6-485D-8DAB-0706547DCA6D}"
 EndProject
