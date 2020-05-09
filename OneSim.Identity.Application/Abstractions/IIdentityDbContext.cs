@@ -18,7 +18,7 @@ namespace OneSim.Identity.Application.Abstractions
     /// <typeparam name="TUser">
     ///     The type of <see cref="IUser"/>.
     /// </typeparam>
-    public interface IIdentityDbContext<TUser> : IDbContext
+    public interface IIdentityDbContext<TUser> : IDbContext, ITransactionFactory, ITransactionEnlistable
         where TUser : class, IUser
     {
         /// <summary>
