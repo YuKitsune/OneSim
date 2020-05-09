@@ -32,8 +32,11 @@ namespace OneSim.Identity.Application.Exceptions
         /// <param name="email">
         ///     The email address which has not been verified.
         /// </param>
-        public UnverifiedEmailException(string userId, string email)
-            : base($"The email address \"{email}\" for user \"{userId}\" has not been verified.")
+        /// <param name="message">
+        ///     The message.
+        /// </param>
+        public UnverifiedEmailException(string userId, string email, string message = null)
+            : base(message ?? $"The email address \"{email}\" for user \"{userId}\" has not been verified.")
         {
             if (string.IsNullOrEmpty(userId)) throw new ArgumentNullException(nameof(userId));
             if (string.IsNullOrEmpty(email)) throw new ArgumentNullException(nameof(email));
