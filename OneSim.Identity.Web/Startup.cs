@@ -1,57 +1,100 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.EntityFrameworkCore;
-
-using OneSim.Identity.Web.Data;
-
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Startup.cs" company="Strato Systems Pty. Ltd.">
+//   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace OneSim.Identity.Web
 {
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+
+    using OneSim.Identity.Infrastructure;
+    using OneSim.Identity.Persistence;
+
+    /// <summary>
+    ///     The startup.
+    /// </summary>
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
+        /// <summary>
+        ///     Gets the <see cref="IConfiguration"/>.
+        /// </summary>
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="configuration">
+        ///     The <see cref="IConfiguration"/>.
+        /// </param>
+        public Startup(IConfiguration configuration) => Configuration = configuration;
+
+        /// <summary>
+        ///     Configures and adds services to the <see cref="IServiceCollection"/> for dependency injection.
+        /// </summary>
+        /// <param name="services">
+        ///     The <see cref="IServiceCollection"/>.
+        /// </param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(
+            // Configure the DbContext
+            services.AddDbContext<IdentityDbContext>(
                 options =>
-                    options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                    .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
-            services.AddRazorPages();
+                    options.UseNpgsql(Configuration.GetConnectionString("IdentityConnection")));
+
+            // Configure Identity
+            services.AddIdentity<User, IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                    .AddEntityFrameworkStores<IdentityDbContext>()
+                    .AddDefaultTokenProviders();
+
+            // Configure IdentityServer
+            IIdentityServerBuilder builder = services.AddIdentityServer(
+                                                          options =>
+                                                          {
+                                                              options.Events.RaiseErrorEvents = true;
+                                                              options.Events.RaiseInformationEvents = true;
+                                                              options.Events.RaiseFailureEvents = true;
+                                                              options.Events.RaiseSuccessEvents = true;
+                                                          })
+                                                     .AddInMemoryIdentityResources(Config.Ids)
+                                                     .AddInMemoryApiResources(Config.Apis)
+                                                     .AddInMemoryClients(Config.Clients)
+                                                     .AddAspNetIdentity<User>();
+
+            // Todo: not recommended for production - you need to store your key material somewhere secure
+            builder.AddDeveloperSigningCredential();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        ///     Method called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">
+        ///     The <see cref="IApplicationBuilder"/>.
+        /// </param>
+        /// <param name="env">
+        ///     The <see cref="IWebHostEnvironment"/>.
+        /// </param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
+                // Show exception page if in dev environment
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
             }
             else
             {
+                // Use default error page otherwise
                 app.UseExceptionHandler("/Home/Error");
 
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                // The default HSTS value is 30 days.
+                // You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -60,6 +103,7 @@ namespace OneSim.Identity.Web
 
             app.UseRouting();
 
+            app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();
 
