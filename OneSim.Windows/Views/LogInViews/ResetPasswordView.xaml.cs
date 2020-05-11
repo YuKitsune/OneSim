@@ -4,19 +4,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Windows.Views
+namespace OneSim.Windows.Views.LogInViews
 {
-    using System.Windows.Controls;
+    using OneSim.Windows.ViewModels;
+    using Strato.Mvvm.Wpf.Controls;
 
     /// <summary>
     ///     Interaction logic for ResetPasswordView.xaml.
     /// </summary>
-    public partial class ResetPasswordView : UserControl
+    public partial class ResetPasswordView : View
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="ResetPasswordView"/> class.
         /// </summary>
-        public ResetPasswordView()
+        /// <param name="viewModel">
+        ///     The <see cref="ResetPasswordViewModel"/> to use.
+        /// </param>
+        public ResetPasswordView(ResetPasswordViewModel viewModel)
+            : base(viewModel)
         {
             InitializeComponent();
         }

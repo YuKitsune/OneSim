@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LogInWindow.xaml.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="MainWindow.xaml.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -9,17 +9,16 @@ namespace OneSim.Windows.Windows
     using System.Windows;
 
     using OneSim.Windows.Events;
-    using OneSim.Windows.ViewModels;
-    using OneSim.Windows.Views.LogInViews;
+
     using Strato.EventAggregator.Abstractions;
     using Strato.Mvvm.Navigation;
     using Strato.Mvvm.Wpf.Windows;
 
     /// <summary>
-    ///     Interaction logic for LogInWindow.xaml.
-    ///     The Log In Window is where the authentication process occurs (Login, 2FA, password reset, etc.)
+    ///     Interaction logic for MainWindow.xaml.
+    ///     The Main Window is where the majority of interaction happens within OneSim.
     /// </summary>
-    public partial class LogInWindow : ManagedWindow
+    public partial class MainWindow : ManagedWindow
     {
         /// <summary>
         ///     Gets the <see cref="IEventAggregator"/>.
@@ -27,7 +26,7 @@ namespace OneSim.Windows.Windows
         public IEventAggregator EventAggregator { get; }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="LogInWindow"/> class.
+        ///     Initializes a new instance of the <see cref="MainWindow"/> class.
         /// </summary>
         /// <param name="windowManager">
         ///     The <see cref="WindowManager"/>.
@@ -38,7 +37,7 @@ namespace OneSim.Windows.Windows
         /// <param name="eventAggregator">
         ///     The <see cref="IEventAggregator"/>.
         /// </param>
-        public LogInWindow(
+        public MainWindow(
             WindowManager windowManager,
             INavigationContext navigationContext,
             IEventAggregator eventAggregator)
@@ -47,8 +46,8 @@ namespace OneSim.Windows.Windows
             InitializeComponent();
 
             // Setup the navigation context
-            NavigationContext.Register<LogInView, LogInViewModel>();
-            NavigationContext.Register<ResetPasswordView, ResetPasswordViewModel>();
+            // Todo: NavigationContext.Register<FirstView, FirstViewModel>();
+            // Todo: NavigationContext.Register<SecondView, SecondViewModel>();
             NavigationControl.UseNavigationContext(NavigationContext);
 
             // Setup the Event Aggregator
@@ -67,7 +66,7 @@ namespace OneSim.Windows.Windows
         /// </param>
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            NavigationContext.NavigateTo<LogInViewModel>();
+            // Todo: NavigationContext.NavigateTo<FirstViewModel>();
         }
 
         /// <summary>

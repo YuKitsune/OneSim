@@ -8,11 +8,11 @@ namespace OneSim.Windows.ViewModels
 {
     using System.Security;
     using System.Threading.Tasks;
-
+    using OneSim.Windows.Events;
+    using Strato.EventAggregator.Abstractions;
     using Strato.Mvvm.Commands;
+    using Strato.Mvvm.Navigation;
     using Strato.Mvvm.ViewModels;
-
-    // Todo: Move into the Identity domain to make it more common.
 
     /// <summary>
     ///     The <see cref="ViewModel"/> for the Log In View.
@@ -57,9 +57,28 @@ namespace OneSim.Windows.ViewModels
         public AsyncCommand LogInCommand => Get(new AsyncCommand(LogInAsync, () => CanLogIn));
 
         /// <summary>
+        ///     Gets the <see cref="RelayCommand"/> used to display the "Reset Password" view.
+        /// </summary>
+        public RelayCommand DisplayResetPasswordViewCommand => Get(new RelayCommand(DisplayResetPasswordView));
+
+        /// <summary>
         ///     Gets the <see cref="AsyncCommand"/> used to log the user in.
         /// </summary>
         public RelayCommand CancelCommand => Get(new RelayCommand(Cancel, () => !LogInCommand.IsExecuting));
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LogInViewModel"/> class.
+        /// </summary>
+        /// <param name="eventAggregator">
+        ///     The <see cref="IEventAggregator"/> to use for publishing and subscribing to events.
+        /// </param>
+        /// <param name="navigationContext">
+        ///     The <see cref="INavigationContext"/> to use for navigation.
+        /// </param>
+        public LogInViewModel(IEventAggregator eventAggregator, INavigationContext navigationContext)
+            : base(eventAggregator, navigationContext)
+        {
+        }
 
         /// <summary>
         ///     Attempts to log the user in as an asynchronous operation.
@@ -74,6 +93,19 @@ namespace OneSim.Windows.ViewModels
             // Todo: Attempt to log in
 
             // Todo: Switch to 2FA view if required
+            bool twoFactorAuthenticationRequired = true;
+            if (twoFactorAuthenticationRequired)
+            {
+                // NavigationContext.NavigateTo<TwoFactorAuthenticationViewModel>();
+            }
+        }
+
+        /// <summary>
+        ///     Displays the "Reset Password" view.
+        /// </summary>
+        public void DisplayResetPasswordView()
+        {
+            NavigationContext.NavigateTo<ResetPasswordViewModel>();
         }
 
         /// <summary>
@@ -81,7 +113,7 @@ namespace OneSim.Windows.ViewModels
         /// </summary>
         public void Cancel()
         {
-            // TODO EOIN MUST TEACH KYLE HOW TO CODE
+            EventAggregator.Publish(new CloseEvent(this));
         }
     }
 }
