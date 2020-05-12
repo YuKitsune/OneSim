@@ -57,6 +57,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{9922BC84-8A72-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Windows", "OneSim.Windows\OneSim.Windows.csproj", "{0BDB2EF8-61ED-437F-A3E8-B7D7937A2E3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Common.Infrastructure", "OneSim.Common.Infrastructure\OneSim.Common.Infrastructure.csproj", "{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}"
+EndProject
 Global
 				GlobalSection(SolutionConfigurationPlatforms) = preSolution
 								Debug|Any CPU = Debug|Any CPU
@@ -391,6 +393,26 @@ Global
 					{0BDB2EF8-61ED-437F-A3E8-B7D7937A2E3C}.Release|x64.Build.0 = Release|Any CPU
 					{0BDB2EF8-61ED-437F-A3E8-B7D7937A2E3C}.Release|x86.ActiveCfg = Release|Any CPU
 					{0BDB2EF8-61ED-437F-A3E8-B7D7937A2E3C}.Release|x86.Build.0 = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|ARM.ActiveCfg = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|ARM.Build.0 = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|ARM64.Build.0 = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|x64.ActiveCfg = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|x64.Build.0 = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|x86.ActiveCfg = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Debug|x86.Build.0 = Debug|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|Any CPU.Build.0 = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|ARM.ActiveCfg = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|ARM.Build.0 = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|ARM64.ActiveCfg = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|ARM64.Build.0 = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|x64.ActiveCfg = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|x64.Build.0 = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|x86.ActiveCfg = Release|Any CPU
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A}.Release|x86.Build.0 = Release|Any CPU
 				EndGlobalSection
 				GlobalSection(SolutionProperties) = preSolution
 								HideSolutionNode = FALSE
@@ -421,6 +443,7 @@ Global
 					{7B843824-E269-4DD4-8621-651E07F3B66D} = {9867B927-E6F4-4835-A522-93CCA8CB2D60}
 					{2C4076BB-7ADF-4442-A563-1D51A45017FA} = {7B843824-E269-4DD4-8621-651E07F3B66D}
 					{0BDB2EF8-61ED-437F-A3E8-B7D7937A2E3C} = {9922BC84-8A72-40F6-BD59-03F15D2703F0}
+					{BBDAE7FD-31CD-4972-8440-6E76B89BAC8A} = {A5B07A8C-0D35-4775-8FA9-01300F146109}
 				EndGlobalSection
 				GlobalSection(ExtensibilityGlobals) = postSolution
 								SolutionGuid = {D696FB2D-65B2-44E2-929D-39F0173B1A24}

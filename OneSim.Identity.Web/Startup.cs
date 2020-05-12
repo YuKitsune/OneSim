@@ -14,6 +14,9 @@ namespace OneSim.Identity.Web
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
 
+    using OneSim.Common.Application.Abstractions;
+    using OneSim.Common.Infrastructure;
+    using OneSim.Identity.Application.Abstractions;
     using OneSim.Identity.Infrastructure;
     using OneSim.Identity.Persistence;
 
@@ -47,9 +50,16 @@ namespace OneSim.Identity.Web
             services.AddDbContext<IdentityDbContext>(
                 options =>
                     options.UseNpgsql(Configuration.GetConnectionString("IdentityConnection")));
+            services.AddTransient<IIdentityDbContext<User>, IdentityDbContext>();
+
+            // Configure our custom services
+            services.AddTransient<IEmailSender, SmtpEmailSender>();
+            services.AddTransient<IUserService<User>, UserService>();
+            services.AddTransient<IAuthenticationService<User>, AuthenticationService>();
+            services.AddTransient<ITwoFactorAuthenticationService<User>, TwoFactorAuthenticationService>();
 
             // Configure Identity
-            services.AddIdentity<User, IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                     .AddEntityFrameworkStores<IdentityDbContext>()
                     .AddDefaultTokenProviders();
 
@@ -61,6 +71,8 @@ namespace OneSim.Identity.Web
                                                               options.Events.RaiseInformationEvents = true;
                                                               options.Events.RaiseFailureEvents = true;
                                                               options.Events.RaiseSuccessEvents = true;
+                                                              options.UserInteraction.LoginUrl = "Account/Login";
+                                                              options.UserInteraction.LogoutUrl = "Account/Logout";
                                                           })
                                                      .AddInMemoryIdentityResources(Config.Ids)
                                                      .AddInMemoryApiResources(Config.Apis)
@@ -69,6 +81,11 @@ namespace OneSim.Identity.Web
 
             // Todo: not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
+
+            // Setup the MVC stuff
+            services.AddControllers();
+            services.AddControllersWithViews();
+            services.AddRazorPages();
         }
 
         /// <summary>

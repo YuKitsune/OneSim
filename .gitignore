@@ -4,3 +4,4 @@ bin
 *.user
 .idea/
 node_modules/
+*.rsa
