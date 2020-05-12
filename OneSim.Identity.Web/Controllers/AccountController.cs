@@ -31,6 +31,7 @@ namespace OneSim.Identity.Web.Controllers
     /// <summary>
     ///     The <see cref="Controller"/> for authentication and account management.
     /// </summary>
+    [Authorize]
     public class AccountController : Controller
     {
         /// <summary>
@@ -176,6 +177,8 @@ namespace OneSim.Identity.Web.Controllers
 
                     // Sign the user in
                     ISignInResult result = await _authenticationService.SignInAsync(user, viewModel.Password);
+
+                    // Todo: Check if email confirmation is required
 
                     // If 2FA is required, then redirect to the 2FA login view
                     if (result.RequiresTwoFactor)
