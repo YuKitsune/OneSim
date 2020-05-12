@@ -16,7 +16,7 @@ namespace OneSim.Identity.Persistence
     /// <summary>
     ///     The <see cref="IIdentityDbContext{TUser}"/> implementation for the <see cref="User"/>.
     /// </summary>
-    public class IdentityDbContext : TransactionalIdentityDbContext, IIdentityDbContext<User>
+    public class IdentityDbContext : TransactionalIdentityDbContext<User>, IIdentityDbContext<User>
     {
         /// <summary>
         ///     Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="User"/>s.
