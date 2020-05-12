@@ -35,7 +35,7 @@ namespace OneSim.Identity.Infrastructure.Extensions
             int errorCount = result.Errors.Count();
             string message = errorCount > 1 ?
                                  $"{errorCount.ToString()} IdentityErrors have occurred." :
-                                 "An IdentityError has occurred.";
+                                 $"An IdentityError has occurred: {result.Errors.First().Description}";
 
             throw new IdentityException(result.Errors, message);
         }
