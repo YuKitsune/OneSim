@@ -104,14 +104,11 @@ namespace OneSim.Identity.Web.Controllers
         /// <summary>
         ///     Returns the index view.
         /// </summary>
-        /// <param name="viewModel">
-        ///     The <see cref="IndexViewModel"/>.
-        /// </param>
         /// <returns>
         ///     The <see cref="IActionResult"/>.
         /// </returns>
         [HttpGet]
-        public IActionResult Index(IndexViewModel viewModel = null) => View(viewModel ?? new IndexViewModel());
+        public IActionResult Index() => View();
 
         /// <summary>
         ///     Returns the Login view.
@@ -175,7 +172,7 @@ namespace OneSim.Identity.Web.Controllers
                         props.IsPersistent = true;
                     }
 
-                    // Sign the user in
+                    // Attempt to sign the user in
                     ISignInResult result = await _authenticationService.SignInAsync(user, viewModel.Password);
 
                     // Todo: Check if email confirmation is required
@@ -229,7 +226,7 @@ namespace OneSim.Identity.Web.Controllers
         }
 
         /// <summary>
-        ///     Logs the user in with Two-Factor Authentication.
+        ///     Handles the Two-Factor Authentication Login request.
         /// </summary>
         /// <param name="viewModel">
         ///     The <see cref="TwoFactorLoginViewModel"/>.
@@ -306,7 +303,7 @@ namespace OneSim.Identity.Web.Controllers
         }
 
         /// <summary>
-        ///     Logs the user in using a 2FA recovery code.
+        ///     Handles the 2FA recovery code login request.
         /// </summary>
         /// <param name="viewModel">
         ///     The <see cref="TwoFactorRecoveryCodeLoginViewModel"/>.
@@ -372,16 +369,21 @@ namespace OneSim.Identity.Web.Controllers
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel viewModel)
         {
-            // Todo: Prevent registration if the customer wishes to create users manually
             try
             {
                 // Check no conflicting users exist
-                User existingUser = await _dbContext.Users.FirstOrDefaultAsync(
-                                        u => u.Email == viewModel.Email ||
-                                             u.UserName == viewModel.UserName);
-                if (existingUser != null)
+                User existingUserEmail = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
+                User existingUserUserName = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == viewModel.UserName);
+                if (existingUserEmail != null)
                 {
                     ModelState.AddModelError(string.Empty, "The given email address is already registered to an account.");
+
+                    return View();
+                }
+
+                if (existingUserUserName != null)
+                {
+                    ModelState.AddModelError(string.Empty, "The given username is already registered to an account.");
 
                     return View();
                 }
@@ -392,18 +394,17 @@ namespace OneSim.Identity.Web.Controllers
                 // Register the user
                 await _userService.RegisterUserAsync(user, viewModel.Password);
 
+                // Todo: Redirect somewhere telling the user they need to verify their email.
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error has occurred registering an account with email \"{viewModel.Email}\".");
-                ModelState.AddModelError(string.Empty, $"An error has occurred registering an account with email \"{viewModel.Email}\".");
+                _logger.LogError(ex, $"An error has occurred registering an account with email \"{viewModel.Email}\" and username \"{viewModel.UserName}\".");
+                ModelState.AddModelError(string.Empty, $"An error has occurred registering the account.");
 
                 return View();
             }
         }
-
-        // Todo: Revisit
 
         /// <summary>
         ///     Returns the account deletion view.
@@ -456,7 +457,7 @@ namespace OneSim.Identity.Web.Controllers
         }
 
         /// <summary>
-        ///     Handles the request to send an email confirmation email.
+        ///     Handles the request to send a verification email.
         /// </summary>
         /// <returns>
         ///     The <see cref="IActionResult"/>.
@@ -510,17 +511,17 @@ namespace OneSim.Identity.Web.Controllers
                 // Confirm email
                 await _userService.VerifyEmailAsync(user, confirmationCode);
 
-                return RedirectToAction(nameof(Index), new IndexViewModel { Message = "Email address confirmed." });
+                return RedirectToAction(nameof(Index), new IndexViewModel { Message = "Email address verified." });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error has occurred confirming the email for user with email \"{user.Email}\".");
+                _logger.LogError(ex, $"An error has occurred verifying the email for user with email \"{user.Email}\".");
 
                 return RedirectToAction(
                     nameof(Index),
                     new IndexViewModel
                     {
-                        Message = "An error occurred while attempting to confirm the email address.",
+                        Message = "An error occurred while attempting to verify the email address.",
                         MessageIsError = true
                     });
             }
@@ -954,7 +955,7 @@ namespace OneSim.Identity.Web.Controllers
         public IActionResult Lockout() => View();
 
         /// <summary>
-        ///     Builds a clean <see cref="LoginViewModel"/> (for no password)
+        ///     Builds a clean <see cref="LoginViewModel"/> (with no password)
         ///     given a dirty <see cref="LoginViewModel"/> (with password).
         /// </summary>
         /// <param name="viewModel">
@@ -985,7 +986,7 @@ namespace OneSim.Identity.Web.Controllers
         /// </param>
         /// <returns>
         ///     The required <see cref="RedirectResult"/>.
-        ///     If no <see cref="RedirectResult"/> could be determined, then <c>null</c> is returned.
+        ///     If no <see cref="RedirectResult"/> could be determined, then a redirect to the Login action is returned.
         /// </returns>
         private IActionResult GetPostLoginRedirect(ISignInResult result, string callbackUri)
         {
@@ -1004,7 +1005,7 @@ namespace OneSim.Identity.Web.Controllers
             // If locked out, then redirect to the lockout view
             if (result.IsLockedOut) return RedirectToAction("Lockout", "Account");
 
-            return null;
+            return RedirectToAction("Login");
         }
     }
 }

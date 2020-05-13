@@ -59,7 +59,7 @@ namespace OneSim.Identity.Web
             services.AddTransient<ITwoFactorAuthenticationService<User>, TwoFactorAuthenticationService>();
 
             // Configure Identity
-            services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
                     .AddEntityFrameworkStores<IdentityDbContext>()
                     .AddDefaultTokenProviders();
 

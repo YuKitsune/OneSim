@@ -8,9 +8,7 @@
     <div class="ui stacked segment">
 
         @* Validation message *@
-        <div class="ui error message" style="padding: 5px;">
-            @Html.ValidationSummary()
-        </div>
+        <div asp-validation-summary="All" class="ui error message" style="padding: 5px;"></div>
 
         @* Email *@
         <div class="field">
@@ -44,6 +42,12 @@
         
         @* Log In button *@
         <button class="ui fluid large blue button" type="submit">Log In</button>
+        
+        @* Log In button *@
+        <div style="margin-top: 5px">
+            Don't have an account?
+            @Html.ActionLink("Register", "Register", "Account")
+        </div>
     </div>
 </form>
 
