@@ -1,16 +1,15 @@
-﻿<controls:View x:Class="OneSim.Windows.Views.LogInViews.LogInView"
-               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-               xmlns:viewModels="clr-namespace:OneSim.Windows.ViewModels"
-               xmlns:ui="http://schemas.modernwpf.com/2019"
-               xmlns:controls="clr-namespace:Strato.Mvvm.Wpf.Controls;assembly=Strato.Mvvm.Wpf"
-               mc:Ignorable="d"
-               Background="{DynamicResource SystemControlPageBackgroundAltHighBrush}"
-               Foreground="{DynamicResource SystemControlPageTextBaseHighBrush}"
-               d:DataContext="{d:DesignInstance viewModels:LogInViewModel}"
-               d:DesignWidth="300">
+﻿<UserControl x:Class="OneSim.Windows.Views.LogInViews.LogInView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:OneSim.Windows.ViewModels"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             mc:Ignorable="d"
+             Background="{DynamicResource SystemControlPageBackgroundAltHighBrush}"
+             Foreground="{DynamicResource SystemControlPageTextBaseHighBrush}"
+             d:DataContext="{d:DesignInstance viewModels:LogInViewModel}"
+             d:DesignWidth="300">
     <Grid Margin="20,5,20,20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -92,4 +91,4 @@
                 Command="{Binding DisplayResetPasswordViewCommand}"
                 Content="Reset Password"/>
     </Grid>
-</controls:View>
+</UserControl>

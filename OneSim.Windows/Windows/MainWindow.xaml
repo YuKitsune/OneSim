@@ -1,15 +1,14 @@
-﻿<windows:ManagedWindow x:Class="OneSim.Windows.Windows.MainWindow"
-                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                       xmlns:local="clr-namespace:OneSim.Windows.Windows"
-                       xmlns:controls="clr-namespace:Strato.Mvvm.Wpf.Controls;assembly=Strato.Mvvm.Wpf"
-                       xmlns:windows="clr-namespace:Strato.Mvvm.Wpf.Windows;assembly=Strato.Mvvm.Wpf"
-                       mc:Ignorable="d"
-                       Title="MainWindow" 
-                       Height="450" 
-                       Width="800"
-                       Loaded="OnLoaded">
-    <controls:NavigationControl x:Name="NavigationControl"/>
-</windows:ManagedWindow>
+﻿<Window x:Class="OneSim.Windows.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OneSim.Windows.Windows"
+        xmlns:controls="clr-namespace:OneSim.Windows.Controls"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        Height="450" 
+        Width="800"
+        Loaded="OnLoaded">
+    <controls:ModernNavigationControl x:Name="NavigationControl"/>
+</Window>
