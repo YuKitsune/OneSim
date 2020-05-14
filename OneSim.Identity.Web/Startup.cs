@@ -129,7 +129,7 @@ namespace OneSim.Identity.Web
                 {
                     endpoints.MapControllerRoute(
                         name: "default",
-                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                        pattern: "{controller=Account}/{action=Index}/{id?}");
                     endpoints.MapRazorPages();
                 });
         }
