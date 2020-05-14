@@ -18,5 +18,25 @@
         SizeToContent="Height"
         ResizeMode="NoResize"
         Loaded="OnLoaded">
-    <controls:ModernNavigationControl x:Name="NavigationControl"/>
+    <Grid Margin="20,0,20,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Banner -->
+        <TextBlock Grid.Row="0"
+                   Margin="0,0,0,5"
+                   TextAlignment="Center"
+                   FontSize="55">
+            <Run Text="One"
+                 FontWeight="Bold"
+                 Foreground="{DynamicResource SystemControlBackgroundAccentBrush}"/><Run Text="Sim"/>
+        </TextBlock>
+
+        <!-- Content -->
+        <controls:ModernNavigationControl Grid.Row="1"
+                                          x:Name="NavigationControl"/>
+
+    </Grid>
 </Window>
