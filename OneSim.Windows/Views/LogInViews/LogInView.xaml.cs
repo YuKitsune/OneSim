@@ -6,13 +6,17 @@
 
 namespace OneSim.Windows.Views.LogInViews
 {
+    using System;
+    using System.Windows.Controls;
+
     using OneSim.Windows.ViewModels;
-    using Strato.Mvvm.Wpf.Controls;
+
+    using Strato.Mvvm;
 
     /// <summary>
     ///     Interaction logic for LogInPage.xaml.
     /// </summary>
-    public partial class LogInView : View
+    public partial class LogInView : UserControl, IView
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="LogInView"/> class.
@@ -21,9 +25,9 @@ namespace OneSim.Windows.Views.LogInViews
         ///     The <see cref="LogInViewModel"/> to use.
         /// </param>
         public LogInView(LogInViewModel viewModel)
-            : base(viewModel)
         {
             InitializeComponent();
+            DataContext = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }
     }
 }

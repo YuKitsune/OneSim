@@ -77,7 +77,7 @@ namespace OneSim.Windows
         }
 
         /// <summary>
-        ///     Registers all <see cref="ManagedWindow"/>s which can be presented in the application.
+        ///     Registers all <see cref="Window"/>s which can be presented in the application.
         /// </summary>
         /// <param name="services">
         ///     The <see cref="IServiceCollection"/>.

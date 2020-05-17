@@ -6,20 +6,20 @@
 
 namespace OneSim.Windows.Windows
 {
+    using System;
     using System.Windows;
 
-    using OneSim.Windows.Events;
     using OneSim.Windows.ViewModels;
     using OneSim.Windows.Views.LogInViews;
     using Strato.EventAggregator.Abstractions;
     using Strato.Mvvm.Navigation;
-    using Strato.Mvvm.Wpf.Windows;
+    using Strato.Mvvm.Navigation.Events;
 
     /// <summary>
     ///     Interaction logic for LogInWindow.xaml.
     ///     The Log In Window is where the authentication process occurs (Login, 2FA, password reset, etc.)
     /// </summary>
-    public partial class LogInWindow : ManagedWindow
+    public partial class LogInWindow : Window
     {
         /// <summary>
         ///     Gets the <see cref="IEventAggregator"/>.
@@ -27,11 +27,13 @@ namespace OneSim.Windows.Windows
         public IEventAggregator EventAggregator { get; }
 
         /// <summary>
+        ///     Gets the <see cref="INavigationContext"/>.
+        /// </summary>
+        public INavigationContext NavigationContext { get; }
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="LogInWindow"/> class.
         /// </summary>
-        /// <param name="windowManager">
-        ///     The <see cref="WindowManager"/>.
-        /// </param>
         /// <param name="navigationContext">
         ///     The <see cref="INavigationContext"/>.
         /// </param>
@@ -39,20 +41,19 @@ namespace OneSim.Windows.Windows
         ///     The <see cref="IEventAggregator"/>.
         /// </param>
         public LogInWindow(
-            WindowManager windowManager,
             INavigationContext navigationContext,
             IEventAggregator eventAggregator)
-            : base(windowManager, navigationContext)
         {
             InitializeComponent();
 
             // Setup the navigation context
+            NavigationContext = navigationContext ?? throw new ArgumentNullException(nameof(navigationContext));
             NavigationContext.Register<LogInView, LogInViewModel>();
             NavigationContext.Register<ResetPasswordView, ResetPasswordViewModel>();
             NavigationControl.UseNavigationContext(NavigationContext);
 
             // Setup the Event Aggregator
-            EventAggregator = eventAggregator;
+            EventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
             EventAggregator.Subscribe<CloseEvent>(HandleCloseEvent);
         }
 

@@ -8,7 +8,6 @@ namespace OneSim.Windows.ViewModels
 {
     using System.Security;
     using System.Threading.Tasks;
-    using OneSim.Windows.Events;
     using Strato.EventAggregator.Abstractions;
     using Strato.Mvvm.Commands;
     using Strato.Mvvm.Navigation;
@@ -64,7 +63,7 @@ namespace OneSim.Windows.ViewModels
         /// <summary>
         ///     Gets the <see cref="AsyncCommand"/> used to log the user in.
         /// </summary>
-        public RelayCommand CancelCommand => Get(new RelayCommand(Cancel, () => !LogInCommand.IsExecuting));
+        public RelayCommand CancelCommand => Get(new RelayCommand(Close, () => !LogInCommand.IsExecuting));
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="LogInViewModel"/> class.
@@ -106,14 +105,6 @@ namespace OneSim.Windows.ViewModels
         public void DisplayResetPasswordView()
         {
             NavigationContext.NavigateTo<ResetPasswordViewModel>();
-        }
-
-        /// <summary>
-        ///     Closes the view and any remaining windows.
-        /// </summary>
-        public void Cancel()
-        {
-            EventAggregator.Publish(new CloseEvent(this));
         }
     }
 }
