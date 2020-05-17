@@ -8,6 +8,7 @@ namespace OneSim.Identity.Web.Controllers
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
     using System.Security.Claims;
     using System.Threading.Tasks;
 
@@ -111,6 +112,74 @@ namespace OneSim.Identity.Web.Controllers
         public IActionResult Index() => View();
 
         /// <summary>
+        ///     Returns the account registration view.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="IActionResult"/>.
+        /// </returns>
+        [HttpGet, AllowAnonymous]
+        public IActionResult Register() => View();
+
+        /// <summary>
+        ///     Handles the request to register a new account.
+        /// </summary>
+        /// <param name="viewModel">
+        ///     The <see cref="RegisterViewModel"/>.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="IActionResult"/>.
+        /// </returns>
+        [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel viewModel)
+        {
+            // Create a clean copy of the ViewModel in case we need to re-display the form
+            RegisterViewModel cleanViewModel = new RegisterViewModel
+                                               {
+                                                   Email = viewModel.Email,
+                                                   UserName = viewModel.UserName
+                                               };
+
+            // If the ViewModel is invalid, then re-display the page
+            if (!ModelState.IsValid) return View(cleanViewModel);
+
+            try
+            {
+                // Check no conflicting users exist
+                User existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError(string.Empty, "The given email address is already registered to an account.");
+
+                    return View(cleanViewModel);
+                }
+
+                existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == viewModel.UserName);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError(string.Empty, "The given username is already registered to an account.");
+
+                    return View(cleanViewModel);
+                }
+
+                // Create a new user
+                User user = new User { Email = viewModel.Email, UserName = viewModel.UserName };
+
+                // Register the user
+                await _userService.RegisterUserAsync(user, viewModel.Password);
+
+                // Todo: Redirect somewhere telling the user they need to verify their email.
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error has occurred registering an account with email \"{viewModel.Email}\" and username \"{viewModel.UserName}\".");
+                ModelState.AddModelError(string.Empty, $"An error has occurred registering the account.");
+
+                return View(cleanViewModel);
+            }
+        }
+
+        /// <summary>
         ///     Returns the Login view.
         /// </summary>
         /// <param name="callbackUri">
@@ -142,8 +211,18 @@ namespace OneSim.Identity.Web.Controllers
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel viewModel)
         {
-            // If the model is valid, continue with the login
-            if (ModelState.IsValid)
+            // Create a clean copy of the ViewModel in case we need to re-display the form
+            LoginViewModel cleanViewModel = new LoginViewModel
+                                            {
+                                                Email = viewModel.Email,
+                                                RememberMe = viewModel.RememberMe,
+                                                CallbackUri = viewModel.CallbackUri
+                                            };
+
+            // If the ViewModel is invalid, then re-display the page
+            if (!ModelState.IsValid) return View(cleanViewModel);
+
+            try
             {
                 // Get the user
                 User user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
@@ -188,15 +267,19 @@ namespace OneSim.Identity.Web.Controllers
                     // Determine where to redirect
                     IActionResult redirectResult = GetPostLoginRedirect(result, viewModel.CallbackUri);
 
-                    return redirectResult;
+                    return redirectResult ?? RedirectToAction("Index");
                 }
 
-                // Throw a generic error if invalid, can't be specific about what went wrong for security reasons
+                // Show a generic error if invalid, can't be specific about what went wrong for security reasons
                 ModelState.AddModelError(string.Empty, "Invalid username or password.");
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error has occurred during a login attempt with email \"{viewModel.Email}\"");
+                ModelState.AddModelError(string.Empty, $"An error has occurred when logging in.");
+            }
 
-            // Something went wrong, clean the view model and go back
-            return View(await BuildLoginViewModelAsync(viewModel));
+            return View(cleanViewModel);
         }
 
         /// <summary>
@@ -237,8 +320,16 @@ namespace OneSim.Identity.Web.Controllers
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWithTwoFactorAuthentication(TwoFactorLoginViewModel viewModel)
         {
-            // If invalid, re-display the form and try again
-            if (!ModelState.IsValid) return View(viewModel);
+            // Create a clean copy of the ViewModel in case we need to re-display the form
+            TwoFactorLoginViewModel cleanViewModel = new TwoFactorLoginViewModel
+                                                     {
+                                                         RememberMachine = viewModel.RememberMachine,
+                                                         RememberMe = viewModel.RememberMe,
+                                                         CallbackUri = viewModel.CallbackUri
+                                                     };
+
+            // If the ViewModel is invalid, then re-display the page
+            if (!ModelState.IsValid) return View(cleanViewModel);
 
             // Get the user
             User user = await _twoFactorAuthenticationService.GetTwoFactorAuthenticationUserAsync();
@@ -258,28 +349,15 @@ namespace OneSim.Identity.Web.Controllers
                 // 2FA code was wrong, try again
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
 
-                return View(
-                    new TwoFactorLoginViewModel
-                    {
-                        CallbackUri = viewModel.CallbackUri,
-                        RememberMe = viewModel.RememberMe,
-                        RememberMachine = viewModel.RememberMachine
-                    });
+                return View(cleanViewModel);
             }
             catch (Exception ex)
             {
                 // Log the error
                 _logger.LogError(ex, $"An error has occurred logging in user using 2FA with email \"{user.Email}\".");
-
                 ModelState.AddModelError(string.Empty, "An error has occurred when attempting to log in.");
 
-                return View(
-                    new TwoFactorLoginViewModel
-                    {
-                        CallbackUri = viewModel.CallbackUri,
-                        RememberMe = viewModel.RememberMe,
-                        RememberMachine = viewModel.RememberMachine
-                    });
+                return View(cleanViewModel);
             }
         }
 
@@ -314,8 +392,14 @@ namespace OneSim.Identity.Web.Controllers
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWithRecoveryCode(TwoFactorRecoveryCodeLoginViewModel viewModel)
         {
-            // If invalid, re-display the form and try again
-            if (!ModelState.IsValid) return View(viewModel);
+            // Create a clean copy of the ViewModel in case we need to re-display the form
+            TwoFactorRecoveryCodeLoginViewModel cleanViewModel = new TwoFactorRecoveryCodeLoginViewModel
+                                                                 {
+                                                                     CallbackUri = viewModel.CallbackUri
+                                                                 };
+
+            // If the ViewModel is invalid, then re-display the page
+            if (!ModelState.IsValid) return View(cleanViewModel);
 
             // Get the user
             User user = await _twoFactorAuthenticationService.GetTwoFactorAuthenticationUserAsync();
@@ -335,7 +419,7 @@ namespace OneSim.Identity.Web.Controllers
                 // 2FA recovery code was wrong, try again
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
 
-                return View(new TwoFactorRecoveryCodeLoginViewModel { CallbackUri = viewModel.CallbackUri });
+                return View(cleanViewModel);
             }
             catch (Exception ex)
             {
@@ -344,65 +428,7 @@ namespace OneSim.Identity.Web.Controllers
 
                 ModelState.AddModelError(string.Empty, "An error has occurred when attempting to log in.");
 
-                return View(new TwoFactorRecoveryCodeLoginViewModel { CallbackUri = viewModel.CallbackUri });
-            }
-        }
-
-        /// <summary>
-        ///     Returns the account registration view.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="IActionResult"/>.
-        /// </returns>
-        [HttpGet, AllowAnonymous]
-        public IActionResult Register() => View();
-
-        /// <summary>
-        ///     Handles the request to register a new account.
-        /// </summary>
-        /// <param name="viewModel">
-        ///     The <see cref="RegisterViewModel"/>.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="IActionResult"/>.
-        /// </returns>
-        [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel viewModel)
-        {
-            try
-            {
-                // Check no conflicting users exist
-                User existingUserEmail = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
-                User existingUserUserName = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == viewModel.UserName);
-                if (existingUserEmail != null)
-                {
-                    ModelState.AddModelError(string.Empty, "The given email address is already registered to an account.");
-
-                    return View();
-                }
-
-                if (existingUserUserName != null)
-                {
-                    ModelState.AddModelError(string.Empty, "The given username is already registered to an account.");
-
-                    return View();
-                }
-
-                // Create a new user
-                User user = new User { Email = viewModel.Email, UserName = viewModel.UserName };
-
-                // Register the user
-                await _userService.RegisterUserAsync(user, viewModel.Password);
-
-                // Todo: Redirect somewhere telling the user they need to verify their email.
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"An error has occurred registering an account with email \"{viewModel.Email}\" and username \"{viewModel.UserName}\".");
-                ModelState.AddModelError(string.Empty, $"An error has occurred registering the account.");
-
-                return View();
+                return View(cleanViewModel);
             }
         }
 
@@ -654,14 +680,9 @@ namespace OneSim.Identity.Web.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An error has occurred changing the password for user with email \"{user.Email}\".");
+                ModelState.AddModelError(string.Empty, "An error occurred while attempting to change the password.");
 
-                return RedirectToAction(
-                    nameof(Index),
-                    new IndexViewModel
-                    {
-                        Message = "An error occurred while attempting to change password.",
-                        MessageIsError = true
-                    });
+                return View();
             }
         }
 
@@ -724,6 +745,16 @@ namespace OneSim.Identity.Web.Controllers
         public async Task<IActionResult> EnableTwoFactorAuthentication(
             EnableTwoFactorAuthenticationViewModel viewModel)
         {
+            // Create a clean copy of the ViewModel in case we need to re-display the form
+            EnableTwoFactorAuthenticationViewModel cleanViewModel = new EnableTwoFactorAuthenticationViewModel
+                                                                    {
+                                                                        SharedKey = viewModel.SharedKey,
+                                                                        AuthenticatorUri = viewModel.AuthenticatorUri
+                                                                    };
+
+            // If the ViewModel is invalid, then re-display the page
+            if (!ModelState.IsValid) return View(cleanViewModel);
+
             // Get the current user
             User user = await _userService.GetUserAsync(User);
 
@@ -740,11 +771,7 @@ namespace OneSim.Identity.Web.Controllers
                 _logger.LogError(ex, $"An error has occurred enabling Two-Factor Authentication for user with email \"{user.Email}\".");
                 ModelState.AddModelError(string.Empty, "An error occurred while attempting to enable Two-Factor Authentication.");
 
-                return View(
-                    new EnableTwoFactorAuthenticationViewModel
-                    {
-                        SharedKey = viewModel.SharedKey, AuthenticatorUri = viewModel.AuthenticatorUri
-                    });
+                return View(cleanViewModel);
             }
         }
 
@@ -955,26 +982,6 @@ namespace OneSim.Identity.Web.Controllers
         public IActionResult Lockout() => View();
 
         /// <summary>
-        ///     Builds a clean <see cref="LoginViewModel"/> (with no password)
-        ///     given a dirty <see cref="LoginViewModel"/> (with password).
-        /// </summary>
-        /// <param name="viewModel">
-        ///     The dirty <see cref="LoginViewModel"/>.
-        /// </param>
-        /// <returns>
-        ///     The clean <see cref="LoginViewModel"/>.
-        /// </returns>
-        private async Task<LoginViewModel> BuildLoginViewModelAsync(LoginViewModel viewModel)
-        {
-            AuthorizationRequest context = await _interactionService.GetAuthorizationContextAsync(viewModel.CallbackUri);
-            LoginViewModel vm = new LoginViewModel { CallbackUri = viewModel.CallbackUri, Email = context?.LoginHint };
-            vm.Email = viewModel.Email;
-            vm.RememberMe = viewModel.RememberMe;
-
-            return vm;
-        }
-
-        /// <summary>
         ///     Gets the required <see cref="RedirectResult"/> given the <see cref="ISignInResult"/> assuming the
         ///     <paramref name="result"/> is the <see cref="ISignInResult"/> of a login attempt.
         /// </summary>
@@ -986,7 +993,7 @@ namespace OneSim.Identity.Web.Controllers
         /// </param>
         /// <returns>
         ///     The required <see cref="RedirectResult"/>.
-        ///     If no <see cref="RedirectResult"/> could be determined, then a redirect to the Login action is returned.
+        ///     If no <see cref="RedirectResult"/> could be determined, then <c>null</c> will be returned.
         /// </returns>
         private IActionResult GetPostLoginRedirect(ISignInResult result, string callbackUri)
         {
@@ -1005,7 +1012,7 @@ namespace OneSim.Identity.Web.Controllers
             // If locked out, then redirect to the lockout view
             if (result.IsLockedOut) return RedirectToAction("Lockout", "Account");
 
-            return RedirectToAction("Login");
+            return null;
         }
     }
 }
