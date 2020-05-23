@@ -12,6 +12,11 @@ namespace OneSim.Identity.Domain
     public interface IUser
     {
         /// <summary>
+        ///     Gets or sets the ID.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         ///     Gets or sets the username of the current <see cref="IUser"/>.
         /// </summary>
         public string UserName { get; set; }
