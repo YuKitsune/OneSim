@@ -1,5 +1,20 @@
+@model OneSim.Identity.Web.ViewModels.Account.IndexViewModel
+
 Yeah whatever. fix it up later.
 
+@if (Model != null &&
+     !string.IsNullOrEmpty(Model.Message))
+{
+    <p>
+        Message here:
+        @Model.Message
+        
+        @if (Model.MessageIsError)
+        {
+            <span>It's also an error btw...</span>
+        }
+    </p>
+}
 Some links:
 @Html.ActionLink("Change Password", "ChangePassword", "Account")
 @Html.ActionLink("Enable 2FA", "EnableTwoFactorAuthentication", "Account")
