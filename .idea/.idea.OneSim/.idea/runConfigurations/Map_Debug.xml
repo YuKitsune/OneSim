@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Map Debug" type="CompoundRunConfigurationType">
+    <toRun name="OneSim.Identity.Web" type="LaunchSettings" />
+    <toRun name="OneSim.Traffic.Map" type="LaunchSettings" />
+    <toRun name="OneSim.Traffic.Api" type="LaunchSettings" />
+    <method v="2" />
+  </configuration>
+</component>
