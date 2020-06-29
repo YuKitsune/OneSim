@@ -6,8 +6,12 @@
 
 namespace OneSim.Windows.ViewModels
 {
-    using System.Security;
+    using System;
+    using System.Diagnostics;
     using System.Threading.Tasks;
+
+    using IdentityModel.OidcClient;
+
     using Strato.EventAggregator.Abstractions;
     using Strato.Mvvm.Commands;
     using Strato.Mvvm.Navigation;
@@ -19,51 +23,24 @@ namespace OneSim.Windows.ViewModels
     public class LogInViewModel : ViewModel
     {
         /// <summary>
-        ///     Gets or sets the username.
+        ///     The <see cref="OidcClient"/> used to communicate with the OneSim Identity server.
         /// </summary>
-        public string Username
-        {
-            get => Get<string>();
-            set => Set(value);
-        }
-
-        /// <summary>
-        ///     Gets or sets the password in the form of a <see cref="SecureString"/>.
-        /// </summary>
-        public string Password
-        {
-            get => Get<string>();
-            set => Set(value);
-        }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether or not you should remember the user.
-        /// </summary>
-        public bool RememberMe
-        {
-            get => Get<bool>();
-            set => Set(value);
-        }
-
-        /// <summary>
-        ///     Gets a value indicating whether or not the user is allowed to log in.
-        /// </summary>
-        public bool CanLogIn => !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
+        private readonly OidcClient _oidcClient;
 
         /// <summary>
         ///     Gets the <see cref="AsyncCommand"/> used to log the user in.
         /// </summary>
-        public AsyncCommand LogInCommand => Get(new AsyncCommand(LogInAsync, () => CanLogIn));
+        public AsyncCommand LogInCommand => Get(new AsyncCommand(LogInAsync));
+
+        /// <summary>
+        ///     Gets the <see cref="AsyncCommand"/> used to register a new user.
+        /// </summary>
+        public AsyncCommand RegisterCommand => Get(new AsyncCommand(RegisterAsync));
 
         /// <summary>
         ///     Gets the <see cref="RelayCommand"/> used to display the "Reset Password" view.
         /// </summary>
         public RelayCommand DisplayResetPasswordViewCommand => Get(new RelayCommand(DisplayResetPasswordView));
-
-        /// <summary>
-        ///     Gets the <see cref="AsyncCommand"/> used to log the user in.
-        /// </summary>
-        public RelayCommand CancelCommand => Get(new RelayCommand(Close, () => !LogInCommand.IsExecuting));
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="LogInViewModel"/> class.
@@ -74,9 +51,13 @@ namespace OneSim.Windows.ViewModels
         /// <param name="navigationContext">
         ///     The <see cref="INavigationContext"/> to use for navigation.
         /// </param>
-        public LogInViewModel(IEventAggregator eventAggregator, INavigationContext navigationContext)
+        /// <param name="oidcClient">
+        ///     The <see cref="OidcClient"/> used to communicate with the OneSim Identity server.
+        /// </param>
+        public LogInViewModel(IEventAggregator eventAggregator, INavigationContext navigationContext, OidcClient oidcClient)
             : base(eventAggregator, navigationContext)
         {
+            _oidcClient = oidcClient ?? throw new ArgumentNullException(nameof(oidcClient));
         }
 
         /// <summary>
@@ -87,16 +68,20 @@ namespace OneSim.Windows.ViewModels
         /// </returns>
         public async Task LogInAsync()
         {
+            LoginResult result = await _oidcClient.LoginAsync();
+            Debugger.Break();
+        }
+
+        /// <summary>
+        ///     Attempts to register a new user.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
+        public async Task RegisterAsync()
+        {
             await Task.Yield();
-
-            // Todo: Attempt to log in
-
-            // Todo: Switch to 2FA view if required
-            bool twoFactorAuthenticationRequired = true;
-            if (twoFactorAuthenticationRequired)
-            {
-                // NavigationContext.NavigateTo<TwoFactorAuthenticationViewModel>();
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>

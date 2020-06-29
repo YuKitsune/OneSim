@@ -13,6 +13,9 @@ namespace OneSim.Windows
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
+    using IdentityModel.OidcClient;
+
+    using OneSim.Windows.Utils;
     using OneSim.Windows.Windows;
 
     using Strato.EventAggregator;
@@ -73,6 +76,28 @@ namespace OneSim.Windows
         {
             services.AddSingleton<IEventAggregator, EventAggregator>();
             services.AddWindowManagementAndNavigation();
+
+            // Build the System Browser
+            // Todo: Get these from some API given an app version number
+            const string Host = "127.0.0.1";
+            const int Port = 42069;
+            const string Path = "";
+            SystemBrowser browser = new SystemBrowser(Host, Port, Path);
+            string redirectUrl = $"http://{browser.Host}:{browser.Port}/{browser.Path}";
+            if (redirectUrl.EndsWith("/")) redirectUrl = redirectUrl.Substring(0, redirectUrl.Length - 1);
+
+            // Build the OIDC client
+            const string Authority = "https://localhost:5001/";
+            OidcClient client = new OidcClient(new OidcClientOptions
+            {
+                Authority = Authority,
+                ClientId = "desktop",
+                Scope = "openid profile traffic",
+                RedirectUri = redirectUrl,
+                Browser = browser
+            });
+            services.AddSingleton(client);
+
             RegisterWindows(services);
         }
 

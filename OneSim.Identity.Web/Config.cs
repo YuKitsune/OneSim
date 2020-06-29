@@ -45,10 +45,26 @@ namespace OneSim.Identity.Web
                 {
                     ClientId = "desktop",
 
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
+                    RequireClientSecret = false,
 
-                    // scopes that client has access to
-                    AllowedScopes = { "traffic" }
+                    RedirectUris = { "http://127.0.0.1:42069" },
+                    PostLogoutRedirectUris = { "http://127.0.0.1:42069" },
+
+                    AllowedScopes = new List<string>
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        "traffic"
+                    },
+
+                    AllowAccessTokensViaBrowser = true,
+                    RequireConsent = false,
+
+                    AllowOfflineAccess = true,
+                    RefreshTokenUsage = TokenUsage.OneTimeOnly,
+                    RefreshTokenExpiration = TokenExpiration.Sliding
                 },
 
                 // interactive ASP.NET Core MVC client
