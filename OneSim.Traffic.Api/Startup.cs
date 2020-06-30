@@ -19,9 +19,8 @@ namespace OneSim.Traffic.Api
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-
     using Newtonsoft.Json.Serialization;
-
+    using OneSim.Common.Domain.Configuration;
     using OneSim.Traffic.Application;
     using OneSim.Traffic.Application.Abstractions;
     using OneSim.Traffic.Domain.Attributes;
@@ -78,6 +77,15 @@ namespace OneSim.Traffic.Api
             // Add DbContext Interfaces
             services.AddScoped<ITrafficDbContext, TrafficDbContext>();
             services.AddScoped<IHistoricalDbContext, HistoricalDbContext>();
+
+            // Add Authentication
+            IdentityServerConfig identityServerConfig = Configuration.GetSection("IdentityServer").Get<IdentityServerConfig>();
+            services.AddAuthentication("Bearer")
+                    .AddJwtBearer("Bearer", options =>
+                    {
+                        options.Authority = identityServerConfig.Authority;
+                        options.Audience = "traffic";
+                    });
 
             // Add Hangfire services
             services.AddHangfire(
@@ -152,6 +160,8 @@ namespace OneSim.Traffic.Api
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("AllowApi");
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(
                 endpoints =>
                 {

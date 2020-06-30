@@ -2,11 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>OneSim.Traffic.Map</RootNamespace>
         <RootNamespace>OneSim.Traffic.Api</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\OneSim.Common.Domain\OneSim.Common.Domain.csproj" />
       <ProjectReference Include="..\OneSim.Traffic.Application\OneSim.Traffic.Application.csproj" />
       <ProjectReference Include="..\OneSim.Traffic.Domain\OneSim.Traffic.Domain.csproj" />
       <ProjectReference Include="..\OneSim.Traffic.Infrastructure\OneSim.Traffic.Infrastructure.csproj" />
