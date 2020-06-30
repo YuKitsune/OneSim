@@ -4,11 +4,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Map
+namespace OneSim.Traffic.Api
 {
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
-
     using OneSim.Traffic.Domain.Entities;
 
     /// <summary>

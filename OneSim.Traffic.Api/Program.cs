@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Map
+namespace OneSim.Traffic.Api
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;

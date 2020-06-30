@@ -4,16 +4,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Map.Controllers
+namespace OneSim.Traffic.Api.Controllers
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
-
+    using OneSim.Traffic.Api.Data;
     using OneSim.Traffic.Domain.Entities;
-    using OneSim.Traffic.Map.Data;
     using OneSim.Traffic.Persistence;
 
     /// <summary>
