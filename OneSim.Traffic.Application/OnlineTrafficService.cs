@@ -109,7 +109,8 @@ namespace OneSim.Traffic.Application
                 // Get the status data
                 _logger.LogInformation("Downloading traffic data.");
                 TrafficDataFetchResult fetchResult = await _statusFileProvider.GetTrafficDataAsync();
-                _logger.LogInformation($"Download complete. Total download time: {fetchResult.FetchTime.TotalSeconds:##,###.00}s.");
+                _logger.LogInformation(
+                    $"Download complete. Total download time: {fetchResult.FetchTime.TotalSeconds:##,###.00}s.");
 
                 // Store the traffic data for archiving purposes
                 archiveEntry.TrafficData = fetchResult.TrafficData;
@@ -125,7 +126,8 @@ namespace OneSim.Traffic.Application
                 stopwatch.Start();
                 TrafficDataParseResult parseResult = _statusFileParser.Parse(fetchResult.TrafficData);
                 stopwatch.Stop();
-                _logger.LogInformation($"Parse complete. Total parse time: {stopwatch.Elapsed.TotalSeconds:##,###.00}s.");
+                _logger.LogInformation(
+                    $"Parse complete. Total parse time: {stopwatch.Elapsed.TotalSeconds:##,###.00}s.");
 
                 // Update the data
                 using (_logger.BeginScope("Updating database"))
