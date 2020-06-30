@@ -12,6 +12,8 @@ namespace OneSim.Traffic.Map
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
 
+    using OneSim.Common.Domain.Configuration;
+
     /// <summary>
     ///     The Startup class.
     /// </summary>
@@ -39,6 +41,34 @@ namespace OneSim.Traffic.Map
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            // Add Identity Server authentication
+            IdentityServerConfig identityServerConfig = Configuration.GetSection("IdentityServer").Get<IdentityServerConfig>();
+            services.AddAuthentication(options =>
+                    {
+                        options.DefaultScheme = "Cookies";
+                        options.DefaultChallengeScheme = "oidc";
+                    })
+                    .AddCookie("Cookies")
+                    .AddOpenIdConnect(
+                        "oidc", options =>
+                        {
+                            options.Authority = identityServerConfig.Authority;
+
+                            options.ClientId = "map";
+                            options.ClientSecret = "secret";
+                            options.ResponseType = "code";
+
+                            options.SignedOutRedirectUri = "https://localhost:6011";
+                            options.SignedOutCallbackPath = "/OidcSignOutCallback";
+                            options.CallbackPath = "/OidcSignInCallback";
+
+                            options.Scope.Add("openid");
+                            options.Scope.Add("profile");
+                            options.Scope.Add("traffic");
+
+                            options.SaveTokens = true;
+                        });
         }
 
         /// <summary>
@@ -68,6 +98,7 @@ namespace OneSim.Traffic.Map
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(

@@ -45,5 +45,9 @@
       <PackageReference Include="Strato.Analyzers" Version="1.0.18" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\OneSim.Common.Domain\OneSim.Common.Domain.csproj" />
+    </ItemGroup>
+
 
 </Project>

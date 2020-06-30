@@ -32,7 +32,7 @@ namespace OneSim.Identity.Web
         public static IEnumerable<ApiResource> Apis =>
             new List<ApiResource>
             {
-                new ApiResource("traffic", "Online Traffic Service")
+                new ApiResource("traffic", "Online Traffic API Service")
             };
 
         /// <summary>
@@ -87,8 +87,41 @@ namespace OneSim.Identity.Web
                                     {
                                         IdentityServerConstants.StandardScopes.OpenId,
                                         IdentityServerConstants.StandardScopes.Profile,
-                                        "api1"
+                                        "traffic"
                                     },
+
+                    AllowOfflineAccess = true
+                },
+
+                // Map visualization for the traffic API
+                new Client
+                {
+                    ClientId = "map",
+
+                    // Todo: Make a better secret
+                    ClientSecrets = { new Secret("secret".Sha256()) },
+
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequireConsent = false,
+                    RequirePkce = true,
+
+                    // where to redirect to after login
+                    RedirectUris =
+                    {
+                        "https://localhost:6011/",
+                        "https://localhost:6011/OidcSignInCallback",
+                        "https://localhost:6011/OidcSignOutCallback",
+                    },
+
+                    // where to redirect to after logout
+                    PostLogoutRedirectUris = { "https://localhost:6011/OidcSignOutCallback" },
+
+                    AllowedScopes = new List<string>
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        "traffic"
+                    },
 
                     AllowOfflineAccess = true
                 }
