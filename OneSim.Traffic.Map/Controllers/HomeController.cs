@@ -6,6 +6,12 @@
 
 namespace OneSim.Traffic.Map.Controllers
 {
+    using System.Threading.Tasks;
+
+    using IdentityModel;
+
+    using IdentityServer4.Validation;
+
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
@@ -23,28 +29,10 @@ namespace OneSim.Traffic.Map.Controllers
         [Authorize]
         public IActionResult Index() => View();
 
-        /// <summary>
-        ///     The OIDC Sign-In callback action.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="IActionResult"/>.
-        /// </returns>
-        public IActionResult OidcSignInCallback()
+        public IActionResult Logout()
         {
-            // Todo: What do i even do here?
-            return Ok();
-        }
-
-        /// <summary>
-        ///     The OIDC Sign-Out callback action.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="IActionResult"/>.
-        /// </returns>
-        public IActionResult OidcSignOutCallback()
-        {
-            // Todo: What do i even do here?
-            return Ok();
+            // Todo: Only allow from whitlisted servers
+            return SignOut("Cookies", "oidc");
         }
     }
 }
