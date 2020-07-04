@@ -7,6 +7,7 @@
 namespace OneSim.Traffic.Api.Data
 {
     using System.Collections.Generic;
+
     using OneSim.Traffic.Domain.Entities;
 
     /// <summary>

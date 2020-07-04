@@ -8,8 +8,11 @@ namespace OneSim.Traffic.Api.Controllers
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+
     using OneSim.Traffic.Api.Data;
     using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Persistence;
@@ -17,6 +20,7 @@ namespace OneSim.Traffic.Api.Controllers
     /// <summary>
     ///     The <see cref="Controller"/> serving the data current traffic data.
     /// </summary>
+    [Authorize]
     public class TrafficDataController : Controller
     {
         /// <summary>
