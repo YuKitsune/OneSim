@@ -6,11 +6,14 @@
 
 namespace OneSim.Traffic.Map
 {
+    using System.Diagnostics;
+
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.IdentityModel.Logging;
 
     using OneSim.Common.Domain.Configuration;
 
@@ -44,31 +47,34 @@ namespace OneSim.Traffic.Map
 
             // Add Identity Server authentication
             IdentityServerConfig identityServerConfig = Configuration.GetSection("IdentityServer").Get<IdentityServerConfig>();
-            services.AddAuthentication(options =>
-                    {
-                        options.DefaultScheme = "Cookies";
-                        options.DefaultChallengeScheme = "oidc";
-                    })
+            services.AddAuthentication(
+                         options =>
+                         {
+                             options.DefaultScheme = "Cookies";
+                             options.DefaultChallengeScheme = "oidc";
+                         })
                     .AddCookie("Cookies")
                     .AddOpenIdConnect(
-                        "oidc", options =>
-                        {
-                            options.Authority = identityServerConfig.Authority;
+                         "oidc",
+                         options =>
+                         {
+                             options.Authority = identityServerConfig.Authority;
 
-                            options.ClientId = "map";
-                            options.ClientSecret = "secret";
-                            options.ResponseType = "code";
+                             options.ClientId = "map";
+                             options.ClientSecret = "secret";
+                             options.ResponseType = "code";
 
-                            options.SignedOutRedirectUri = "https://localhost:6011";
-                            options.SignedOutCallbackPath = "/OidcSignOutCallback";
-                            options.CallbackPath = "/OidcSignInCallback";
+                             options.Scope.Add("openid");
+                             options.Scope.Add("profile");
+                             options.Scope.Add("traffic");
 
-                            options.Scope.Add("openid");
-                            options.Scope.Add("profile");
-                            options.Scope.Add("traffic");
+                             options.SaveTokens = true;
 
-                            options.SaveTokens = true;
-                        });
+                             // Todo: Find a better way to determine if we're in development, would like to use env.IsDevelopment()
+                             options.RequireHttpsMetadata = !Debugger.IsAttached;
+                         });
+
+            IdentityModelEventSource.ShowPII = true;
         }
 
         /// <summary>
