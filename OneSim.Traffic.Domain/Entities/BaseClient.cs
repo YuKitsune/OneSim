@@ -43,7 +43,7 @@ namespace OneSim.Traffic.Domain.Entities
         public string Server { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="AdministrativeRating"/>
+        ///     Gets or sets the <see cref="AdministrativeRating"/>.
         /// </summary>
         public AdministrativeRating AdministrativeRating { get; set; }
 

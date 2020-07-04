@@ -19,11 +19,6 @@ namespace OneSim.Identity.Persistence
     public class IdentityDbContext : TransactionalIdentityDbContext<User>, IIdentityDbContext<User>
     {
         /// <summary>
-        ///     Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="User"/>s.
-        /// </summary>
-        public DbSet<User> Users { get; set; }
-
-        /// <summary>
         ///     Initializes a new instance of the <see cref="IdentityDbContext"/> class.
         /// </summary>
         /// <param name="dbContextOptions">

@@ -439,7 +439,6 @@ namespace OneSim.Identity.Web.Controllers
                 if (passwordMatches)
                 {
                     // Todo: await _userService.DeActivateUserAsync(user);
-
                     return View("AccountDeleted");
                 }
 

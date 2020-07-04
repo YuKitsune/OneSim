@@ -11,8 +11,10 @@ namespace OneSim.Traffic.Api
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
+
     using Hangfire;
     using Hangfire.PostgreSql;
+
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.HttpOverrides;
@@ -20,7 +22,9 @@ namespace OneSim.Traffic.Api
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+
     using Newtonsoft.Json.Serialization;
+
     using OneSim.Common.Domain.Configuration;
     using OneSim.Traffic.Application;
     using OneSim.Traffic.Application.Abstractions;
