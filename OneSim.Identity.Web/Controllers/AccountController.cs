@@ -182,7 +182,7 @@ namespace OneSim.Identity.Web.Controllers
                     {
                         return RedirectToAction(
                             nameof(LoginWithTwoFactorAuthentication),
-                            new { viewModel.RememberMe, ReturnUrl = viewModel.CallbackUri });
+                            new { viewModel.RememberMe, viewModel.CallbackUri });
                     }
 
                     // Determine where to redirect

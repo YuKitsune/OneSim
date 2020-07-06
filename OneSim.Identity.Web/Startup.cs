@@ -73,6 +73,7 @@ namespace OneSim.Identity.Web
                                                               options.Events.RaiseSuccessEvents = true;
                                                               options.UserInteraction.LoginUrl = "/Account/Login";
                                                               options.UserInteraction.LogoutUrl = "/Account/Logout";
+                                                              options.UserInteraction.LoginReturnUrlParameter = "callbackUri";
                                                           })
                                                      .AddInMemoryIdentityResources(Config.Ids)
                                                      .AddInMemoryApiResources(Config.Apis)
