@@ -1,0 +1,18 @@
+@model IdentityServer4.Models.LogoutRequest
+@{
+    ViewData["Title"] = "Logged Out";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<form id="logoutForm" class="ui large form" asp-action="Logout" asp-controller="Account" method="post">
+    <div class="ui stacked segment">
+        
+        <p>
+            You have been logged out.
+        </p>
+        
+        @* iFrame for front-channel logout *@
+        <iframe src="@Model.SignOutIFrameUrl" hidden></iframe>
+        
+    </div>
+</form>

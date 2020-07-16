@@ -53,11 +53,11 @@ namespace OneSim.Identity.Web
                     PostLogoutRedirectUris = { "http://127.0.0.1:42069" },
 
                     AllowedScopes = new List<string>
-                    {
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile,
-                        "traffic"
-                    },
+                                    {
+                                        IdentityServerConstants.StandardScopes.OpenId,
+                                        IdentityServerConstants.StandardScopes.Profile,
+                                        "traffic"
+                                    },
 
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
@@ -65,32 +65,6 @@ namespace OneSim.Identity.Web
                     AllowOfflineAccess = true,
                     RefreshTokenUsage = TokenUsage.OneTimeOnly,
                     RefreshTokenExpiration = TokenExpiration.Sliding
-                },
-
-                // interactive ASP.NET Core MVC client
-                new Client
-                {
-                    ClientId = "mvc",
-                    ClientSecrets = { new Secret("secret".Sha256()) },
-
-                    AllowedGrantTypes = GrantTypes.Code,
-                    RequireConsent = false,
-                    RequirePkce = true,
-
-                    // where to redirect to after login
-                    RedirectUris = { "http://localhost:5002/signin-oidc" },
-
-                    // where to redirect to after logout
-                    PostLogoutRedirectUris = { "http://localhost:5002/signout-callback-oidc" },
-
-                    AllowedScopes = new List<string>
-                                    {
-                                        IdentityServerConstants.StandardScopes.OpenId,
-                                        IdentityServerConstants.StandardScopes.Profile,
-                                        "traffic"
-                                    },
-
-                    AllowOfflineAccess = true
                 },
 
                 // Map visualization for the traffic API
@@ -106,22 +80,15 @@ namespace OneSim.Identity.Web
                     RequirePkce = true,
 
                     // where to redirect to after login
-                    RedirectUris =
-                    {
-                        "https://localhost:6011/",
-                        "https://localhost:6011/OidcSignInCallback",
-                        "https://localhost:6011/OidcSignOutCallback",
-                    },
-
-                    // where to redirect to after logout
-                    PostLogoutRedirectUris = { "https://localhost:6011/OidcSignOutCallback" },
+                    RedirectUris = { "https://localhost:6011/signin-oidc" },
+                    FrontChannelLogoutUri = "https://localhost:6011/Home/Logout",
 
                     AllowedScopes = new List<string>
-                    {
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile,
-                        "traffic"
-                    },
+                                    {
+                                        IdentityServerConstants.StandardScopes.OpenId,
+                                        IdentityServerConstants.StandardScopes.Profile,
+                                        "traffic"
+                                    },
 
                     AllowOfflineAccess = true
                 }

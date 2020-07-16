@@ -182,7 +182,7 @@ namespace OneSim.Identity.Web.Controllers
                     {
                         return RedirectToAction(
                             nameof(LoginWithTwoFactorAuthentication),
-                            new { viewModel.RememberMe, ReturnUrl = viewModel.CallbackUri });
+                            new { viewModel.RememberMe, viewModel.CallbackUri });
                     }
 
                     // Determine where to redirect
@@ -439,7 +439,6 @@ namespace OneSim.Identity.Web.Controllers
                 if (passwordMatches)
                 {
                     // Todo: await _userService.DeActivateUserAsync(user);
-
                     return View("AccountDeleted");
                 }
 
@@ -871,17 +870,14 @@ namespace OneSim.Identity.Web.Controllers
             // Get the identity provider
             string identityProvider = User?.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
 
-            // Check if the provider matches the local provider
+            // Check if the identity provider is an external provider
             if (!string.IsNullOrEmpty(identityProvider) &&
                 identityProvider != IdentityServerConstants.LocalIdentityProvider)
             {
-                if (viewModel.LogoutId == null)
-                {
-                    // If there's no current logout context, we need to create one
-                    // this captures necessary info from the current logged in user
-                    // before we sign out and redirect away to the external IdP for sign out
-                    viewModel.LogoutId = await _interactionService.CreateLogoutContextAsync();
-                }
+                // If there's no current logout context, we need to create one
+                // this captures necessary info from the current logged in user
+                // before we sign out and redirect away to the external IdP for sign out
+                viewModel.LogoutId ??= await _interactionService.CreateLogoutContextAsync();
 
                 // Todo: Update this URL
                 string url = "/Authentication/Logout?logoutId=" + viewModel.LogoutId;
@@ -905,14 +901,8 @@ namespace OneSim.Identity.Web.Controllers
             // Get context information (client name, post logout redirect URI and iframe for federated sign out)
             LogoutRequest logout = await _interactionService.GetLogoutContextAsync(viewModel.LogoutId);
 
-            // Redirect to the Login page, or the redirect URI if we have one
-            string redirectUrl = logout?.PostLogoutRedirectUri;
-            if (string.IsNullOrEmpty(redirectUrl))
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            return Redirect(redirectUrl);
+            // Show the Logged Out page
+            return View("LoggedOut", logout);
         }
 
         /// <summary>

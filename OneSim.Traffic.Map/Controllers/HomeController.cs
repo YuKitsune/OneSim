@@ -23,28 +23,14 @@ namespace OneSim.Traffic.Map.Controllers
         [Authorize]
         public IActionResult Index() => View();
 
-        /// <summary>
-        ///     The OIDC Sign-In callback action.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="IActionResult"/>.
-        /// </returns>
-        public IActionResult OidcSignInCallback()
-        {
-            // Todo: What do i even do here?
-            return Ok();
-        }
+        // Todo: Only allow from whitelisted servers?
 
         /// <summary>
-        ///     The OIDC Sign-Out callback action.
+        ///     The logout page.
         /// </summary>
         /// <returns>
         ///     The <see cref="IActionResult"/>.
         /// </returns>
-        public IActionResult OidcSignOutCallback()
-        {
-            // Todo: What do i even do here?
-            return Ok();
-        }
+        public IActionResult Logout() => SignOut("Cookies", "oidc");
     }
 }

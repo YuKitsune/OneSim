@@ -8,10 +8,13 @@ namespace OneSim.Traffic.Api
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
+
     using Hangfire;
     using Hangfire.PostgreSql;
+
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.HttpOverrides;
@@ -19,7 +22,9 @@ namespace OneSim.Traffic.Api
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+
     using Newtonsoft.Json.Serialization;
+
     using OneSim.Common.Domain.Configuration;
     using OneSim.Traffic.Application;
     using OneSim.Traffic.Application.Abstractions;
@@ -81,11 +86,16 @@ namespace OneSim.Traffic.Api
             // Add Authentication
             IdentityServerConfig identityServerConfig = Configuration.GetSection("IdentityServer").Get<IdentityServerConfig>();
             services.AddAuthentication("Bearer")
-                    .AddJwtBearer("Bearer", options =>
-                    {
-                        options.Authority = identityServerConfig.Authority;
-                        options.Audience = "traffic";
-                    });
+                    .AddJwtBearer(
+                         "Bearer",
+                         options =>
+                         {
+                             options.Authority = identityServerConfig.Authority;
+                             options.Audience = "traffic";
+
+                             // Todo: Find a better way to determine if we're in development, would like to use env.IsDevelopment()
+                             options.RequireHttpsMetadata = !Debugger.IsAttached;
+                         });
 
             // Add Hangfire services
             services.AddHangfire(
