@@ -94,6 +94,29 @@ namespace OneSim.Traffic.Application
         }
 
         /// <summary>
+        ///     Tried to execute the <see cref="UpdateTrafficDataAsync"/> method and catches then logs any exceptions
+        ///     thrown within.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="Task{TResult}"/> representing the asynchronous operation.
+        ///     The <see cref="Task{TResult}.Result"/> contains a <see cref="bool"/> representing whether or not the
+        ///     <see cref="UpdateTrafficDataAsync"/> executed successfully.
+        /// </returns>
+        public async Task<bool> TryUpdateTrafficDataAsync()
+        {
+            try
+            {
+                await UpdateTrafficDataAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to run {nameof(UpdateTrafficDataAsync)}.");
+                return false;
+            }
+        }
+
+        /// <summary>
         ///     Updates the traffic data.
         /// </summary>
         /// <returns>
