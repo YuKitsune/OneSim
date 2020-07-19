@@ -8,10 +8,20 @@ namespace OneSim.Windows.Windows
 {
     using System;
     using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Data;
 
+    using ModernWpf.Controls;
+
+    using OneSim.Windows.Controls;
+    using OneSim.Windows.Extensions;
+    using OneSim.Windows.ViewModels;
+    using OneSim.Windows.Views.MainViews;
     using Strato.EventAggregator.Abstractions;
     using Strato.Mvvm.Navigation;
     using Strato.Mvvm.Navigation.Events;
+
+    using ListView = ModernWpf.Controls.ListView;
 
     /// <summary>
     ///     Interaction logic for MainWindow.xaml.
@@ -46,13 +56,15 @@ namespace OneSim.Windows.Windows
 
             // Setup the navigation context
             NavigationContext = navigationContext ?? throw new ArgumentNullException(nameof(navigationContext));
-            // Todo: NavigationContext.Register<FirstView, FirstViewModel>();
-            // Todo: NavigationContext.Register<SecondView, SecondViewModel>();
+            NavigationContext.Register<FlyNowView, FlyNowViewModel>();
             NavigationControl.UseNavigationContext(NavigationContext);
 
             // Setup the Event Aggregator
             EventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
             EventAggregator.Subscribe<CloseEvent>(HandleCloseEvent);
+
+            // Show the back button when we're allowed to go back
+            SetBinding(TitleBar.IsBackButtonVisibleProperty, new Binding { Path = new PropertyPath(Frame.CanGoBackProperty), Source = NavigationControl });
         }
 
         /// <summary>
@@ -82,6 +94,41 @@ namespace OneSim.Windows.Windows
             {
                 Close();
             }
+        }
+
+        /// <summary>
+        ///     Handles the request to go back.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The <see cref="BackRequestedEventArgs"/>.
+        /// </param>
+        private void OnBackRequested(object sender, BackRequestedEventArgs e)
+        {
+            if (NavigationControl.CanGoBack) NavigationControl.GoBack();
+        }
+
+        /// <summary>
+        ///     Handles when the Sidebars selection has changed.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The <see cref="SelectionChangedEventArgs"/>.
+        /// </param>
+        private void SidebarSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (NavigationContext == null) return;
+            if (sender == null) return;
+            if (!(sender is ListView listView)) return;
+            if (listView.SelectedItem == null ||
+                !(listView.SelectedItem is SidebarItem sidebarItem)) return;
+
+            // Navigate to the ViewModel instance
+            NavigationContext.NavigateTo(sidebarItem.ViewModel.GetType(), sidebarItem.ViewModel);
         }
     }
 }

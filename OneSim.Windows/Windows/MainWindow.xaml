@@ -4,11 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OneSim.Windows.Windows"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:controls="clr-namespace:OneSim.Windows.Controls"
+        xmlns:viewModels="clr-namespace:OneSim.Windows.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="OneSim"
         Height="450" 
         Width="800"
-        Loaded="OnLoaded">
-    <controls:ModernNavigationControl x:Name="NavigationControl"/>
+        Loaded="OnLoaded"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource SystemControlPageBackgroundAltHighBrush}"
+        Foreground="{DynamicResource SystemControlPageTextBaseHighBrush}"
+        ui:ThemeManager.IsThemeAware="True"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        ui:TitleBar.BackRequested="OnBackRequested">
+    <Window.DataContext>
+        <viewModels:MainWindowViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <DockPanel Grid.Column="0"
+                   Background="{DynamicResource NavigationViewExpandedPaneBackground}">
+            <ui:ListView x:Name="PagesList"
+                         DockPanel.Dock="Top"
+                         DisplayMemberPath="Title"
+                         SelectedValuePath="ViewModel"
+                         SelectedIndex="0"
+                         SelectionChanged="SidebarSelectionChanged"
+                         ItemsSource="{Binding SidebarItems}"/>
+        </DockPanel>
+
+        <!-- Primary navigation control -->
+        <controls:ModernNavigationControl x:Name="NavigationControl" 
+                                          Grid.Column="1"/>
+    </Grid>
 </Window>
