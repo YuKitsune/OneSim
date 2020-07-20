@@ -63,7 +63,7 @@ namespace OneSim.Windows
             // Show the window
             // Todo: If the user has already logged in, then show the MainWindow, otherwise, show the login window
             WindowManager windowManager = ServiceProvider.GetRequiredService<WindowManager>();
-            windowManager.OpenWindow<LogInWindow>();
+            windowManager.OpenWindow<MainWindow>();
         }
 
         /// <summary>

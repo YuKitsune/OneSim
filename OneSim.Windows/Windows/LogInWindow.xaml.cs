@@ -49,7 +49,6 @@ namespace OneSim.Windows.Windows
             // Setup the navigation context
             NavigationContext = navigationContext ?? throw new ArgumentNullException(nameof(navigationContext));
             NavigationContext.Register<LogInView, LogInViewModel>();
-            NavigationContext.Register<ResetPasswordView, ResetPasswordViewModel>();
             NavigationControl.UseNavigationContext(NavigationContext);
 
             // Setup the Event Aggregator

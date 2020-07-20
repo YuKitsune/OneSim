@@ -33,14 +33,9 @@ namespace OneSim.Windows.ViewModels
         public AsyncCommand LogInCommand => Get(new AsyncCommand(LogInAsync));
 
         /// <summary>
-        ///     Gets the <see cref="AsyncCommand"/> used to register a new user.
+        ///     Gets the <see cref="AsyncCommand"/> used to configure offline mode.
         /// </summary>
-        public AsyncCommand RegisterCommand => Get(new AsyncCommand(RegisterAsync));
-
-        /// <summary>
-        ///     Gets the <see cref="RelayCommand"/> used to display the "Reset Password" view.
-        /// </summary>
-        public RelayCommand DisplayResetPasswordViewCommand => Get(new RelayCommand(DisplayResetPasswordView));
+        public AsyncCommand UseOfflineModeCommand => Get(new AsyncCommand(UseOfflineMode));
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="LogInViewModel"/> class.
@@ -70,26 +65,19 @@ namespace OneSim.Windows.ViewModels
         {
             LoginResult result = await _oidcClient.LoginAsync();
             Debugger.Break();
-        }
-
-        /// <summary>
-        ///     Attempts to register a new user.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="Task"/> representing the asynchronous operation.
-        /// </returns>
-        public async Task RegisterAsync()
-        {
-            await Task.Yield();
             throw new NotImplementedException();
         }
 
         /// <summary>
-        ///     Displays the "Reset Password" view.
+        ///     Attempts to configure OneSim for use in offline mode as an asynchronous operation.
         /// </summary>
-        public void DisplayResetPasswordView()
+        /// <returns>
+        ///     The <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
+        public async Task UseOfflineMode()
         {
-            NavigationContext.NavigateTo<ResetPasswordViewModel>();
+            await Task.Yield();
+            throw new NotImplementedException();
         }
     }
 }
