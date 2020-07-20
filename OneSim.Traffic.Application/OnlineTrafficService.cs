@@ -213,7 +213,7 @@ namespace OneSim.Traffic.Application
 
                 // Add to the history
                 pilot.History.Add(
-                    new Point3d
+                    new Point4D
                     {
                         Latitude = pilot.Latitude,
                         Longitude = pilot.Longitude,

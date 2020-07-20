@@ -197,7 +197,7 @@ namespace OneSim.Traffic.Tests.Services
 
             Assert.IsTrue(pilotWithPlan.FlightPlanFiled);
             Assert.IsNotNull(pilotWithPlan.FlightPlan);
-            Point3d pilotWithPlanPoint = pilotWithPlan.History.First();
+            Point3D pilotWithPlanPoint = pilotWithPlan.History.First();
             Assert.IsNotNull(pilotWithPlanPoint);
             Assert.AreEqual(pilotWithPlanPoint.Latitude, pilotWithPlan.Latitude);
             Assert.AreEqual(pilotWithPlanPoint.Longitude, pilotWithPlan.Longitude);
@@ -212,7 +212,7 @@ namespace OneSim.Traffic.Tests.Services
                                                                      PilotWithoutFlightPlan.Callsign);
             Assert.IsFalse(pilotWithoutPlan.FlightPlanFiled);
             Assert.IsNull(pilotWithoutPlan.FlightPlan);
-            Point3d pilotWithoutPlanPoint = pilotWithoutPlan.History.First();
+            Point3D pilotWithoutPlanPoint = pilotWithoutPlan.History.First();
             Assert.IsNotNull(pilotWithoutPlanPoint);
             Assert.AreEqual(pilotWithoutPlanPoint.Latitude, pilotWithoutPlan.Latitude);
             Assert.AreEqual(pilotWithoutPlanPoint.Longitude, pilotWithoutPlan.Longitude);

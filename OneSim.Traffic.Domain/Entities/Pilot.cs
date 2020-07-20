@@ -64,13 +64,13 @@ namespace OneSim.Traffic.Domain.Entities
         public bool FlightPlanFiled => FlightPlan != null;
 
         /// <summary>
-        ///     Gets or sets the <see cref="Point3d"/>s representing the current <see cref="Pilot"/>'s previous positions.
+        ///     Gets or sets the <see cref="Point4D"/>s representing the current <see cref="Pilot"/>'s previous positions.
         /// </summary>
-        public ICollection<Point3d> History { get; set; }
+        public ICollection<Point4D> History { get; set; }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Pilot"/> class.
         /// </summary>
-        public Pilot() => History = new List<Point3d>();
+        public Pilot() => History = new List<Point4D>();
     }
 }

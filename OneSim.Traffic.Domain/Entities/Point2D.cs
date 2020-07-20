@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Point3d.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="Point2D.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -9,9 +9,9 @@ namespace OneSim.Traffic.Domain.Entities
     using System;
 
     /// <summary>
-    ///     A 3D point in space.
+    ///     A 2 dimensional (Latitude/Longitude) point in space.
     /// </summary>
-    public class Point3d
+    public class Point2D
     {
         /// <summary>
         ///     Gets or sets the ID.
@@ -27,16 +27,5 @@ namespace OneSim.Traffic.Domain.Entities
         ///     Gets or sets the longitude.
         /// </summary>
         public double Longitude { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the altitude in feet (ft).
-        /// </summary>
-        public int Altitude { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the <see cref="DateTime"/> at which the owner of the current <see cref="Point3d"/> was
-        ///     located at <see cref="Point3d"/>.
-        /// </summary>
-        public DateTime DateTime { get; set; }
     }
 }
