@@ -21,5 +21,28 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     E.g. 120.500 = 120500.
         /// </summary>
         public int Frequency { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Navaid"/> class.
+        /// </summary>
+        /// <param name="identifier">
+        ///     The ICAO identifier.
+        /// </param>
+        /// <param name="location">
+        ///     The <see cref="Point2D"/> representing the location.
+        /// </param>
+        /// <param name="frequency">
+        ///     the frequency of the <see cref="Navaid"/> multiplied by 1000.
+        ///     E.g. 120.500 = 120500.
+        /// </param>
+        /// <param name="type">
+        ///     The <see cref="NavaidType"/>.
+        /// </param>
+        public Navaid(string identifier, Point2D location, int frequency, NavaidType type)
+            : base(identifier, location)
+        {
+            Frequency = frequency;
+            Type = type;
+        }
     }
 }

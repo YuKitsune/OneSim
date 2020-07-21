@@ -9,7 +9,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
     /// <summary>
     ///     The Air Traffic Controller position.
     /// </summary>
-    public class ControllerPosition : SectorSetSpecific
+    public class ControllerPosition : SectorSetSpecificEntity
     {
         /// <summary>
         ///     Gets or sets the ID of the current <see cref="ControllerPosition"/>.

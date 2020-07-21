@@ -10,7 +10,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
     ///     The class representing what priority a particular <see cref="ControllerPosition"/> has when assuming a
     ///     specific <see cref="Sector"/>.
     /// </summary>
-    public class ControllerPriority : SectorSetSpecific
+    public class ControllerPriority : SectorSetSpecificEntity
     {
         /// <summary>
         ///     Gets or sets the ID of the current <see cref="ControllerPriority"/>.

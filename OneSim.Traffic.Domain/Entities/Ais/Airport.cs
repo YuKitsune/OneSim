@@ -24,14 +24,30 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public AirspaceClass? Class { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="ControllerPosition"/>s available at the current
+        ///     Gets the <see cref="List{T}"/> of <see cref="ControllerPosition"/>s available at the current
         ///     <see cref="Airport"/>.
         /// </summary>
-        public List<ControllerPosition> ControllerPositions { get; set; }
+        public List<ControllerPosition> ControllerPositions { get; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="Runway"/>.
+        ///     Gets the <see cref="List{T}"/> of <see cref="Runway"/>.
         /// </summary>
-        public List<Runway> Runways { get; set; }
+        public List<Runway> Runways { get; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Airport"/> class.
+        /// </summary>
+        /// <param name="identifier">
+        ///     The ICAO identifier.
+        /// </param>
+        /// <param name="location">
+        ///     The <see cref="Point2D"/> representing the location.
+        /// </param>
+        public Airport(string identifier, Point2D location)
+            : base(identifier, location)
+        {
+            ControllerPositions = new List<ControllerPosition>();
+            Runways = new List<Runway>();
+        }
     }
 }

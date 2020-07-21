@@ -11,7 +11,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
     /// <summary>
     ///     The Air Traffic Control sector.
     /// </summary>
-    public class Sector : SectorSetSpecific
+    public class Sector : SectorSetSpecificEntity
     {
         /// <summary>
         ///     Gets or sets the ID of the current <see cref="Sector"/>.
@@ -24,10 +24,10 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public string Name { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="Point2D"/>2 representing the lateral border of the
+        ///     Gets the <see cref="List{T}"/> of <see cref="Point2D"/>2 representing the lateral border of the
         ///     current <see cref="Sector"/>.
         /// </summary>
-        public List<Point2D> Border { get; set; }
+        public List<Point2D> Border { get; }
 
         // Todo: Holes.
 
@@ -42,9 +42,18 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public int UpperLevel { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="ControllerPriority"/>s for the current
+        ///     Gets the <see cref="List{T}"/> of <see cref="ControllerPriority"/>s for the current
         ///     <see cref="Sector"/>.
         /// </summary>
-        public List<ControllerPriority> Positions { get; set; }
+        public List<ControllerPriority> Positions { get; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Sector"/> class.
+        /// </summary>
+        public Sector()
+        {
+            Border = new List<Point2D>();
+            Positions = new List<ControllerPriority>();
+        }
     }
 }

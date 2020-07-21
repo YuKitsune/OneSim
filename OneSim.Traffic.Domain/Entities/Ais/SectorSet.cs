@@ -7,7 +7,6 @@
 namespace OneSim.Traffic.Domain.Entities.Ais
 {
     using System;
-    using System.Collections.Generic;
 
     using OneSim.Traffic.Domain.Entities;
 
@@ -16,6 +15,16 @@ namespace OneSim.Traffic.Domain.Entities.Ais
     /// </summary>
     public class SectorSet
     {
+        /// <summary>
+        ///     Gets or sets the ID of the current <see cref="SectorSet"/>.
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the name of the current <see cref="SectorSet"/>.
+        /// </summary>
+        public string Name { get; set; }
+
         /// <summary>
         ///     Gets or sets the <see cref="DateTimeOffset"/> at which the current <see cref="SectorSet"/> becomes
         ///     effective.

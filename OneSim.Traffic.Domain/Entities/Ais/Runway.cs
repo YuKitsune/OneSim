@@ -6,10 +6,12 @@
 
 namespace OneSim.Traffic.Domain.Entities.Ais
 {
+    using System;
+
     /// <summary>
     ///     The runway.
     /// </summary>
-    public class Runway : SectorSetSpecific
+    public class Runway : SectorSetSpecificEntity
     {
         /// <summary>
         ///     Gets or sets the ID of the current <see cref="Runway"/>.
@@ -33,5 +35,26 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     Gets or sets the heading.
         /// </summary>
         public int Heading { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Runway"/> class.
+        /// </summary>
+        /// <param name="identifier">
+        ///     The ICAO identifier.
+        /// </param>
+        /// <param name="thresholdLocation">
+        ///     The <see cref="Point2D"/> representing the location.
+        /// </param>
+        /// <param name="heading">
+        ///     The heading.
+        /// </param>
+        public Runway(string identifier, Point2D thresholdLocation, int heading)
+        {
+            if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
+            if (thresholdLocation == null) throw new ArgumentNullException(nameof(thresholdLocation));
+            Identifier = identifier;
+            ThresholdLocation = thresholdLocation;
+            Heading = heading;
+        }
     }
 }
