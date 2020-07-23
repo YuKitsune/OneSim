@@ -6,8 +6,6 @@
 
 namespace OneSim.Traffic.Domain.Entities
 {
-    using System;
-
     /// <summary>
     ///     A 2 dimensional (Latitude/Longitude) point in space.
     /// </summary>
@@ -27,5 +25,20 @@ namespace OneSim.Traffic.Domain.Entities
         ///     Gets or sets the longitude.
         /// </summary>
         public double Longitude { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Point2D"/> class.
+        /// </summary>
+        /// <param name="longitude">
+        ///     The longitude.
+        /// </param>
+        /// <param name="latitude">
+        ///     The latitude.
+        /// </param>
+        public Point2D(double longitude = 0, double latitude = 0)
+        {
+            Longitude = longitude;
+            Latitude = latitude;
+        }
     }
 }
