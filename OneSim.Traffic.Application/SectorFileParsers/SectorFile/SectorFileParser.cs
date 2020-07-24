@@ -26,81 +26,166 @@ namespace OneSim.Traffic.Application.SectorFileParsers
     /// </remarks>
     public class SectorFileParser : IDisposable
     {
-        public event EventHandler<DataFoundEventArgs<SectorInfo>> SectorInfoFound;
-        public event EventHandler<DataFoundEventArgs<LabeledSegment>> ArtccSegmentFound;
-        public event EventHandler<DataFoundEventArgs<LabeledSegment>> ArtccLowSegmentFound;
-        public event EventHandler<DataFoundEventArgs<LabeledSegment>> ArtccHighSegmentFound;
-        
         /// <summary>
         ///     Gets or sets the current <see cref="SectorSet"/>.
         /// </summary>
         private SectorSet SectorSet { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="Airport"/>s.
+        ///     Gets the <see cref="List{T}"/> of <see cref="Airport"/>s.
         /// </summary>
-        private List<Airport> Airports { get; set; }
+        private List<Airport> Airports { get; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="Fix"/>es.
+        ///     Gets the <see cref="List{T}"/> of <see cref="Fix"/>es.
         /// </summary>
-        private List<Fix> Fixes { get; set; }
+        private List<Fix> Fixes { get; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="Navaid"/>s.
+        ///     Gets the <see cref="List{T}"/> of <see cref="Navaid"/>s.
         /// </summary>
-        private List<Navaid> Navaids { get; set; }
+        private List<Navaid> Navaids { get; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of low-level <see cref="Airway"/>.
+        ///     Gets the <see cref="List{T}"/> of <see cref="NamedSegment"/>s which were found in the low-level
+        ///     <see cref="Airway"/> section.
         /// </summary>
-        private List<Airway> LowAirways { get; set; }
+        private List<NamedSegment> LowAirwaySegments { get; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of high-level <see cref="Airway"/>.
+        ///     Gets the <see cref="List{T}"/> of low-level <see cref="Airway"/>.
         /// </summary>
-        private List<Airway> HighAirways { get; set; }
+        private List<Airway> LowAirways { get; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="TerminalRoute"/>s which are <see cref="TerminalRouteType.StandardTerminalArrivalRoute"/>s.
+        ///     Gets the <see cref="List{T}"/> of <see cref="NamedSegment"/>s which were found in the
+        ///     high-level <see cref="Airway"/> section.
         /// </summary>
-        private List<TerminalRoute> Stars { get; set; }
+        private List<NamedSegment> HighAirwaySegments { get; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="TerminalRoute"/>s which are <see cref="TerminalRouteType.StandardInstrumentDepartures"/>s.
+        ///     Gets the <see cref="List{T}"/> of high-level <see cref="Airway"/>.
         /// </summary>
-        private List<TerminalRoute> Sids { get; set; }
+        private List<Airway> HighAirways { get; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of <see cref="ParseError"/>s.
+        ///     Gets the <see cref="List{T}"/> of <see cref="NamedSegment"/> which were found in the
+        ///     STARs section.
         /// </summary>
-        private List<ParseError> ParseErrors { get; set; }
+        private List<NamedSegment> StarSegments { get; }
 
-        ////////////////////////////////////////////////////////////////////////////////
-        // Fields:
+        /// <summary>
+        ///     Gets the <see cref="List{T}"/> of <see cref="TerminalRoute"/>s which are <see cref="TerminalRouteType.StandardTerminalArrivalRoute"/>s.
+        /// </summary>
+        private List<TerminalRoute> Stars { get; }
 
-        private static Regex sRegexColorDefinition = new Regex(@"^#define\s+(\S+)\s+(.+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static Regex sRegexSectionHeader = new Regex(@"^\[(.+)\]$", RegexOptions.Compiled);
-        private static Regex sRegexVorNdb = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
-        private static Regex sRegexFix = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
-        private static Regex sRegexAirport = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+([A-Z]))?", RegexOptions.Compiled);
-        private static Regex sRegexRunway = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
-        private static Regex sRegexBoundarySegment = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
-        private static Regex sRegexDiagramBegin = new Regex(@"^(.{26})\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+(\S+))?", RegexOptions.Compiled);
-        private static Regex sRegexDiagramContinuation = new Regex(@"^\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+(\S+))?", RegexOptions.Compiled);
-        private static Regex sRegexGeoSegment = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+(\S+))?", RegexOptions.Compiled);
-        private static Regex sRegexRegionBegin = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
-        private static Regex sRegexRegionContinuation = new Regex(@"^\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
-        private static Regex sRegexStaticText = new Regex(@"^""(.+)""\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
-        private CultureInfo mCulture = new CultureInfo("en-US");
-        private Match mMatch;
-        private Dictionary<string, Fix> mFixes = new Dictionary<string, Fix>();
-        private int mLineNumber = 0;
-        private string mCurrentLine = string.Empty;
-        private FileSection mCurrentSection = FileSection.None;
-        private SectorInfo mSectorInfo;
-        private Region mCurrentRegion;
-        private Diagram mCurrentDiagram;
+        /// <summary>
+        ///     Gets the <see cref="List{T}"/> of <see cref="NamedSegment"/> which were found in the
+        ///     SIDs section.
+        /// </summary>
+        private List<NamedSegment> SidSegments { get; }
+
+        /// <summary>
+        ///     Gets the <see cref="List{T}"/> of <see cref="TerminalRoute"/>s which are <see cref="TerminalRouteType.StandardInstrumentDepartures"/>s.
+        /// </summary>
+        private List<TerminalRoute> Sids { get; }
+
+        /// <summary>
+        ///     Gets the <see cref="List{T}"/> of <see cref="ParseError"/>s.
+        /// </summary>
+        private List<ParseError> ParseErrors { get; }
+
+        /// <summary>
+        ///     The <see cref="Regex"/> for the Section header.
+        /// </summary>
+        private static readonly Regex SectionHeaderRegex = new Regex(@"^\[(.+)\]$", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     The <see cref="Regex"/> for VORs and NDBs.
+        /// </summary>
+        private static readonly Regex VorNdbRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     The <see cref="Regex"/> for the Fixes.
+        /// </summary>
+        private static readonly Regex FixRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     The <see cref="Regex"/> for the Airports.
+        /// </summary>
+        private static readonly Regex AirportRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+([A-Z]))?", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     The <see cref="Regex"/> for the Runways.
+        /// </summary>
+        private static readonly Regex RunwayRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     The <see cref="Regex"/> for the ARTCC boundaries.
+        /// </summary>
+        private static readonly Regex BundarySegmentRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     The <see cref="Regex"/> for the diagrams headers.
+        /// </summary>
+        private static readonly Regex DiagramBeginRegex = new Regex(@"^(.{26})\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+(\S+))?", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     The <see cref="Regex"/> for the diagrams continuations.
+        /// </summary>
+        private static readonly Regex DiagramContinuationRegex = new Regex(@"^\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+(\S+))?", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     The <see cref="CultureInfo"/>.
+        /// </summary>
+        private readonly CultureInfo _culture = new CultureInfo("en-US");
+
+        /// <summary>
+        ///     The current <see cref="Match"/>.
+        /// </summary>
+        private Match _currentMatch;
+
+        /// <summary>
+        ///     The <see cref="Dictionary{TKey,TValue}"/> of parsed <see cref="Fix"/>es.
+        /// </summary>
+        private readonly Dictionary<string, Fix> _fixes = new Dictionary<string, Fix>();
+
+        /// <summary>
+        ///     The current line number.
+        /// </summary>
+        private int _lineNumber = 0;
+
+        /// <summary>
+        ///     The current line content.
+        /// </summary>
+        private string _currentLine = string.Empty;
+
+        /// <summary>
+        ///     The current <see cref="FileSection"/>.
+        /// </summary>
+        private FileSection _currentSection = FileSection.None;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SectorFileParser"/> class.
+        /// </summary>
+        public SectorFileParser()
+        {
+            Airports = new List<Airport>();
+            Fixes = new List<Fix>();
+            Navaids = new List<Navaid>();
+
+            LowAirwaySegments = new List<NamedSegment>();
+            LowAirways = new List<Airway>();
+            HighAirwaySegments = new List<NamedSegment>();
+            HighAirways = new List<Airway>();
+
+            StarSegments = new List<NamedSegment>();
+            Stars = new List<TerminalRoute>();
+            SidSegments = new List<NamedSegment>();
+            Sids = new List<TerminalRoute>();
+
+            ParseErrors = new List<ParseError>();
+        }
 
         /// <summary>
         ///     Adds a new <see cref="ParseError"/> to the error list.
@@ -108,7 +193,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         /// <param name="message">
         ///     The error message.
         /// </param>
-        private void RaiseParseError(string message) => ParseErrors.Add(new ParseError(mLineNumber, mCurrentLine, message));
+        private void RaiseParseError(string message) => ParseErrors.Add(new ParseError(_lineNumber, _currentLine, message));
 
         /// <summary>
         ///     Determines whether or not the given <see cref="char"/> is whitespace.
@@ -148,7 +233,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         {
             // Frequencies are stored in integer form.
             double freq = 0.0;
-            double.TryParse(s, NumberStyles.Float, mCulture, out freq);
+            double.TryParse(s, NumberStyles.Float, _culture, out freq);
             return (int)(freq * 1000);
         }
 
@@ -186,7 +271,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         }
 
         /// <summary>
-        ///     Converts a DMS cooridinate to a <see cref="double"/>.
+        ///     Converts a DMS coordinate to a <see cref="double"/>.
         /// </summary>
         /// <param name="s">
         ///     The DMS coordinate in the form of a <see cref="string"/>.
@@ -232,12 +317,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                                 string sec = secWhole + "." + secDec;
 
                                 // Parse into numeric values.
-                                int degrees = 0;
-                                int minutes = 0;
-                                double seconds = 0.0f;
-                                int.TryParse(deg, out degrees);
-                                int.TryParse(min, out minutes);
-                                double.TryParse(sec, NumberStyles.Float, mCulture, out seconds);
+                                int.TryParse(deg, out int degrees);
+                                int.TryParse(min, out int minutes);
+                                double.TryParse(sec, NumberStyles.Float, _culture, out double seconds);
 
                                 // Do the math.
                                 double result = (double)degrees;
@@ -253,7 +335,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
 
             // If we fall through to this line, then there was a problem with the value.
-            RaiseParseError(string.Format("Invalid formatting in lat/lon value: {0}", s));
+            RaiseParseError($"Invalid formatting in lat/lon value: {s}");
             return 0.0;
         }
 
@@ -272,13 +354,13 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         private double GetCoordFromFix(string s, bool wantLat)
         {
             s = s.ToUpper();
-            if (mFixes.ContainsKey(s))
+            if (_fixes.ContainsKey(s))
             {
-                return wantLat ? mFixes[s].Location.Latitude : mFixes[s].Location.Longitude;
+                return wantLat ? _fixes[s].Location.Latitude : _fixes[s].Location.Longitude;
             }
             else
             {
-                RaiseParseError(string.Format("Unknown fix name: {0}", s));
+                RaiseParseError($"Unknown fix name: {s}");
                 return 0.0;
             }
         }
@@ -291,92 +373,85 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 int infoSectionLine = 0;
                 for (int pass = 1; pass <= 2; pass++)
                 {
-                    mCurrentSection = FileSection.None;
-                    mLineNumber = 0;
+                    _currentSection = FileSection.None;
+                    _lineNumber = 0;
 
                     // Rewind the file for pass 2.
                     if (pass == 2) sr.BaseStream.Seek(0, SeekOrigin.Begin);
 
                     // Step through the file.
-                    while ((mCurrentLine = sr.ReadLine()) != null)
+                    while ((_currentLine = sr.ReadLine()) != null)
                     {
-                        mLineNumber++;
+                        _lineNumber++;
 
                         // Skip empty lines.
-                        if (string.IsNullOrEmpty(mCurrentLine.Trim())) continue;
+                        if (string.IsNullOrEmpty(_currentLine.Trim())) continue;
 
                         // Skip lines that contain only a comment.
-                        if (mCurrentLine.Trim().Substring(0, 1) == ";" || mCurrentLine.Trim().Substring(0, 1) == "//") continue;
+                        if (_currentLine.Trim().Substring(0, 1) == ";" || _currentLine.Trim().Substring(0, 1) == "//") continue;
 
                         // Strip off trailing comments.
-                        StripComments(ref mCurrentLine);
+                        StripComments(ref _currentLine);
 
                         // Trim trailing whitespace from the line.
-                        mCurrentLine = mCurrentLine.TrimEnd(new char[] { ' ', '\t', '\r', '\n', '\f' });
+                        _currentLine = _currentLine.TrimEnd(new char[] { ' ', '\t', '\r', '\n', '\f' });
 
                         // If the line ends up empty, skip it.
-                        if (string.IsNullOrEmpty(mCurrentLine)) continue;
+                        if (string.IsNullOrEmpty(_currentLine)) continue;
 
                         // Look for [SECTION] headers.
-                        if (mCurrentLine.Substring(0, 1) == "[")
+                        if (_currentLine.Substring(0, 1) == "[")
                         {
-                            mMatch = sRegexSectionHeader.Match(mCurrentLine);
-                            if (mMatch.Success)
+                            _currentMatch = SectionHeaderRegex.Match(_currentLine);
+                            if (_currentMatch.Success)
                             {
-                                // Finish up any pending multi-line objects.
-                                FinalizePendingObjects();
-
                                 // Switch to the new section.
-                                switch (mMatch.Groups[1].Value.ToUpper())
+                                switch (_currentMatch.Groups[1].Value.ToUpper())
                                 {
                                     case "INFO":
-                                        mCurrentSection = FileSection.Info;
+                                        _currentSection = FileSection.Info;
                                         infoSectionLine = 0;
                                         continue;
                                     case "VOR":
-                                        mCurrentSection = FileSection.VOR;
+                                        _currentSection = FileSection.VOR;
                                         continue;
                                     case "NDB":
-                                        mCurrentSection = FileSection.NDB;
+                                        _currentSection = FileSection.NDB;
                                         continue;
                                     case "AIRPORT":
-                                        mCurrentSection = FileSection.Airport;
+                                        _currentSection = FileSection.Airport;
                                         continue;
                                     case "RUNWAY":
-                                        mCurrentSection = FileSection.Runway;
+                                        _currentSection = FileSection.Runway;
                                         continue;
                                     case "FIXES":
-                                        mCurrentSection = FileSection.Fixes;
+                                        _currentSection = FileSection.Fixes;
                                         continue;
                                     case "ARTCC":
-                                        mCurrentSection = FileSection.ARTCC;
+                                        _currentSection = FileSection.ARTCC;
                                         continue;
                                     case "ARTCC HIGH":
-                                        mCurrentSection = FileSection.ArtccHigh;
+                                        _currentSection = FileSection.ArtccHigh;
                                         continue;
                                     case "ARTCC LOW":
-                                        mCurrentSection = FileSection.ArtccLow;
+                                        _currentSection = FileSection.ArtccLow;
                                         continue;
                                     case "SID":
-                                        mCurrentSection = FileSection.SID;
+                                        _currentSection = FileSection.SID;
                                         continue;
                                     case "STAR":
-                                        mCurrentSection = FileSection.STAR;
-                                        continue;
-                                    case "GEO":
-                                        mCurrentSection = FileSection.Geo;
+                                        _currentSection = FileSection.STAR;
                                         continue;
                                     case "LOW AIRWAY":
-                                        mCurrentSection = FileSection.LowAirway;
+                                        _currentSection = FileSection.LowAirway;
                                         continue;
                                     case "HIGH AIRWAY":
-                                        mCurrentSection = FileSection.HighAirway;
+                                        _currentSection = FileSection.HighAirway;
                                         continue;
+                                    case "GEO":
                                     case "REGIONS":
-                                        mCurrentSection = FileSection.Regions;
-                                        continue;
                                     case "LABELS":
-                                        mCurrentSection = FileSection.Labels;
+                                        _currentSection = FileSection.Unsupported;
                                         continue;
                                     default:
                                         if (pass == 1) RaiseParseError("Unknown section header encountered.");
@@ -385,8 +460,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                             }
                         }
 
+                        // If we're in an unsupported section, just skip
+                        if (_currentSection == FileSection.Unsupported) continue;
+
                         // If we get here, and we're not in a [SECTION], then we've found an orphaned line.
-                        if (mCurrentSection == FileSection.None)
+                        if (_currentSection == FileSection.None)
                         {
                             if (pass == 1) RaiseParseError("Orphaned line.");
                             continue;
@@ -397,7 +475,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                         switch (pass)
                         {
                             case 1:
-                                switch (mCurrentSection)
+                                switch (_currentSection)
                                 {
                                     case FileSection.Info:
                                         ParseInfoLine(++infoSectionLine);
@@ -416,7 +494,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
 
                                 break;
                             case 2:
-                                switch (mCurrentSection)
+                                switch (_currentSection)
                                 {
                                     case FileSection.Runway:
                                         ParseRunwayLine();
@@ -428,18 +506,14 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                                     case FileSection.LowAirway:
                                         ParseNamedSegmentLine();
                                         break;
-                                    case FileSection.Geo:
-                                        ParseGeoLine();
-                                        break;
-                                    case FileSection.Regions:
-                                        ParseRegionLine();
-                                        break;
                                     case FileSection.SID:
                                     case FileSection.STAR:
                                         ParseDiagramLine();
                                         break;
+                                    case FileSection.Geo:
+                                    case FileSection.Regions:
                                     case FileSection.Labels:
-                                        ParseLabelLine();
+                                        // Not supported by OneSim
                                         break;
                                 }
 
@@ -448,61 +522,31 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                     }
                 }
 
-                // Finish up any pending multi-line objects.
-                FinalizePendingObjects();
+                // Convert segments to airways
+                LowAirways.AddRange(GetAirwaysFromSegments(LowAirwaySegments));
+                HighAirways.AddRange(GetAirwaysFromSegments(HighAirwaySegments));
+
+                // Convert segments to SIDs and STARs
             }
         }
-
-        ////////////////////////////////////////////////////////////////////////////////
 
         private void ParseInfoLine(int infoLine)
         {
             switch (infoLine)
             {
                 case 1:
-                    SectorSet.Name = mCurrentLine;
+                    SectorSet.Name = _currentLine;
                     break;
-                // case 2:
-                // case 3:
-                //     break;
-                // case 4:
-                //     mSectorInfo.Center.Lat = DmsToDecimal(mCurrentLine);
-                //     break;
-                // case 5:
-                //     mSectorInfo.Center.Lon = DmsToDecimal(mCurrentLine);
-                //     break;
-                // case 6:
-                // {
-                //     double d = 0.0;
-                //     double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
-                //     mSectorInfo.MilesPerDegLat = d;
-                //     break;
-                // }
-                //
-                // case 7:
-                // {
-                //     double d = 0.0;
-                //     double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
-                //     mSectorInfo.MilesPerDegLon = d;
-                //     break;
-                // }
-                //
-                // case 8:
-                // {
-                //     double d = 0.0;
-                //     double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
-                //     mSectorInfo.MagneticVariation = d;
-                //     break;
-                // }
-                //
-                // case 9:
-                // {
-                //     double d = 0.0;
-                //     double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
-                //     mSectorInfo.Scale = d;
-                //     if (SectorInfoFound != null) SectorInfoFound(this, new DataFoundEventArgs<SectorInfo>(mSectorInfo));
-                //     break;
-                // }
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    // Unsupported by OneSim
+                    break;
 
                 default:
                     RaiseParseError("Extra line in [INFO] section.");
@@ -511,128 +555,128 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         }
 
         /// <summary>
-        ///     Parses the <see cref="mCurrentLine"/> as a <see cref="Navaid"/>.
+        ///     Parses the <see cref="_currentLine"/> as a <see cref="Navaid"/>.
         /// </summary>
         private void ParseVorNdbLine()
         {
-            mMatch = sRegexVorNdb.Match(mCurrentLine);
-            if (mMatch.Success)
+            _currentMatch = VorNdbRegex.Match(_currentLine);
+            if (_currentMatch.Success)
             {
-                NavaidType type = mCurrentSection switch
+                NavaidType type = _currentSection switch
                 {
                     FileSection.VOR => NavaidType.VOR,
                     FileSection.NDB => NavaidType.NDB,
                     _ => throw new InvalidOperationException("Invalid file section.")
                 };
 
-                string id = mMatch.Groups[1].Value.ToUpper();
+                string id = _currentMatch.Groups[1].Value.ToUpper();
                 Navaid n = new Navaid(
                     id,
-                    new Domain.Entities.Point2D(
-                        DmsToDecimal(mMatch.Groups[4].Value),
-                        DmsToDecimal(mMatch.Groups[3].Value)),
-                    ParseFrequency(mMatch.Groups[2].Value),
+                    new Point2D(
+                        DmsToDecimal(_currentMatch.Groups[4].Value),
+                        DmsToDecimal(_currentMatch.Groups[3].Value)),
+                    ParseFrequency(_currentMatch.Groups[2].Value),
                     type);
-                if (mFixes.ContainsKey(id))
+                if (_fixes.ContainsKey(id))
                 {
-                    mFixes[id] = n;
+                    _fixes[id] = n;
                 }
                 else
                 {
-                    mFixes.Add(id, n);
+                    _fixes.Add(id, n);
                 }
 
                 Navaids.Add(n);
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
+                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
         /// <summary>
-        ///      Parses the <see cref="mCurrentLine"/> as an <see cref="Airport"/>.
+        ///      Parses the <see cref="_currentLine"/> as an <see cref="Airport"/>.
         /// </summary>
         private void ParseAirportLine()
         {
-            mMatch = sRegexAirport.Match(mCurrentLine);
-            if (mMatch.Success)
+            _currentMatch = AirportRegex.Match(_currentLine);
+            if (_currentMatch.Success)
             {
-                string id = mMatch.Groups[1].Value.ToUpper();
+                string id = _currentMatch.Groups[1].Value.ToUpper();
                 Airport a = new Airport(
                     id,
-                    new Domain.Entities.Point2D(
-                        DmsToDecimal(mMatch.Groups[4].Value),
-                        DmsToDecimal(mMatch.Groups[3].Value)));
+                    new Point2D(
+                        DmsToDecimal(_currentMatch.Groups[4].Value),
+                        DmsToDecimal(_currentMatch.Groups[3].Value)));
 
                 // Todo: CTAF: ParseFrequency(mMatch.Groups[2].Value),
-                if (!string.IsNullOrEmpty(mMatch.Groups[5].Value)) a.Class = (AirspaceClass)Enum.Parse(typeof(AirspaceClass);
+                if (!string.IsNullOrEmpty(_currentMatch.Groups[5].Value)) a.Class = (AirspaceClass)Enum.Parse(typeof(AirspaceClass), _currentMatch.Groups[5].Value);
 
-                if (mFixes.ContainsKey(id))
+                if (_fixes.ContainsKey(id))
                 {
-                    mFixes[id] = a;
+                    _fixes[id] = a;
                 }
                 else
                 {
-                    mFixes.Add(id, a);
+                    _fixes.Add(id, a);
                 }
 
                 Airports.Add(a);
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
+                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
         private void ParseFixLine()
         {
-            mMatch = sRegexFix.Match(mCurrentLine);
-            if (mMatch.Success)
+            _currentMatch = FixRegex.Match(_currentLine);
+            if (_currentMatch.Success)
             {
-                string id = mMatch.Groups[1].Value.ToUpper();
+                string id = _currentMatch.Groups[1].Value.ToUpper();
                 Fix f = new Fix(
                     id,
                     new Point2D(
-                        DmsToDecimal(mMatch.Groups[3].Value),
-                        DmsToDecimal(mMatch.Groups[2].Value)));
-                if (mFixes.ContainsKey(id))
+                        DmsToDecimal(_currentMatch.Groups[3].Value),
+                        DmsToDecimal(_currentMatch.Groups[2].Value)));
+                if (_fixes.ContainsKey(id))
                 {
-                    mFixes[id] = f;
+                    _fixes[id] = f;
                 }
                 else
                 {
-                    mFixes.Add(id, f);
+                    _fixes.Add(id, f);
                 }
 
                 Fixes.Add(f);
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
+                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
         private void ParseRunwayLine()
         {
-            mMatch = sRegexRunway.Match(mCurrentLine);
-            if (mMatch.Success)
+            _currentMatch = RunwayRegex.Match(_currentLine);
+            if (_currentMatch.Success)
             {
                 int hdg1 = 0;
-                int.TryParse(mMatch.Groups[3].Value, out hdg1);
+                int.TryParse(_currentMatch.Groups[3].Value, out hdg1);
                 int hdg2 = 0;
-                int.TryParse(mMatch.Groups[4].Value, out hdg2);
+                int.TryParse(_currentMatch.Groups[4].Value, out hdg2);
                 Runway r1 = new Runway(
-                    mMatch.Groups[1].Value.ToUpper(),
+                    _currentMatch.Groups[1].Value.ToUpper(),
                     new Point2D(
-                        TranslateCoordinate(mMatch.Groups[6].Value, false),
-                        TranslateCoordinate(mMatch.Groups[5].Value, true)),
+                        TranslateCoordinate(_currentMatch.Groups[6].Value, false),
+                        TranslateCoordinate(_currentMatch.Groups[5].Value, true)),
                     hdg1);
                 Runway r2 = new Runway(
-                    mMatch.Groups[2].Value.ToUpper(),
+                    _currentMatch.Groups[2].Value.ToUpper(),
                     new Point2D(
-                        TranslateCoordinate(mMatch.Groups[8].Value, false),
-                        TranslateCoordinate(mMatch.Groups[7].Value, true)),
+                        TranslateCoordinate(_currentMatch.Groups[8].Value, false),
+                        TranslateCoordinate(_currentMatch.Groups[7].Value, true)),
                     hdg2);
 
                 // Todo: Figure out how to get the closest airport
@@ -640,28 +684,26 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
+                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
-        ////////////////////////////////////////////////////////////////////////////////
-
         private void ParseNamedSegmentLine()
         {
-            mMatch = sRegexBoundarySegment.Match(mCurrentLine);
-            if (mMatch.Success)
+            _currentMatch = BundarySegmentRegex.Match(_currentLine);
+            if (_currentMatch.Success)
             {
                 NamedSegment segment = new NamedSegment(
-                    mMatch.Groups[1].Value,
+                    _currentMatch.Groups[1].Value,
                     new Point2D(
-                        TranslateCoordinate(mMatch.Groups[3].Value, false),
-                        TranslateCoordinate(mMatch.Groups[2].Value, true)),
+                        TranslateCoordinate(_currentMatch.Groups[3].Value, false),
+                        TranslateCoordinate(_currentMatch.Groups[2].Value, true)),
                     new Point2D(
-                        TranslateCoordinate(mMatch.Groups[5].Value, false),
-                        TranslateCoordinate(mMatch.Groups[4].Value, true)));
+                        TranslateCoordinate(_currentMatch.Groups[5].Value, false),
+                        TranslateCoordinate(_currentMatch.Groups[4].Value, true)));
 
                 // Get the airway if it already exists
-                switch (mCurrentSection)
+                switch (_currentSection)
                 {
                     // Todo: ARTCCs
                     // case FileSection.ARTCC:
@@ -674,125 +716,130 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                     //     if (ArtccLowSegmentFound != null) ArtccLowSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
                     //     break;
                     case FileSection.HighAirway:
-                        
-                        // Find the airway if it already exists
-                        if (HighAirwaySegmentFound != null) HighAirwaySegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
+                        HighAirwaySegments.Add(segment);
                         break;
 
                     case FileSection.LowAirway:
-                        if (LowAirwaySegmentFound != null) LowAirwaySegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
+                        LowAirwaySegments.Add(segment);
                         break;
                 }
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
+                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
-
-        private void AddSegment(NamedSegment segment, FileSection section)
-        {
-            if (section == FileSection.LowAirway ||
-                section == FileSection.HighAirway)
-            {
-                Airway targetAirway = null;
-                targetAirway = LowAirways.FirstOrDefault(a => a.Identifier == segment.Label);
-                if (targetAirway == null) targetAirway = HighAirways.FirstOrDefault(a => a.Identifier == segment.Label);
-                if (targetAirway == null)
-                {
-                    targetAirway = new Airway(segment.Label);
-                    targetAirway.Fixes.Add(segment.Start);
-                    targetAirway.Fixes.Add(segment.End);
-                }
-                else
-                {
-                    // 
-                }
-            }
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////
 
         private void ParseDiagramLine()
         {
-            // Check if the line starts with whitespace. If not, it's the start of a new
-            // diagram. If so, it's a continuation of an existing diagram definition.
-            if (!IsWhitespace(mCurrentLine[0]))
+            // Check if the line starts with whitespace. If not, it's the start of a new diagram.
+            // If so, it's a continuation of an existing diagram definition.
+            NamedSegment segment = null;
+            if (!IsWhitespace(_currentLine[0]))
             {
-                mMatch = sRegexDiagramBegin.Match(mCurrentLine);
-                if (mMatch.Success)
+                _currentMatch = DiagramBeginRegex.Match(_currentLine);
+                if (_currentMatch.Success)
                 {
-
-                    // Finish up any existing diagram and start a new one.
-                    FinalizePendingDiagram();
-                    mCurrentDiagram = new Diagram(mMatch.Groups[1].Value.Trim());
-                    mCurrentDiagram.Segments.Add(new ColoredSegment(
-                        new SectorPoint(TranslateCoordinate(mMatch.Groups[3].Value, false), TranslateCoordinate(mMatch.Groups[2].Value, true)),
-                        new SectorPoint(TranslateCoordinate(mMatch.Groups[5].Value, false), TranslateCoordinate(mMatch.Groups[4].Value, true)),
-                        ParseColor(mMatch.Groups[6].Value)
-                    ));
+                    segment = new NamedSegment(
+                        _currentMatch.Groups[1].Value.Trim(),
+                        new Point2D(
+                            TranslateCoordinate(_currentMatch.Groups[3].Value, false),
+                            TranslateCoordinate(_currentMatch.Groups[2].Value, true)),
+                        new Point2D(
+                            TranslateCoordinate(_currentMatch.Groups[5].Value, false),
+                            TranslateCoordinate(_currentMatch.Groups[4].Value, true)));
                 }
                 else
                 {
-                    RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
+                    RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
                 }
             }
             else
             {
-                mMatch = sRegexDiagramContinuation.Match(mCurrentLine);
-                if (mMatch.Success)
+                _currentMatch = DiagramContinuationRegex.Match(_currentLine);
+                if (_currentMatch.Success)
                 {
-                    // Make sure we have an existing diagram object started.
-                    if (mCurrentDiagram == null)
+                    // Get the identifier of the last SID or STAR
+                    string lastIdentifier;
+                    switch (_currentSection)
                     {
-                        RaiseParseError("Found diagram continuation line without prior diagram start line.");
-                        return;
+                        case FileSection.SID:
+                            lastIdentifier = SidSegments.Last().Label;
+                            break;
+
+                        case FileSection.STAR:
+                            lastIdentifier = StarSegments.Last().Label;
+                            break;
+
+                        default:
+                            RaiseParseError("Found diagram continuation line without prior diagram start line.");
+                            return;
                     }
 
-                    // Add the segment.
-                    mCurrentDiagram.Segments.Add(new ColoredSegment(
-                        new SectorPoint(TranslateCoordinate(mMatch.Groups[2].Value, false), TranslateCoordinate(mMatch.Groups[1].Value, true)),
-                        new SectorPoint(TranslateCoordinate(mMatch.Groups[4].Value, false), TranslateCoordinate(mMatch.Groups[3].Value, true)),
-                        ParseColor(mMatch.Groups[5].Value)
-                    ));
-
+                    segment = new NamedSegment(
+                        lastIdentifier,
+                        new Point2D(
+                            TranslateCoordinate(_currentMatch.Groups[2].Value, false),
+                            TranslateCoordinate(_currentMatch.Groups[1].Value, true)),
+                        new Point2D(
+                            TranslateCoordinate(_currentMatch.Groups[4].Value, false),
+                            TranslateCoordinate(_currentMatch.Groups[3].Value, true)));
                 }
                 else
                 {
-                    RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
+                    RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
                 }
             }
-        }
 
-        ////////////////////////////////////////////////////////////////////////////////
-
-        private void FinalizePendingObjects()
-        {
-            FinalizePendingDiagram();
-            FinalizePendingRegion();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////
-
-        private void FinalizePendingDiagram()
-        {
-            if (mCurrentDiagram != null)
+            if (segment == null) return;
+            switch (_currentSection)
             {
-                if (mCurrentSection == FileSection.SID)
+                case FileSection.SID:
+                    SidSegments.Add(segment);
+                    break;
+
+                case FileSection.STAR:
+                    SidSegments.Add(segment);
+                    break;
+
+                default:
+                    RaiseParseError("Found diagram continuation line without prior diagram start line.");
+                    return;
+            }
+        }
+
+        private List<Airway> GetAirwaysFromSegments(List<NamedSegment> segments)
+        {
+            List<Airway> airways = new List<Airway>();
+            string[] identifiers = segments.Select(s => s.Label).Distinct().ToArray();
+
+            foreach (string identifier in identifiers)
+            {
+                List<NamedSegment> currentSegments = HighAirwaySegments.Where(s => s.Label == identifier).ToList();
+                Airway airway = new Airway(identifier);
+
+                NamedSegment firstSegment = currentSegments.First(s => !LowAirwaySegments.Select(s1 => s1.End).Contains(s.Start));
+                NamedSegment lastSegment = currentSegments.First(s => !LowAirwaySegments.Select(s1 => s1.Start).Contains(s.End));
+
+                airway.Fixes.Add(GetFixFromPoint(firstSegment.Start));
+                airway.Fixes.Add(GetFixFromPoint(firstSegment.End));
+                while (true)
                 {
-                    if (SidFound != null) SidFound(this, new DataFoundEventArgs<Diagram>(mCurrentDiagram));
-                }
-                else if (mCurrentSection == FileSection.STAR)
-                {
-                    if (StarFound != null) StarFound(this, new DataFoundEventArgs<Diagram>(mCurrentDiagram));
-                }
-                else
-                {
-                    throw new InvalidOperationException("Invalid file section.");
+                    Fix lastFix = airway.Fixes.Last();
+                    NamedSegment nextSegment = currentSegments.First(s => s.Start == lastFix.Location);
+                    airway.Fixes.Add(GetFixFromPoint(nextSegment.End));
+                    if (nextSegment == lastSegment) break;
                 }
 
-                mCurrentDiagram = null;
+                airways.Add(airway);
             }
+
+            return airways;
+        }
+
+        private Fix GetFixFromPoint(Point2D point)
+        {
+            throw new NotImplementedException();
         }
     }
 }
