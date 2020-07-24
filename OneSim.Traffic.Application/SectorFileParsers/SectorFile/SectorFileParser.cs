@@ -10,9 +10,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text.RegularExpressions;
 
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
+    using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Ais;
 
     /// <summary>
@@ -28,6 +30,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         public event EventHandler<DataFoundEventArgs<LabeledSegment>> ArtccSegmentFound;
         public event EventHandler<DataFoundEventArgs<LabeledSegment>> ArtccLowSegmentFound;
         public event EventHandler<DataFoundEventArgs<LabeledSegment>> ArtccHighSegmentFound;
+        
+        /// <summary>
+        ///     Gets or sets the current <see cref="SectorSet"/>.
+        /// </summary>
+        private SectorSet SectorSet { get; set; }
 
         /// <summary>
         ///     Gets or sets the <see cref="List{T}"/> of <see cref="Airport"/>s.
@@ -278,7 +285,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
 
         public void Parse(Stream stream)
         {
-            mSectorInfo = new SectorInfo();
+            SectorSet = new SectorSet();
             using (StreamReader sr = new StreamReader(stream))
             {
                 int infoSectionLine = 0;
@@ -453,49 +460,49 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             switch (infoLine)
             {
                 case 1:
-                    mSectorInfo.SectorName = mCurrentLine;
+                    SectorSet.Name = mCurrentLine;
                     break;
-                case 2:
-                case 3:
-                    break;
-                case 4:
-                    mSectorInfo.Center.Lat = DmsToDecimal(mCurrentLine);
-                    break;
-                case 5:
-                    mSectorInfo.Center.Lon = DmsToDecimal(mCurrentLine);
-                    break;
-                case 6:
-                {
-                    double d = 0.0;
-                    double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
-                    mSectorInfo.MilesPerDegLat = d;
-                    break;
-                }
-
-                case 7:
-                {
-                    double d = 0.0;
-                    double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
-                    mSectorInfo.MilesPerDegLon = d;
-                    break;
-                }
-
-                case 8:
-                {
-                    double d = 0.0;
-                    double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
-                    mSectorInfo.MagneticVariation = d;
-                    break;
-                }
-
-                case 9:
-                {
-                    double d = 0.0;
-                    double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
-                    mSectorInfo.Scale = d;
-                    if (SectorInfoFound != null) SectorInfoFound(this, new DataFoundEventArgs<SectorInfo>(mSectorInfo));
-                    break;
-                }
+                // case 2:
+                // case 3:
+                //     break;
+                // case 4:
+                //     mSectorInfo.Center.Lat = DmsToDecimal(mCurrentLine);
+                //     break;
+                // case 5:
+                //     mSectorInfo.Center.Lon = DmsToDecimal(mCurrentLine);
+                //     break;
+                // case 6:
+                // {
+                //     double d = 0.0;
+                //     double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
+                //     mSectorInfo.MilesPerDegLat = d;
+                //     break;
+                // }
+                //
+                // case 7:
+                // {
+                //     double d = 0.0;
+                //     double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
+                //     mSectorInfo.MilesPerDegLon = d;
+                //     break;
+                // }
+                //
+                // case 8:
+                // {
+                //     double d = 0.0;
+                //     double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
+                //     mSectorInfo.MagneticVariation = d;
+                //     break;
+                // }
+                //
+                // case 9:
+                // {
+                //     double d = 0.0;
+                //     double.TryParse(mCurrentLine, NumberStyles.Float, mCulture, out d);
+                //     mSectorInfo.Scale = d;
+                //     if (SectorInfoFound != null) SectorInfoFound(this, new DataFoundEventArgs<SectorInfo>(mSectorInfo));
+                //     break;
+                // }
 
                 default:
                     RaiseParseError("Extra line in [INFO] section.");
@@ -511,24 +518,19 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             mMatch = sRegexVorNdb.Match(mCurrentLine);
             if (mMatch.Success)
             {
-                NavaidType type;
-                if (mCurrentSection == FileSection.VOR)
+                NavaidType type = mCurrentSection switch
                 {
-                    type = NavaidType.VOR;
-                }
-                else if (mCurrentSection == FileSection.NDB)
-                {
-                    type = NavaidType.NDB;
-                }
-                else
-                {
-                    throw new InvalidOperationException("Invalid file section.");
-                }
+                    FileSection.VOR => NavaidType.VOR,
+                    FileSection.NDB => NavaidType.NDB,
+                    _ => throw new InvalidOperationException("Invalid file section.")
+                };
 
                 string id = mMatch.Groups[1].Value.ToUpper();
                 Navaid n = new Navaid(
                     id,
-                    new Domain.Entities.Point2D(DmsToDecimal(mMatch.Groups[4].Value), DmsToDecimal(mMatch.Groups[3].Value)),
+                    new Domain.Entities.Point2D(
+                        DmsToDecimal(mMatch.Groups[4].Value),
+                        DmsToDecimal(mMatch.Groups[3].Value)),
                     ParseFrequency(mMatch.Groups[2].Value),
                     type);
                 if (mFixes.ContainsKey(id))
@@ -544,7 +546,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
+                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
             }
         }
 
@@ -559,7 +561,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 string id = mMatch.Groups[1].Value.ToUpper();
                 Airport a = new Airport(
                     id,
-                    new Domain.Entities.Point2D(DmsToDecimal(mMatch.Groups[4].Value), DmsToDecimal(mMatch.Groups[3].Value)));
+                    new Domain.Entities.Point2D(
+                        DmsToDecimal(mMatch.Groups[4].Value),
+                        DmsToDecimal(mMatch.Groups[3].Value)));
 
                 // Todo: CTAF: ParseFrequency(mMatch.Groups[2].Value),
                 if (!string.IsNullOrEmpty(mMatch.Groups[5].Value)) a.Class = (AirspaceClass)Enum.Parse(typeof(AirspaceClass);
@@ -577,11 +581,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
+                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
             }
         }
-
-        ////////////////////////////////////////////////////////////////////////////////
 
         private void ParseFixLine()
         {
@@ -591,8 +593,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 string id = mMatch.Groups[1].Value.ToUpper();
                 Fix f = new Fix(
                     id,
-                    new SectorPoint(DmsToDecimal(mMatch.Groups[3].Value), DmsToDecimal(mMatch.Groups[2].Value))
-                );
+                    new Point2D(
+                        DmsToDecimal(mMatch.Groups[3].Value),
+                        DmsToDecimal(mMatch.Groups[2].Value)));
                 if (mFixes.ContainsKey(id))
                 {
                     mFixes[id] = f;
@@ -602,15 +605,13 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                     mFixes.Add(id, f);
                 }
 
-                if (FixFound != null) FixFound(this, new DataFoundEventArgs<Fix>(f));
+                Fixes.Add(f);
             }
             else
             {
-                RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
+                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
             }
         }
-
-        ////////////////////////////////////////////////////////////////////////////////
 
         private void ParseRunwayLine()
         {
@@ -621,17 +622,25 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 int.TryParse(mMatch.Groups[3].Value, out hdg1);
                 int hdg2 = 0;
                 int.TryParse(mMatch.Groups[4].Value, out hdg2);
-                Runway r = new Runway(
+                Runway r1 = new Runway(
                     mMatch.Groups[1].Value.ToUpper(),
+                    new Point2D(
+                        TranslateCoordinate(mMatch.Groups[6].Value, false),
+                        TranslateCoordinate(mMatch.Groups[5].Value, true)),
+                    hdg1);
+                Runway r2 = new Runway(
                     mMatch.Groups[2].Value.ToUpper(),
-                    hdg1,
-                    hdg2,
-                    new SectorPoint(TranslateCoordinate(mMatch.Groups[6].Value, false), TranslateCoordinate(mMatch.Groups[5].Value, true)),
-                    new SectorPoint(TranslateCoordinate(mMatch.Groups[8].Value, false), TranslateCoordinate(mMatch.Groups[7].Value, true))
-                );
+                    new Point2D(
+                        TranslateCoordinate(mMatch.Groups[8].Value, false),
+                        TranslateCoordinate(mMatch.Groups[7].Value, true)),
+                    hdg2);
+
+                // Todo: Figure out how to get the closest airport
                 if (RunwayFound != null) RunwayFound(this, new DataFoundEventArgs<Runway>(r));
-            } else {
-                RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
+            }
+            else
+            {
+                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
             }
         }
 
@@ -642,25 +651,34 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             mMatch = sRegexBoundarySegment.Match(mCurrentLine);
             if (mMatch.Success)
             {
-                LabeledSegment segment = new LabeledSegment(
+                NamedSegment segment = new NamedSegment(
                     mMatch.Groups[1].Value,
-                    new SectorPoint(TranslateCoordinate(mMatch.Groups[3].Value, false), TranslateCoordinate(mMatch.Groups[2].Value, true)),
-                    new SectorPoint(TranslateCoordinate(mMatch.Groups[5].Value, false), TranslateCoordinate(mMatch.Groups[4].Value, true))
-                );
+                    new Point2D(
+                        TranslateCoordinate(mMatch.Groups[3].Value, false),
+                        TranslateCoordinate(mMatch.Groups[2].Value, true)),
+                    new Point2D(
+                        TranslateCoordinate(mMatch.Groups[5].Value, false),
+                        TranslateCoordinate(mMatch.Groups[4].Value, true)));
+
+                // Get the airway if it already exists
                 switch (mCurrentSection)
                 {
-                    case FileSection.ARTCC:
-                        if (ArtccSegmentFound != null) ArtccSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
-                        break;
-                    case FileSection.ArtccHigh:
-                        if (ArtccHighSegmentFound != null) ArtccHighSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
-                        break;
-                    case FileSection.ArtccLow:
-                        if (ArtccLowSegmentFound != null) ArtccLowSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
-                        break;
+                    // Todo: ARTCCs
+                    // case FileSection.ARTCC:
+                    //     if (ArtccSegmentFound != null) ArtccSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
+                    //     break;
+                    // case FileSection.ArtccHigh:
+                    //     if (ArtccHighSegmentFound != null) ArtccHighSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
+                    //     break;
+                    // case FileSection.ArtccLow:
+                    //     if (ArtccLowSegmentFound != null) ArtccLowSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
+                    //     break;
                     case FileSection.HighAirway:
+                        
+                        // Find the airway if it already exists
                         if (HighAirwaySegmentFound != null) HighAirwaySegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
                         break;
+
                     case FileSection.LowAirway:
                         if (LowAirwaySegmentFound != null) LowAirwaySegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
                         break;
@@ -668,70 +686,27 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
+                RaiseParseError($"Unrecognized formatting in {mCurrentSection} section.");
             }
         }
 
-        ////////////////////////////////////////////////////////////////////////////////
-
-        private void ParseGeoLine()
+        private void AddSegment(NamedSegment segment, FileSection section)
         {
-            mMatch = sRegexGeoSegment.Match(mCurrentLine);
-            if (mMatch.Success)
+            if (section == FileSection.LowAirway ||
+                section == FileSection.HighAirway)
             {
-                ColoredSegment s = new ColoredSegment(
-                    new SectorPoint(TranslateCoordinate(mMatch.Groups[2].Value, false), TranslateCoordinate(mMatch.Groups[1].Value, true)),
-                    new SectorPoint(TranslateCoordinate(mMatch.Groups[4].Value, false), TranslateCoordinate(mMatch.Groups[3].Value, true)),
-                    ParseColor(mMatch.Groups[5].Value)
-                );
-                if (GeoSegmentFound != null) GeoSegmentFound(this, new DataFoundEventArgs<ColoredSegment>(s));
-            }
-            else
-            {
-                RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
-            }
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////
-
-        private void ParseRegionLine()
-        {
-            // Check if the line starts with whitespace. If not, it's the start of a new
-            // region. If so, it's a continuation of an existing region definition.
-            if (!IsWhitespace(mCurrentLine[0]))
-            {
-                mMatch = sRegexRegionBegin.Match(mCurrentLine);
-                if (mMatch.Success)
+                Airway targetAirway = null;
+                targetAirway = LowAirways.FirstOrDefault(a => a.Identifier == segment.Label);
+                if (targetAirway == null) targetAirway = HighAirways.FirstOrDefault(a => a.Identifier == segment.Label);
+                if (targetAirway == null)
                 {
-
-                    // Finish up any existing region and start a new one.
-                    FinalizePendingRegion();
-                    mCurrentRegion = new Region(ParseColor(mMatch.Groups[1].Value));
-                    mCurrentRegion.Points.Add(new SectorPoint(TranslateCoordinate(mMatch.Groups[3].Value, false), TranslateCoordinate(mMatch.Groups[2].Value, true)));
+                    targetAirway = new Airway(segment.Label);
+                    targetAirway.Fixes.Add(segment.Start);
+                    targetAirway.Fixes.Add(segment.End);
                 }
                 else
                 {
-                    RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
-                }
-            }
-            else
-            {
-                mMatch = sRegexRegionContinuation.Match(mCurrentLine);
-                if (mMatch.Success)
-                {
-
-                    // Make sure we have an existing region object started.
-                    if (mCurrentRegion == null) {
-                        RaiseParseError("Found region continuation line without prior region start line.");
-                        return;
-                    }
-
-                    // Add the point.
-                    mCurrentRegion.Points.Add(new SectorPoint(TranslateCoordinate(mMatch.Groups[2].Value, false), TranslateCoordinate(mMatch.Groups[1].Value, true)));
-                }
-                else
-                {
-                    RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
+                    // 
                 }
             }
         }
@@ -786,26 +761,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 {
                     RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
                 }
-            }
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////
-
-        private void ParseLabelLine()
-        {
-            mMatch = sRegexStaticText.Match(mCurrentLine);
-            if (mMatch.Success)
-            {
-                StaticText s = new StaticText(
-                    new SectorPoint(TranslateCoordinate(mMatch.Groups[3].Value, false), TranslateCoordinate(mMatch.Groups[2].Value, true)),
-                    mMatch.Groups[1].Value,
-                    ParseColor(mMatch.Groups[4].Value)
-                );
-                if (StaticTextFound != null) StaticTextFound(this, new DataFoundEventArgs<StaticText>(s));
-            }
-            else
-            {
-                RaiseParseError(string.Format("Unrecognized formatting in {0} section.", mCurrentSection));
             }
         }
 
