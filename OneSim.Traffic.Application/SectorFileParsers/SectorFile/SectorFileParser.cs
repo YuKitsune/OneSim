@@ -193,7 +193,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         /// <param name="message">
         ///     The error message.
         /// </param>
-        private void RaiseParseError(string message) => ParseErrors.Add(new ParseError(_lineNumber, _currentLine, message));
+        private void AddParseError(string message) => ParseErrors.Add(new ParseError(_lineNumber, _currentLine, message));
 
         /// <summary>
         ///     Determines whether or not the given <see cref="char"/> is whitespace.
@@ -284,7 +284,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             // Make sure we got a value.
             if (!string.IsNullOrEmpty(s))
             {
-
                 // Find out which side of the axis we're on, then strip out the N, S, E or W.
                 bool neg = s.IndexOfAny(new char[] { 'S', 's', 'W', 'w' }) > -1;
                 s = s.Substring(1);
@@ -335,7 +334,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
 
             // If we fall through to this line, then there was a problem with the value.
-            RaiseParseError($"Invalid formatting in lat/lon value: {s}");
+            AddParseError($"Invalid formatting in lat/lon value: {s}");
             return 0.0;
         }
 
@@ -454,7 +453,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                                         _currentSection = FileSection.Unsupported;
                                         continue;
                                     default:
-                                        if (pass == 1) RaiseParseError("Unknown section header encountered.");
+                                        if (pass == 1) AddParseError("Unknown section header encountered.");
                                         continue;
                                 }
                             }
@@ -466,7 +465,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                         // If we get here, and we're not in a [SECTION], then we've found an orphaned line.
                         if (_currentSection == FileSection.None)
                         {
-                            if (pass == 1) RaiseParseError("Orphaned line.");
+                            if (pass == 1) AddParseError("Orphaned line.");
                             continue;
                         }
 
@@ -549,7 +548,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                     break;
 
                 default:
-                    RaiseParseError("Extra line in [INFO] section.");
+                    AddParseError("Extra line in [INFO] section.");
                     break;
             }
         }
@@ -590,7 +589,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
+                AddParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
@@ -625,7 +624,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
+                AddParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
@@ -653,7 +652,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
+                AddParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
@@ -684,7 +683,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
+                AddParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
@@ -726,10 +725,13 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
             else
             {
-                RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
+                AddParseError($"Unrecognized formatting in {_currentSection} section.");
             }
         }
 
+        /// <summary>
+        ///     Parses the <see cref="_currentLine"/> as a diagram, but stores it as a <see cref="NamedSegment"/>.
+        /// </summary>
         private void ParseDiagramLine()
         {
             // Check if the line starts with whitespace. If not, it's the start of a new diagram.
@@ -751,7 +753,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 }
                 else
                 {
-                    RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
+                    AddParseError($"Unrecognized formatting in {_currentSection} section.");
                 }
             }
             else
@@ -772,7 +774,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                             break;
 
                         default:
-                            RaiseParseError("Found diagram continuation line without prior diagram start line.");
+                            AddParseError("Found diagram continuation line without prior diagram start line.");
                             return;
                     }
 
@@ -787,7 +789,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 }
                 else
                 {
-                    RaiseParseError($"Unrecognized formatting in {_currentSection} section.");
+                    AddParseError($"Unrecognized formatting in {_currentSection} section.");
                 }
             }
 
@@ -803,7 +805,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                     break;
 
                 default:
-                    RaiseParseError("Found diagram continuation line without prior diagram start line.");
+                    AddParseError("Found diagram continuation line without prior diagram start line.");
                     return;
             }
         }
