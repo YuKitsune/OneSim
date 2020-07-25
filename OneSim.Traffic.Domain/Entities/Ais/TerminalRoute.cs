@@ -15,11 +15,6 @@ namespace OneSim.Traffic.Domain.Entities.Ais
     public class TerminalRoute : PreDefinedRoute
     {
         /// <summary>
-        ///     Gets or sets the identifier of the current <see cref="TerminalRoute"/>.
-        /// </summary>
-        public string Identifier { get; set; }
-
-        /// <summary>
         ///     Gets or sets the <see cref="TerminalRouteType"/>.
         /// </summary>
         public TerminalRouteType Type { get; set; }
@@ -36,14 +31,18 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         /// <param name="identifier">
         ///     The identifier of the <see cref="TerminalRoute"/>.
         /// </param>
+        /// <param name="type">
+        ///     The <see cref="TerminalRouteType"/>.
+        /// </param>
         /// <param name="fixes">
         ///     The <see cref="List{T}"/> of <see cref="Fix"/>es which make up the <see cref="TerminalRoute"/>.
         /// </param>
-        public TerminalRoute(string identifier, List<Fix> fixes = null)
+        public TerminalRoute(string identifier, TerminalRouteType type, List<Fix> fixes = null)
             : base(fixes)
         {
             if (string.IsNullOrEmpty(Identifier)) throw new ArgumentNullException(nameof(identifier));
             Identifier = identifier;
+            Type = type;
 
             ValidRunways = new List<Runway>();
         }

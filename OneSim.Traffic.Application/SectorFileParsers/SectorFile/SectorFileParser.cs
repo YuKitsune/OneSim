@@ -808,38 +808,68 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
         }
 
-        private List<Airway> GetAirwaysFromSegments(List<NamedSegment> segments)
+        /// <summary>
+        ///     Converts the given <see cref="List{T}"/> of <see cref="NamedSegment"/>s to a <see cref="List{T}"/> of
+        ///     <typeparamref name="TRoute"/>s.
+        /// </summary>
+        /// <param name="segments">
+        ///     The <see cref="List{T}"/> of <see cref="NamedSegment"/>s to convert.
+        /// </param>
+        /// <param name="routeFactory">
+        ///     The <see cref="Func{TParam, TResult}"/> to invoke when creating new <typeparamref name="TRoute"/>s.
+        ///     The parameter is the <see cref="PreDefinedRoute.Identifier"/>.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="List{T}"/> of <see cref="TRoute"/>s.
+        /// </returns>
+        /// <typeparam name="TRoute">
+        ///     The type of <see cref="PreDefinedRoute"/>.
+        /// </typeparam>
+        private List<TRoute> GetRoutesFromSegments<TRoute>(
+            List<NamedSegment> segments,
+            Func<string, TRoute> routeFactory)
+            where TRoute : PreDefinedRoute
         {
-            List<Airway> airways = new List<Airway>();
+            List<TRoute> routes = new List<TRoute>();
+
+            // Get all of the identifiers that were found
             string[] identifiers = segments.Select(s => s.Label).Distinct().ToArray();
 
             foreach (string identifier in identifiers)
             {
-                List<NamedSegment> currentSegments = HighAirwaySegments.Where(s => s.Label == identifier).ToList();
-                Airway airway = new Airway(identifier);
+                // Get all segments with the current identifier, and create a new route
+                List<NamedSegment> currentSegments = segments.Where(s => s.Label == identifier).ToList();
+                TRoute route = routeFactory(identifier);
 
-                NamedSegment firstSegment = currentSegments.First(s => !LowAirwaySegments.Select(s1 => s1.End).Contains(s.Start));
-                NamedSegment lastSegment = currentSegments.First(s => !LowAirwaySegments.Select(s1 => s1.Start).Contains(s.End));
+                // Find our first segment (start point doesn't match any of the end points), and our last segment
+                // (end point doesn't match any of the start points)
+                NamedSegment firstSegment = currentSegments.First(s => !segments.Select(s1 => s1.End).Contains(s.Start));
+                NamedSegment lastSegment = currentSegments.First(s => !segments.Select(s1 => s1.Start).Contains(s.End));
 
-                airway.Fixes.Add(GetFixFromPoint(firstSegment.Start));
-                airway.Fixes.Add(GetFixFromPoint(firstSegment.End));
+                // Add the first segment to the route
+                route.Fixes.Add(GetFixFromPoint(firstSegment.Start));
+                route.Fixes.Add(GetFixFromPoint(firstSegment.End));
                 while (true)
                 {
-                    Fix lastFix = airway.Fixes.Last();
+                    // Find the next segment
+                    Fix lastFix = route.Fixes.Last();
                     NamedSegment nextSegment = currentSegments.First(s => s.Start == lastFix.Location);
-                    airway.Fixes.Add(GetFixFromPoint(nextSegment.End));
+
+                    // Add it in
+                    route.Fixes.Add(GetFixFromPoint(nextSegment.End));
+
+                    // If the next segment is the same as the last segment, then we've finished with this route
                     if (nextSegment == lastSegment) break;
                 }
 
-                airways.Add(airway);
+                routes.Add(route);
             }
 
-            return airways;
-        }
 
         private Fix GetFixFromPoint(Point2D point)
         {
             throw new NotImplementedException();
+            return routes;
         }
     }
 }

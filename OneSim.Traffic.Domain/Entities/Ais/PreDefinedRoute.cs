@@ -19,6 +19,11 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public int Id { get; set; }
 
         /// <summary>
+        ///     Gets or sets the identifier for the current <see cref="PreDefinedRoute"/>.
+        /// </summary>
+        public string Identifier { get; set; }
+
+        /// <summary>
         ///     Gets or sets the <see cref="List{T}"/> of <see cref="Fix"/>es which make up the
         ///     <see cref="PreDefinedRoute"/>.
         /// </summary>
