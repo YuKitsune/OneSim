@@ -656,30 +656,67 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
         }
 
+        /// <summary>
+        ///     Parses the <see cref="_currentLine"/> as a <see cref="Runway"/>.
+        /// </summary>
         private void ParseRunwayLine()
         {
             _currentMatch = RunwayRegex.Match(_currentLine);
             if (_currentMatch.Success)
             {
-                int hdg1 = 0;
-                int.TryParse(_currentMatch.Groups[3].Value, out hdg1);
-                int hdg2 = 0;
-                int.TryParse(_currentMatch.Groups[4].Value, out hdg2);
-                Runway r1 = new Runway(
+                // Create the first runway
+                int.TryParse(_currentMatch.Groups[3].Value, out int firstHeading);
+                Runway firstRunway = new Runway(
                     _currentMatch.Groups[1].Value.ToUpper(),
                     new Point2D(
                         TranslateCoordinate(_currentMatch.Groups[6].Value, false),
                         TranslateCoordinate(_currentMatch.Groups[5].Value, true)),
-                    hdg1);
-                Runway r2 = new Runway(
+                    firstHeading);
+
+                // Create the second runway
+                int.TryParse(_currentMatch.Groups[4].Value, out int secondHeading);
+                Runway secondRunway = new Runway(
                     _currentMatch.Groups[2].Value.ToUpper(),
                     new Point2D(
                         TranslateCoordinate(_currentMatch.Groups[8].Value, false),
                         TranslateCoordinate(_currentMatch.Groups[7].Value, true)),
-                    hdg2);
+                    secondHeading);
 
-                // Todo: Figure out how to get the closest airport
-                if (RunwayFound != null) RunwayFound(this, new DataFoundEventArgs<Runway>(r));
+                // Find the midpoint between the thresholds
+                Point2D runwayMidpoint = new Point2D(
+                    (firstRunway.ThresholdLocation.Longitude - secondRunway.ThresholdLocation.Longitude) / 2,
+                    (firstRunway.ThresholdLocation.Latitude - secondRunway.ThresholdLocation.Latitude) / 2);
+
+                // Find the closest airport so we can add it
+                Airport closestAirport = null;
+                double distance = 0;
+                foreach (Airport airport in Airports)
+                {
+                    double currentDistance =
+                        Math.Sqrt(
+                            Math.Pow(airport.Location.Latitude - runwayMidpoint.Latitude, 2) +
+                            Math.Pow(airport.Location.Longitude - runwayMidpoint.Longitude, 2));
+
+                    // If we don't have an airport set, just use the current one, otherwise override if we have a
+                    // closer one
+                    if (closestAirport == null ||
+                        currentDistance < distance)
+                    {
+                        closestAirport = airport;
+                        continue;
+                    }
+                }
+
+                // Add the runways to the closest airport
+                if (closestAirport != null)
+                {
+                    closestAirport.Runways.Add(firstRunway);
+                    closestAirport.Runways.Add(secondRunway);
+                }
+                else
+                {
+                    AddParseError("Unable to find a suitable airport for runways.");
+                }
             }
             else
             {
