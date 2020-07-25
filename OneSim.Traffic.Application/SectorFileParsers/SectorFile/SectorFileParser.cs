@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Application.SectorFileParsers
+namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers
     using System.Linq;
     using System.Text.RegularExpressions;
 
-    using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
     using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Ais;
 
@@ -24,7 +23,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
     ///     The GEO, REGIONS and LABELS sections, as well as color definitions are ignored, as OneSim does not have a
     ///     use for them.
     /// </remarks>
-    public class SectorFileParser : IDisposable
+    public class SectorFileParser
     {
         /// <summary>
         ///     Gets or sets the current <see cref="SectorSet"/>.
@@ -86,7 +85,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         private List<NamedSegment> SidSegments { get; }
 
         /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="TerminalRoute"/>s which are <see cref="TerminalRouteType.StandardInstrumentDepartures"/>s.
+        ///     Gets the <see cref="List{T}"/> of <see cref="TerminalRoute"/>s which are <see cref="TerminalRouteType.StandardInstrumentDeparture"/>s.
         /// </summary>
         private List<TerminalRoute> Sids { get; }
 
@@ -123,7 +122,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         /// <summary>
         ///     The <see cref="Regex"/> for the ARTCC boundaries.
         /// </summary>
-        private static readonly Regex BundarySegmentRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
+        private static readonly Regex BoundarySegmentRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
 
         /// <summary>
         ///     The <see cref="Regex"/> for the diagrams headers.
@@ -138,17 +137,12 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         /// <summary>
         ///     The <see cref="CultureInfo"/>.
         /// </summary>
-        private readonly CultureInfo _culture = new CultureInfo("en-US");
+        private static readonly CultureInfo _culture = new CultureInfo("en-US");
 
         /// <summary>
         ///     The current <see cref="Match"/>.
         /// </summary>
         private Match _currentMatch;
-
-        /// <summary>
-        ///     The <see cref="Dictionary{TKey,TValue}"/> of parsed <see cref="Fix"/>es.
-        /// </summary>
-        private readonly Dictionary<string, Fix> _fixes = new Dictionary<string, Fix>();
 
         /// <summary>
         ///     The current line number.
@@ -214,9 +208,10 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         /// </param>
         private static void StripComments(ref string line)
         {
+            // Get rid of anything after ";" or "//"
             int pos = line.IndexOf(';');
             if (pos > -1) line = line.Substring(0, pos);
-            pos = line.IndexOf("//");
+            pos = line.IndexOf("//", StringComparison.Ordinal);
             if (pos > -1) line = line.Substring(0, pos);
         }
 
@@ -232,13 +227,12 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         private int ParseFrequency(string s)
         {
             // Frequencies are stored in integer form.
-            double freq = 0.0;
-            double.TryParse(s, NumberStyles.Float, _culture, out freq);
+            double.TryParse(s, NumberStyles.Float, _culture, out double freq);
             return (int)(freq * 1000);
         }
 
         /// <summary>
-        ///     Translates the given <see cref="string"/> inta coordinate.
+        ///     Translates the given <see cref="string"/> into a coordinate.
         /// </summary>
         /// <param name="s">
         ///     The <see cref="string"/> to parse.
@@ -254,20 +248,13 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             // Make sure we got a value.
             if (string.IsNullOrEmpty(s))
             {
-                RaiseParseError("Empty lat/lon value.");
+                AddParseError("Empty lat/lon value.");
                 return 0.0;
             }
 
             // If the string contains a decimal point, we assume it is in Degrees/Minutes/Seconds format,
             // in which case we translate to decimal. Otherwise, we look it up in the fixes table.
-            if (s.IndexOfAny(new char[] { ',', '.' }) > -1)
-            {
-                return DmsToDecimal(s);
-            }
-            else
-            {
-                return GetCoordFromFix(s, wantLat);
-            }
+            return s.IndexOfAny(new char[] { ',', '.' }) > -1 ? DmsToDecimal(s) : GetCoordinateFromFix(s, wantLat);
         }
 
         /// <summary>
@@ -350,26 +337,46 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         /// <returns>
         ///     The coordinate in the form of a <see cref="double"/>.
         /// </returns>
-        private double GetCoordFromFix(string s, bool wantLat)
+        private double GetCoordinateFromFix(string s, bool wantLat)
         {
             s = s.ToUpper();
             if (_fixes.ContainsKey(s))
             {
                 return wantLat ? _fixes[s].Location.Latitude : _fixes[s].Location.Longitude;
             }
-            else
-            {
-                RaiseParseError($"Unknown fix name: {s}");
-                return 0.0;
-            }
+
+            AddParseError($"Unknown fix name: {s}");
+            return 0.0;
         }
 
+        /// <summary>
+        ///     Gets a specific <see cref="Fix"/> given a <see cref="Point2D"/>.
+        /// </summary>
+        /// <param name="point">
+        ///     The <see cref="Point2D"/>.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="Fix"/>.
+        /// </returns>
+        private Fix GetFixFromPoint(Point2D point)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Parses the given sector file content.
+        /// </summary>
+        /// <param name="stream">
+        ///     The sector file content in the form of a <see cref="string"/>.
+        /// </param>
         public void Parse(Stream stream)
         {
             SectorSet = new SectorSet();
             using (StreamReader sr = new StreamReader(stream))
             {
                 int infoSectionLine = 0;
+
+                // Need 2 passes, 1 to get all the fixes, 2 to get segments, diagrams, etc (since they rely on fixes)
                 for (int pass = 1; pass <= 2; pass++)
                 {
                     _currentSection = FileSection.None;
@@ -522,13 +529,21 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 }
 
                 // Convert segments to airways
-                LowAirways.AddRange(GetAirwaysFromSegments(LowAirwaySegments));
-                HighAirways.AddRange(GetAirwaysFromSegments(HighAirwaySegments));
+                LowAirways.AddRange(GetRoutesFromSegments(LowAirwaySegments, identifier => new Airway(identifier)));
+                HighAirways.AddRange(GetRoutesFromSegments(HighAirwaySegments, identifier => new Airway(identifier)));
 
                 // Convert segments to SIDs and STARs
+                Sids.AddRange(GetRoutesFromSegments(SidSegments, identifier => new TerminalRoute(identifier, TerminalRouteType.StandardInstrumentDeparture)));
+                Stars.AddRange(GetRoutesFromSegments(StarSegments, identifier => new TerminalRoute(identifier, TerminalRouteType.StandardTerminalArrivalRoute)));
             }
         }
 
+        /// <summary>
+        ///     Parses the current line as an info line.
+        /// </summary>
+        /// <param name="infoLine">
+        ///     The line number relative to the info section.
+        /// </param>
         private void ParseInfoLine(int infoLine)
         {
             switch (infoLine)
@@ -561,6 +576,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             _currentMatch = VorNdbRegex.Match(_currentLine);
             if (_currentMatch.Success)
             {
+                // Check which type of Navaid we're reading
                 NavaidType type = _currentSection switch
                 {
                     FileSection.VOR => NavaidType.VOR,
@@ -568,24 +584,17 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                     _ => throw new InvalidOperationException("Invalid file section.")
                 };
 
-                string id = _currentMatch.Groups[1].Value.ToUpper();
-                Navaid n = new Navaid(
-                    id,
+                // Create the navaid
+                string identifier = _currentMatch.Groups[1].Value.ToUpper();
+                Navaid navaid = new Navaid(
+                    identifier,
                     new Point2D(
                         DmsToDecimal(_currentMatch.Groups[4].Value),
                         DmsToDecimal(_currentMatch.Groups[3].Value)),
                     ParseFrequency(_currentMatch.Groups[2].Value),
                     type);
-                if (_fixes.ContainsKey(id))
-                {
-                    _fixes[id] = n;
-                }
-                else
-                {
-                    _fixes.Add(id, n);
-                }
 
-                Navaids.Add(n);
+                Navaids.Add(navaid);
             }
             else
             {
@@ -601,26 +610,20 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             _currentMatch = AirportRegex.Match(_currentLine);
             if (_currentMatch.Success)
             {
-                string id = _currentMatch.Groups[1].Value.ToUpper();
-                Airport a = new Airport(
-                    id,
+                // Create the airport
+                string identifier = _currentMatch.Groups[1].Value.ToUpper();
+                Airport airport = new Airport(
+                    identifier,
                     new Point2D(
                         DmsToDecimal(_currentMatch.Groups[4].Value),
                         DmsToDecimal(_currentMatch.Groups[3].Value)));
 
                 // Todo: CTAF: ParseFrequency(mMatch.Groups[2].Value),
-                if (!string.IsNullOrEmpty(_currentMatch.Groups[5].Value)) a.Class = (AirspaceClass)Enum.Parse(typeof(AirspaceClass), _currentMatch.Groups[5].Value);
 
-                if (_fixes.ContainsKey(id))
-                {
-                    _fixes[id] = a;
-                }
-                else
-                {
-                    _fixes.Add(id, a);
-                }
+                // Set the AirspaceClass if we have one
+                if (!string.IsNullOrEmpty(_currentMatch.Groups[5].Value)) airport.Class = (AirspaceClass)Enum.Parse(typeof(AirspaceClass), _currentMatch.Groups[5].Value);
 
-                Airports.Add(a);
+                Airports.Add(airport);
             }
             else
             {
@@ -628,27 +631,23 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
         }
 
+        /// <summary>
+        ///     Parses the <see cref="_currentLine"/> as a <see cref="Fix"/>.
+        /// </summary>
         private void ParseFixLine()
         {
             _currentMatch = FixRegex.Match(_currentLine);
             if (_currentMatch.Success)
             {
-                string id = _currentMatch.Groups[1].Value.ToUpper();
-                Fix f = new Fix(
-                    id,
+                // Create the fix
+                string identifier = _currentMatch.Groups[1].Value.ToUpper();
+                Fix fix = new Fix(
+                    identifier,
                     new Point2D(
                         DmsToDecimal(_currentMatch.Groups[3].Value),
                         DmsToDecimal(_currentMatch.Groups[2].Value)));
-                if (_fixes.ContainsKey(id))
-                {
-                    _fixes[id] = f;
-                }
-                else
-                {
-                    _fixes.Add(id, f);
-                }
 
-                Fixes.Add(f);
+                Fixes.Add(fix);
             }
             else
             {
@@ -724,11 +723,15 @@ namespace OneSim.Traffic.Application.SectorFileParsers
             }
         }
 
+        /// <summary>
+        ///     Parses the <see cref="_currentLine"/> as a <see cref="NamedSegment"/>.
+        /// </summary>
         private void ParseNamedSegmentLine()
         {
-            _currentMatch = BundarySegmentRegex.Match(_currentLine);
+            _currentMatch = BoundarySegmentRegex.Match(_currentLine);
             if (_currentMatch.Success)
             {
+                // Create the segment
                 NamedSegment segment = new NamedSegment(
                     _currentMatch.Groups[1].Value,
                     new Point2D(
@@ -738,7 +741,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                         TranslateCoordinate(_currentMatch.Groups[5].Value, false),
                         TranslateCoordinate(_currentMatch.Groups[4].Value, true)));
 
-                // Get the airway if it already exists
+                // Add to the appropriate list
                 switch (_currentSection)
                 {
                     // Todo: ARTCCs
@@ -779,6 +782,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 _currentMatch = DiagramBeginRegex.Match(_currentLine);
                 if (_currentMatch.Success)
                 {
+                    // Create the new segment
                     segment = new NamedSegment(
                         _currentMatch.Groups[1].Value.Trim(),
                         new Point2D(
@@ -815,6 +819,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                             return;
                     }
 
+                    // Create the segment with the Identifier of the last segment we added
                     segment = new NamedSegment(
                         lastIdentifier,
                         new Point2D(
@@ -830,6 +835,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 }
             }
 
+            // Add the segment to the appropriate list
             if (segment == null) return;
             switch (_currentSection)
             {
@@ -904,10 +910,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers
                 routes.Add(route);
             }
 
-
-        private Fix GetFixFromPoint(Point2D point)
-        {
-            throw new NotImplementedException();
             return routes;
         }
     }
