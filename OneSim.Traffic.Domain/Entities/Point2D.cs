@@ -6,6 +6,8 @@
 
 namespace OneSim.Traffic.Domain.Entities
 {
+    using System;
+
     /// <summary>
     ///     A 2 dimensional (Latitude/Longitude) point in space.
     /// </summary>
@@ -39,6 +41,31 @@ namespace OneSim.Traffic.Domain.Entities
         {
             Longitude = longitude;
             Latitude = latitude;
+        }
+
+        /// <summary>
+        ///     Checks if the given <see cref="Point2D"/> is within <paramref name="distance"/> nautical miles of the
+        ///     current <see cref="Point2D"/>.
+        /// </summary>
+        /// <param name="distance">
+        ///     The distance in nautical miles.
+        /// </param>
+        /// <param name="point">
+        ///     The <see cref="Point2D"/>.
+        /// </param>
+        /// <returns>
+        ///     <c>true</c> if the <paramref name="point"/> is within <paramref name="distance"/> nautical miles of the
+        ///     current <see cref="Point2D"/>, <c>false</c> otherwise.
+        /// </returns>
+        public bool IsWithin(int distance, Point2D point)
+        {
+            const int NauticalMilesPerDegree = 60;
+            double degreeDistance =
+                Math.Sqrt(
+                    Math.Pow(Latitude - point.Latitude, 2) +
+                    Math.Pow(Longitude - point.Longitude, 2));
+
+            return (Math.Floor(degreeDistance) * NauticalMilesPerDegree) <= distance;
         }
     }
 }

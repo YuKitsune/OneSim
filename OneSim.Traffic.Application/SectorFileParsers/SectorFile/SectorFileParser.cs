@@ -26,73 +26,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
     public class SectorFileParser
     {
         /// <summary>
-        ///     Gets or sets the current <see cref="SectorSet"/>.
+        ///     Gets or sets the <see cref="SectorFileParseResult"/>.
         /// </summary>
-        private SectorSet SectorSet { get; set; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="Airport"/>s.
-        /// </summary>
-        private List<Airport> Airports { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="Fix"/>es.
-        /// </summary>
-        private List<Fix> Fixes { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="Navaid"/>s.
-        /// </summary>
-        private List<Navaid> Navaids { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="NamedSegment"/>s which were found in the low-level
-        ///     <see cref="Airway"/> section.
-        /// </summary>
-        private List<NamedSegment> LowAirwaySegments { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of low-level <see cref="Airway"/>.
-        /// </summary>
-        private List<Airway> LowAirways { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="NamedSegment"/>s which were found in the
-        ///     high-level <see cref="Airway"/> section.
-        /// </summary>
-        private List<NamedSegment> HighAirwaySegments { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of high-level <see cref="Airway"/>.
-        /// </summary>
-        private List<Airway> HighAirways { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="NamedSegment"/> which were found in the
-        ///     STARs section.
-        /// </summary>
-        private List<NamedSegment> StarSegments { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="TerminalRoute"/>s which are <see cref="TerminalRouteType.StandardTerminalArrivalRoute"/>s.
-        /// </summary>
-        private List<TerminalRoute> Stars { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="NamedSegment"/> which were found in the
-        ///     SIDs section.
-        /// </summary>
-        private List<NamedSegment> SidSegments { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="TerminalRoute"/>s which are <see cref="TerminalRouteType.StandardInstrumentDeparture"/>s.
-        /// </summary>
-        private List<TerminalRoute> Sids { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="ParseError"/>s.
-        /// </summary>
-        private List<ParseError> ParseErrors { get; }
+        private SectorFileParseResult Result { get; set; }
 
         /// <summary>
         ///     The <see cref="Regex"/> for the Section header.
@@ -125,19 +61,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         private static readonly Regex BoundarySegmentRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
 
         /// <summary>
-        ///     The <see cref="Regex"/> for the diagrams headers.
-        /// </summary>
-        private static readonly Regex DiagramBeginRegex = new Regex(@"^(.{26})\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+(\S+))?", RegexOptions.Compiled);
-
-        /// <summary>
-        ///     The <see cref="Regex"/> for the diagrams continuations.
-        /// </summary>
-        private static readonly Regex DiagramContinuationRegex = new Regex(@"^\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(?:\s+(\S+))?", RegexOptions.Compiled);
-
-        /// <summary>
         ///     The <see cref="CultureInfo"/>.
         /// </summary>
-        private static readonly CultureInfo _culture = new CultureInfo("en-US");
+        private static readonly CultureInfo Culture = new CultureInfo("en-US");
 
         /// <summary>
         ///     The current <see cref="Match"/>.
@@ -147,7 +73,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         /// <summary>
         ///     The current line number.
         /// </summary>
-        private int _lineNumber = 0;
+        private int _lineNumber;
 
         /// <summary>
         ///     The current line content.
@@ -160,34 +86,12 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         private FileSection _currentSection = FileSection.None;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="SectorFileParser"/> class.
-        /// </summary>
-        public SectorFileParser()
-        {
-            Airports = new List<Airport>();
-            Fixes = new List<Fix>();
-            Navaids = new List<Navaid>();
-
-            LowAirwaySegments = new List<NamedSegment>();
-            LowAirways = new List<Airway>();
-            HighAirwaySegments = new List<NamedSegment>();
-            HighAirways = new List<Airway>();
-
-            StarSegments = new List<NamedSegment>();
-            Stars = new List<TerminalRoute>();
-            SidSegments = new List<NamedSegment>();
-            Sids = new List<TerminalRoute>();
-
-            ParseErrors = new List<ParseError>();
-        }
-
-        /// <summary>
         ///     Adds a new <see cref="ParseError"/> to the error list.
         /// </summary>
         /// <param name="message">
         ///     The error message.
         /// </param>
-        private void AddParseError(string message) => ParseErrors.Add(new ParseError(_lineNumber, _currentLine, message));
+        private void AddParseError(string message) => Result.ParseErrors.Add(new ParseError(_lineNumber, _currentLine, message));
 
         /// <summary>
         ///     Determines whether or not the given <see cref="char"/> is whitespace.
@@ -227,34 +131,37 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         private int ParseFrequency(string s)
         {
             // Frequencies are stored in integer form.
-            double.TryParse(s, NumberStyles.Float, _culture, out double freq);
+            double.TryParse(s, NumberStyles.Float, Culture, out double freq);
             return (int)(freq * 1000);
         }
 
         /// <summary>
-        ///     Translates the given <see cref="string"/> into a coordinate.
+        ///     Gets a <see cref="Fix"/> given a <see cref="Point2D"/>.
         /// </summary>
-        /// <param name="s">
-        ///     The <see cref="string"/> to parse.
-        /// </param>
-        /// <param name="wantLat">
-        ///     Whether or not we're looking for the latitude.
+        /// <param name="point">
+        ///     The <see cref="Point2D"/>.
         /// </param>
         /// <returns>
-        ///     The coordinate in the form of a <see cref="double"/>.
+        ///     The <see cref="Point2D"/> at the <paramref name="point"/>.
         /// </returns>
-        private double TranslateCoordinate(string s, bool wantLat)
+        private Fix GetFixFromPoint(Point2D point)
         {
-            // Make sure we got a value.
-            if (string.IsNullOrEmpty(s))
-            {
-                AddParseError("Empty lat/lon value.");
-                return 0.0;
-            }
+            const int MaxDistance = 1;
 
-            // If the string contains a decimal point, we assume it is in Degrees/Minutes/Seconds format,
-            // in which case we translate to decimal. Otherwise, we look it up in the fixes table.
-            return s.IndexOfAny(new char[] { ',', '.' }) > -1 ? DmsToDecimal(s) : GetCoordinateFromFix(s, wantLat);
+            // Check fixes
+            Fix matchingFix = Result.Fixes.FirstOrDefault(f => f.Location.IsWithin(MaxDistance, point));
+            if (matchingFix != null) return matchingFix;
+
+            // Check navaids
+            Navaid matchingNavaid = Result.Navaids.FirstOrDefault(n => n.Location.IsWithin(MaxDistance, point));
+            if (matchingNavaid != null) return matchingNavaid;
+
+            // Check airports
+            Fix matchingAirport = Result.Airports.FirstOrDefault(a => a.Location.IsWithin(MaxDistance, point));
+            if (matchingAirport != null) return matchingAirport;
+
+            // Made it this far and haven't found anything, we're fucked
+            throw new Exception($"Unable to find any fixes within {MaxDistance}nm of {point}.");
         }
 
         /// <summary>
@@ -272,11 +179,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
             if (!string.IsNullOrEmpty(s))
             {
                 // Find out which side of the axis we're on, then strip out the N, S, E or W.
-                bool neg = s.IndexOfAny(new char[] { 'S', 's', 'W', 'w' }) > -1;
+                bool neg = s.IndexOfAny(new[] { 'S', 's', 'W', 'w' }) > -1;
                 s = s.Substring(1);
 
                 // Get the whole degrees portion.
-                char[] sep = new char[] { '.', ',' };
+                char[] sep = { '.', ',' };
                 int pt1 = s.IndexOfAny(sep);
                 if (pt1 > -1)
                 {
@@ -305,11 +212,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                                 // Parse into numeric values.
                                 int.TryParse(deg, out int degrees);
                                 int.TryParse(min, out int minutes);
-                                double.TryParse(sec, NumberStyles.Float, _culture, out double seconds);
+                                double.TryParse(sec, NumberStyles.Float, Culture, out double seconds);
 
                                 // Do the math.
-                                double result = (double)degrees;
-                                result += (double)minutes / 60.0;
+                                double result = degrees;
+                                result += minutes / 60.0;
                                 result += seconds / 3600.0;
 
                                 // Return the result, negated if necessary.
@@ -326,44 +233,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         }
 
         /// <summary>
-        ///     Gets the coordinate from a given <see cref="Fix"/>.
-        /// </summary>
-        /// <param name="s">
-        ///     The <see cref="Fix.Identifier"/>.
-        /// </param>
-        /// <param name="wantLat">
-        ///     Whether or not we're looking for the latitude.
-        /// </param>
-        /// <returns>
-        ///     The coordinate in the form of a <see cref="double"/>.
-        /// </returns>
-        private double GetCoordinateFromFix(string s, bool wantLat)
-        {
-            s = s.ToUpper();
-            if (_fixes.ContainsKey(s))
-            {
-                return wantLat ? _fixes[s].Location.Latitude : _fixes[s].Location.Longitude;
-            }
-
-            AddParseError($"Unknown fix name: {s}");
-            return 0.0;
-        }
-
-        /// <summary>
-        ///     Gets a specific <see cref="Fix"/> given a <see cref="Point2D"/>.
-        /// </summary>
-        /// <param name="point">
-        ///     The <see cref="Point2D"/>.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="Fix"/>.
-        /// </returns>
-        private Fix GetFixFromPoint(Point2D point)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         ///     Parses the given sector file content.
         /// </summary>
         /// <param name="stream">
@@ -371,7 +240,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         /// </param>
         public void Parse(Stream stream)
         {
-            SectorSet = new SectorSet();
+            Result = new SectorFileParseResult();
             using (StreamReader sr = new StreamReader(stream))
             {
                 int infoSectionLine = 0;
@@ -394,13 +263,15 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                         if (string.IsNullOrEmpty(_currentLine.Trim())) continue;
 
                         // Skip lines that contain only a comment.
-                        if (_currentLine.Trim().Substring(0, 1) == ";" || _currentLine.Trim().Substring(0, 1) == "//") continue;
+                        if (_currentLine.Trim().Substring(0, 1) == ";" ||
+                            _currentLine.Trim().Substring(0, 1) == "//")
+                            continue;
 
                         // Strip off trailing comments.
                         StripComments(ref _currentLine);
 
                         // Trim trailing whitespace from the line.
-                        _currentLine = _currentLine.TrimEnd(new char[] { ' ', '\t', '\r', '\n', '\f' });
+                        _currentLine = _currentLine.TrimEnd(' ', '\t', '\r', '\n', '\f');
 
                         // If the line ends up empty, skip it.
                         if (string.IsNullOrEmpty(_currentLine)) continue;
@@ -418,47 +289,46 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                                         _currentSection = FileSection.Info;
                                         infoSectionLine = 0;
                                         continue;
+
                                     case "VOR":
                                         _currentSection = FileSection.VOR;
                                         continue;
+
                                     case "NDB":
                                         _currentSection = FileSection.NDB;
                                         continue;
+
                                     case "AIRPORT":
                                         _currentSection = FileSection.Airport;
                                         continue;
+
                                     case "RUNWAY":
                                         _currentSection = FileSection.Runway;
                                         continue;
+
                                     case "FIXES":
                                         _currentSection = FileSection.Fixes;
                                         continue;
-                                    case "ARTCC":
-                                        _currentSection = FileSection.ARTCC;
-                                        continue;
-                                    case "ARTCC HIGH":
-                                        _currentSection = FileSection.ArtccHigh;
-                                        continue;
-                                    case "ARTCC LOW":
-                                        _currentSection = FileSection.ArtccLow;
-                                        continue;
-                                    case "SID":
-                                        _currentSection = FileSection.SID;
-                                        continue;
-                                    case "STAR":
-                                        _currentSection = FileSection.STAR;
-                                        continue;
+
                                     case "LOW AIRWAY":
                                         _currentSection = FileSection.LowAirway;
                                         continue;
+
                                     case "HIGH AIRWAY":
                                         _currentSection = FileSection.HighAirway;
                                         continue;
+
+                                    case "ARTCC":
+                                    case "ARTCC HIGH":
+                                    case "ARTCC LOW":
+                                    case "SID":
+                                    case "STAR":
                                     case "GEO":
                                     case "REGIONS":
                                     case "LABELS":
                                         _currentSection = FileSection.Unsupported;
                                         continue;
+
                                     default:
                                         if (pass == 1) AddParseError("Unknown section header encountered.");
                                         continue;
@@ -486,25 +356,30 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                                     case FileSection.Info:
                                         ParseInfoLine(++infoSectionLine);
                                         break;
+
                                     case FileSection.VOR:
                                     case FileSection.NDB:
                                         ParseVorNdbLine();
                                         break;
+
                                     case FileSection.Airport:
                                         ParseAirportLine();
                                         break;
+
                                     case FileSection.Fixes:
                                         ParseFixLine();
                                         break;
                                 }
 
                                 break;
+
                             case 2:
                                 switch (_currentSection)
                                 {
                                     case FileSection.Runway:
                                         ParseRunwayLine();
                                         break;
+
                                     case FileSection.ARTCC:
                                     case FileSection.ArtccHigh:
                                     case FileSection.ArtccLow:
@@ -512,10 +387,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                                     case FileSection.LowAirway:
                                         ParseNamedSegmentLine();
                                         break;
+
                                     case FileSection.SID:
                                     case FileSection.STAR:
-                                        ParseDiagramLine();
-                                        break;
                                     case FileSection.Geo:
                                     case FileSection.Regions:
                                     case FileSection.Labels:
@@ -529,12 +403,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 }
 
                 // Convert segments to airways
-                LowAirways.AddRange(GetRoutesFromSegments(LowAirwaySegments, identifier => new Airway(identifier)));
-                HighAirways.AddRange(GetRoutesFromSegments(HighAirwaySegments, identifier => new Airway(identifier)));
-
-                // Convert segments to SIDs and STARs
-                Sids.AddRange(GetRoutesFromSegments(SidSegments, identifier => new TerminalRoute(identifier, TerminalRouteType.StandardInstrumentDeparture)));
-                Stars.AddRange(GetRoutesFromSegments(StarSegments, identifier => new TerminalRoute(identifier, TerminalRouteType.StandardTerminalArrivalRoute)));
+                Result.LowAirways.AddRange(GetRoutesFromSegments(Result.LowAirwaySegments, identifier => new Airway(identifier)));
+                Result.HighAirways.AddRange(GetRoutesFromSegments(Result.HighAirwaySegments, identifier => new Airway(identifier)));
             }
         }
 
@@ -549,8 +419,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
             switch (infoLine)
             {
                 case 1:
-                    SectorSet.Name = _currentLine;
+                    Result.SectorSet.Name = _currentLine;
                     break;
+
                 case 2:
                 case 3:
                 case 4:
@@ -594,7 +465,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                     ParseFrequency(_currentMatch.Groups[2].Value),
                     type);
 
-                Navaids.Add(navaid);
+                Result.Navaids.Add(navaid);
             }
             else
             {
@@ -623,7 +494,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 // Set the AirspaceClass if we have one
                 if (!string.IsNullOrEmpty(_currentMatch.Groups[5].Value)) airport.Class = (AirspaceClass)Enum.Parse(typeof(AirspaceClass), _currentMatch.Groups[5].Value);
 
-                Airports.Add(airport);
+                Result.Airports.Add(airport);
             }
             else
             {
@@ -647,7 +518,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                         DmsToDecimal(_currentMatch.Groups[3].Value),
                         DmsToDecimal(_currentMatch.Groups[2].Value)));
 
-                Fixes.Add(fix);
+                Result.Fixes.Add(fix);
             }
             else
             {
@@ -668,8 +539,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 Runway firstRunway = new Runway(
                     _currentMatch.Groups[1].Value.ToUpper(),
                     new Point2D(
-                        TranslateCoordinate(_currentMatch.Groups[6].Value, false),
-                        TranslateCoordinate(_currentMatch.Groups[5].Value, true)),
+                        DmsToDecimal(_currentMatch.Groups[6].Value),
+                        DmsToDecimal(_currentMatch.Groups[5].Value)),
                     firstHeading);
 
                 // Create the second runway
@@ -677,8 +548,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 Runway secondRunway = new Runway(
                     _currentMatch.Groups[2].Value.ToUpper(),
                     new Point2D(
-                        TranslateCoordinate(_currentMatch.Groups[8].Value, false),
-                        TranslateCoordinate(_currentMatch.Groups[7].Value, true)),
+                        DmsToDecimal(_currentMatch.Groups[8].Value),
+                        DmsToDecimal(_currentMatch.Groups[7].Value)),
                     secondHeading);
 
                 // Find the midpoint between the thresholds
@@ -689,7 +560,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 // Find the closest airport so we can add it
                 Airport closestAirport = null;
                 double distance = 0;
-                foreach (Airport airport in Airports)
+                foreach (Airport airport in Result.Airports)
                 {
                     double currentDistance =
                         Math.Sqrt(
@@ -702,7 +573,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                         currentDistance < distance)
                     {
                         closestAirport = airport;
-                        continue;
                     }
                 }
 
@@ -735,11 +605,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 NamedSegment segment = new NamedSegment(
                     _currentMatch.Groups[1].Value,
                     new Point2D(
-                        TranslateCoordinate(_currentMatch.Groups[3].Value, false),
-                        TranslateCoordinate(_currentMatch.Groups[2].Value, true)),
+                        DmsToDecimal(_currentMatch.Groups[3].Value),
+                        DmsToDecimal(_currentMatch.Groups[2].Value)),
                     new Point2D(
-                        TranslateCoordinate(_currentMatch.Groups[5].Value, false),
-                        TranslateCoordinate(_currentMatch.Groups[4].Value, true)));
+                        DmsToDecimal(_currentMatch.Groups[5].Value),
+                        DmsToDecimal(_currentMatch.Groups[4].Value)));
 
                 // Add to the appropriate list
                 switch (_currentSection)
@@ -748,108 +618,27 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                     // case FileSection.ARTCC:
                     //     if (ArtccSegmentFound != null) ArtccSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
                     //     break;
+
                     // case FileSection.ArtccHigh:
                     //     if (ArtccHighSegmentFound != null) ArtccHighSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
                     //     break;
+
                     // case FileSection.ArtccLow:
                     //     if (ArtccLowSegmentFound != null) ArtccLowSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
                     //     break;
+
                     case FileSection.HighAirway:
-                        HighAirwaySegments.Add(segment);
+                        Result.HighAirwaySegments.Add(segment);
                         break;
 
                     case FileSection.LowAirway:
-                        LowAirwaySegments.Add(segment);
+                        Result.LowAirwaySegments.Add(segment);
                         break;
                 }
             }
             else
             {
                 AddParseError($"Unrecognized formatting in {_currentSection} section.");
-            }
-        }
-
-        /// <summary>
-        ///     Parses the <see cref="_currentLine"/> as a diagram, but stores it as a <see cref="NamedSegment"/>.
-        /// </summary>
-        private void ParseDiagramLine()
-        {
-            // Check if the line starts with whitespace. If not, it's the start of a new diagram.
-            // If so, it's a continuation of an existing diagram definition.
-            NamedSegment segment = null;
-            if (!IsWhitespace(_currentLine[0]))
-            {
-                _currentMatch = DiagramBeginRegex.Match(_currentLine);
-                if (_currentMatch.Success)
-                {
-                    // Create the new segment
-                    segment = new NamedSegment(
-                        _currentMatch.Groups[1].Value.Trim(),
-                        new Point2D(
-                            TranslateCoordinate(_currentMatch.Groups[3].Value, false),
-                            TranslateCoordinate(_currentMatch.Groups[2].Value, true)),
-                        new Point2D(
-                            TranslateCoordinate(_currentMatch.Groups[5].Value, false),
-                            TranslateCoordinate(_currentMatch.Groups[4].Value, true)));
-                }
-                else
-                {
-                    AddParseError($"Unrecognized formatting in {_currentSection} section.");
-                }
-            }
-            else
-            {
-                _currentMatch = DiagramContinuationRegex.Match(_currentLine);
-                if (_currentMatch.Success)
-                {
-                    // Get the identifier of the last SID or STAR
-                    string lastIdentifier;
-                    switch (_currentSection)
-                    {
-                        case FileSection.SID:
-                            lastIdentifier = SidSegments.Last().Label;
-                            break;
-
-                        case FileSection.STAR:
-                            lastIdentifier = StarSegments.Last().Label;
-                            break;
-
-                        default:
-                            AddParseError("Found diagram continuation line without prior diagram start line.");
-                            return;
-                    }
-
-                    // Create the segment with the Identifier of the last segment we added
-                    segment = new NamedSegment(
-                        lastIdentifier,
-                        new Point2D(
-                            TranslateCoordinate(_currentMatch.Groups[2].Value, false),
-                            TranslateCoordinate(_currentMatch.Groups[1].Value, true)),
-                        new Point2D(
-                            TranslateCoordinate(_currentMatch.Groups[4].Value, false),
-                            TranslateCoordinate(_currentMatch.Groups[3].Value, true)));
-                }
-                else
-                {
-                    AddParseError($"Unrecognized formatting in {_currentSection} section.");
-                }
-            }
-
-            // Add the segment to the appropriate list
-            if (segment == null) return;
-            switch (_currentSection)
-            {
-                case FileSection.SID:
-                    SidSegments.Add(segment);
-                    break;
-
-                case FileSection.STAR:
-                    SidSegments.Add(segment);
-                    break;
-
-                default:
-                    AddParseError("Found diagram continuation line without prior diagram start line.");
-                    return;
             }
         }
 
