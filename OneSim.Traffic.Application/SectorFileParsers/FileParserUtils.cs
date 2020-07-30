@@ -8,6 +8,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers
 {
     using System;
     using System.Globalization;
+    using System.Linq;
+
+    using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
+    using OneSim.Traffic.Domain.Entities;
+    using OneSim.Traffic.Domain.Entities.Ais;
 
     /// <summary>
     ///     The file parser utilities.
@@ -121,6 +126,68 @@ namespace OneSim.Traffic.Application.SectorFileParsers
 
             // If we fall through to this line, then there was a problem with the value.
             throw new Exception($"Invalid formatting in lat/lon value: {s}");
+        }
+
+        /// <summary>
+        ///     Gets a <see cref="Fix"/> given a <see cref="Point2D"/>.
+        /// </summary>
+        /// <param name="result">
+        ///     The <see cref="SectorFileParseResult"/> to get the fixes from.
+        /// </param>
+        /// <param name="point">
+        ///     The <see cref="Point2D"/>.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="Fix"/> at the <paramref name="point"/>.
+        /// </returns>
+        public static Fix GetFixFromPoint(SectorFileParseResult result, Point2D point)
+        {
+            const int MaxDistance = 1;
+
+            // Check fixes
+            Fix matchingFix = result.Fixes.FirstOrDefault(f => f.Location.IsWithin(MaxDistance, point));
+            if (matchingFix != null) return matchingFix;
+
+            // Check navaids
+            Navaid matchingNavaid = result.Navaids.FirstOrDefault(n => n.Location.IsWithin(MaxDistance, point));
+            if (matchingNavaid != null) return matchingNavaid;
+
+            // Check airports
+            Fix matchingAirport = result.Airports.FirstOrDefault(a => a.Location.IsWithin(MaxDistance, point));
+            if (matchingAirport != null) return matchingAirport;
+
+            // Made it this far and haven't found anything, we're fucked
+            throw new Exception($"Unable to find any fixes within {MaxDistance}nm of {point}.");
+        }
+
+        /// <summary>
+        ///     Gets a <see cref="Fix"/> given a <see cref="Fix.Identifier"/>.
+        /// </summary>
+        /// <param name="result">
+        ///     The <see cref="SectorFileParseResult"/> to get the fixes from.
+        /// </param>
+        /// <param name="identifier">
+        ///     The <see cref="Fix.Identifier"/>.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="Fix"/> with the matching <paramref name="identifier"/>.
+        /// </returns>
+        public static Fix GetFixFromName(SectorFileParseResult result, string identifier)
+        {
+            // Check fixes
+            Fix matchingFix = result.Fixes.FirstOrDefault(f => f.Identifier == identifier);
+            if (matchingFix != null) return matchingFix;
+
+            // Check navaids
+            Navaid matchingNavaid = result.Navaids.FirstOrDefault(n => n.Identifier == identifier);
+            if (matchingNavaid != null) return matchingNavaid;
+
+            // Check airports
+            Fix matchingAirport = result.Airports.FirstOrDefault(a => a.Identifier == identifier);
+            if (matchingAirport != null) return matchingAirport;
+
+            // Made it this far and haven't found anything, we're fucked
+            throw new Exception($"Unable to find any fixes with the identifier {identifier}.");
         }
     }
 }

@@ -13,9 +13,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
     using System.Linq;
     using System.Text.RegularExpressions;
 
-    using Microsoft.VisualBasic.CompilerServices;
-    using Microsoft.VisualBasic.FileIO;
-
     using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Ais;
 
@@ -116,35 +113,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 AddParseError(ex.Message);
                 return 0.0;
             }
-        }
-
-        /// <summary>
-        ///     Gets a <see cref="Fix"/> given a <see cref="Point2D"/>.
-        /// </summary>
-        /// <param name="point">
-        ///     The <see cref="Point2D"/>.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="Point2D"/> at the <paramref name="point"/>.
-        /// </returns>
-        private Fix GetFixFromPoint(Point2D point)
-        {
-            const int MaxDistance = 1;
-
-            // Check fixes
-            Fix matchingFix = Result.Fixes.FirstOrDefault(f => f.Location.IsWithin(MaxDistance, point));
-            if (matchingFix != null) return matchingFix;
-
-            // Check navaids
-            Navaid matchingNavaid = Result.Navaids.FirstOrDefault(n => n.Location.IsWithin(MaxDistance, point));
-            if (matchingNavaid != null) return matchingNavaid;
-
-            // Check airports
-            Fix matchingAirport = Result.Airports.FirstOrDefault(a => a.Location.IsWithin(MaxDistance, point));
-            if (matchingAirport != null) return matchingAirport;
-
-            // Made it this far and haven't found anything, we're fucked
-            throw new Exception($"Unable to find any fixes within {MaxDistance}nm of {point}.");
         }
 
         /// <summary>
@@ -596,8 +564,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 NamedSegment lastSegment = currentSegments.First(s => !segments.Select(s1 => s1.Start).Contains(s.End));
 
                 // Add the first segment to the route
-                route.Fixes.Add(GetFixFromPoint(firstSegment.Start));
-                route.Fixes.Add(GetFixFromPoint(firstSegment.End));
+                route.Fixes.Add(FileParserUtils.GetFixFromPoint(Result, firstSegment.Start));
+                route.Fixes.Add(FileParserUtils.GetFixFromPoint(Result, firstSegment.End));
                 while (true)
                 {
                     // Find the next segment
@@ -605,7 +573,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                     NamedSegment nextSegment = currentSegments.First(s => s.Start == lastFix.Location);
 
                     // Add it in
-                    route.Fixes.Add(GetFixFromPoint(nextSegment.End));
+                    route.Fixes.Add(FileParserUtils.GetFixFromPoint(Result, nextSegment.End));
 
                     // If the next segment is the same as the last segment, then we've finished with this route
                     if (nextSegment == lastSegment) break;
