@@ -12,6 +12,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
     using System.Text.RegularExpressions;
 
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
+    using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Ais;
 
     /// <summary>
@@ -48,6 +49,21 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
         ///     The current <see cref="FileSection"/>.
         /// </summary>
         private FileSection _currentSection = FileSection.None;
+
+        /// <summary>
+        ///     Gets or sets the <see cref="SectorLine.LineId"/> of the <see cref="SectorLine"/> currently being parsed.
+        /// </summary>
+        private string CurrentSectorLineName { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the <see cref="List{T}"/> of found <see cref="SectorLine"/>s.
+        /// </summary>
+        private List<SectorLine> SectorLines { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the <see cref="Sector"/> currently being parsed.
+        /// </summary>
+        private Sector CurrentSector { get; set; }
 
         /// <summary>
         ///     Adds a new <see cref="ParseError"/> to the error list.
@@ -239,7 +255,157 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
         /// </summary>
         public void ParseAirspaceLine()
         {
-            throw new NotImplementedException();
+            string[] sections = _currentLine.Split(":");
+
+            string subSectionName = sections[0];
+            switch (subSectionName)
+            {
+                case "SECTORLINE":
+                    CurrentSectorLineName = sections[1];
+                    SectorLines.Add(new SectorLine(CurrentSectorLineName));
+                    break;
+
+                case "CIRCLE_SECTORLINE":
+
+                    Point2D centerPoint;
+                    int radius;
+                    if (sections.Length == 5)
+                    {
+                        centerPoint =
+                            new Point2D(
+                                FileParserUtils.DmsToDecimal(sections[3]),
+                                FileParserUtils.DmsToDecimal(sections[2]));
+                        radius = int.Parse(sections[4]);
+                    }
+                    else if (sections.Length == 4)
+                    {
+                        centerPoint = FileParserUtils.GetFixFromName(SectorFileResult, sections[2]).Location;
+                        radius = int.Parse(sections[3]);
+                    }
+                    else
+                    {
+                        AddParseError($"Unexpected amount of sections in CIRCLE_SECTORLINE. Expected 4 or 5, found {sections.Length}.");
+                        return;
+                    }
+
+                    const int ArcResolution = 1;
+                    List<Point2D> points = new List<Point2D>();
+                    for (int i = 0; i < 360; i += ArcResolution)
+                    {
+                        // Todo: Defined in two places, move somewhere more common
+                        const int NauticalMilesPerDegree = 60;
+                        double latitude = centerPoint.Latitude + ((radius * NauticalMilesPerDegree) * Math.Cos(i));
+                        double longitude = centerPoint.Longitude + ((radius * NauticalMilesPerDegree) * Math.Sin(i));
+                        points.Add(new Point2D(longitude, latitude));
+                    }
+
+                    SectorLine circleLine = new SectorLine(sections[0]);
+                    circleLine.Points.AddRange(points);
+
+                    SectorLines.Add(circleLine);
+                    break;
+
+                case "COORD":
+                    Point2D point = new Point2D(
+                        FileParserUtils.DmsToDecimal(sections[2]),
+                        FileParserUtils.DmsToDecimal(sections[1]));
+                    SectorLines.First(l => l.LineId == CurrentSectorLineName).Points.Add(point);
+                    break;
+
+                case "SECTOR":
+
+                    // Finish off the current sector
+                    if (CurrentSector != null) Result.Sectors.Add(CurrentSector);
+                    CurrentSector = new Sector
+                                    {
+                                        Identifier = sections[1],
+                                        LowerLevel = int.Parse(sections[2]),
+                                        UpperLevel = int.Parse(sections[3]),
+                                    };
+
+                    break;
+
+                case "OWNER":
+                    if (CurrentSector == null)
+                    {
+                        AddParseError("Orphaned Sector Owner Definition.");
+                        return;
+                    }
+
+                    for (int i = 1; i < sections.Length; i++)
+                    {
+                        string sectorId = sections[i];
+                        ControllerPosition position =
+                            Result.ControllerPositions.FirstOrDefault(p => p.SectorId == sectorId);
+
+                        if (position == null)
+                        {
+                            AddParseError($"No Position with ID \"{sectorId}\" was defined.");
+                            return;
+                        }
+
+                        CurrentSector.Positions.Add(new ControllerPriority { Position = position, Priority = i });
+                    }
+
+                    break;
+
+                case "BORDER":
+                    if (CurrentSector == null)
+                    {
+                        AddParseError("Orphaned Sector Border Definition.");
+                        return;
+                    }
+
+                    for (int i = 1; i < sections.Length; i++)
+                    {
+                        string sectorLineId = sections[i];
+                        SectorLine line = SectorLines.FirstOrDefault(l => l.LineId == sectorLineId);
+
+                        if (line == null)
+                        {
+                            AddParseError($"No Sector Line with ID \"{sectorLineId}\" was defined.");
+                            return;
+                        }
+
+                        CurrentSector.Border.AddRange(line.Points);
+                    }
+
+                    break;
+
+                case "ACTIVE":
+                    if (CurrentSector == null)
+                    {
+                        AddParseError("Orphaned Sector Active Runway Definition.");
+                        return;
+                    }
+
+                    string icaoCode = sections[1];
+                    string runwayId = sections[2];
+
+                    Airport targetAirport = SectorFileResult.Airports.FirstOrDefault(a => a.Identifier == icaoCode);
+                    if (targetAirport == null)
+                    {
+                        AddParseError($"No Airport with ID \"{icaoCode}\" was defined.");
+                        return;
+                    }
+
+                    Runway targetRunway = targetAirport.Runways.FirstOrDefault(r => r.Identifier == runwayId);
+                    if (targetRunway == null)
+                    {
+                        AddParseError($"No Runway with ID \"{runwayId}\" was defined.");
+                        return;
+                    }
+
+                    CurrentSector.ActiveRunways.Add(targetRunway);
+
+                    break;
+
+                // Ignored sub-sections
+                case "DISPLAY":
+                case "DISPLAY_SECTORLINE":
+                case "ALTOWNER":
+                    break;
+            }
         }
     }
 }

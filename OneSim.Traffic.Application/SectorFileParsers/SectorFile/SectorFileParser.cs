@@ -61,11 +61,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         private static readonly Regex BoundarySegmentRegex = new Regex(@"^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", RegexOptions.Compiled);
 
         /// <summary>
-        ///     The <see cref="CultureInfo"/>.
-        /// </summary>
-        private static readonly CultureInfo Culture = new CultureInfo("en-US");
-
-        /// <summary>
         ///     The current <see cref="Match"/>.
         /// </summary>
         private Match _currentMatch;

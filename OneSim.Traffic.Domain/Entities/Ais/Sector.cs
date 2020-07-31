@@ -19,9 +19,9 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public int Id { get; set; }
 
         /// <summary>
-        ///     Gets or sets the name of the current <see cref="Sector"/>.
+        ///     Gets or sets local sector file identifier for the current <see cref="Sector"/>.
         /// </summary>
-        public string Name { get; set; }
+        public string Identifier { get; set; }
 
         /// <summary>
         ///     Gets the <see cref="List{T}"/> of <see cref="Point2D"/>2 representing the lateral border of the
@@ -48,12 +48,19 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public List<ControllerPriority> Positions { get; }
 
         /// <summary>
+        ///     Gets the <see cref="List{T}"/> of <see cref="Runway"/>s which must be active for the current
+        ///     <see cref="Sector"/> to be displayed.
+        /// </summary>
+        public List<Runway> ActiveRunways { get; }
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="Sector"/> class.
         /// </summary>
         public Sector()
         {
             Border = new List<Point2D>();
             Positions = new List<ControllerPriority>();
+            ActiveRunways = new List<Runway>();
         }
     }
 }

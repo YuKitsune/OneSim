@@ -59,6 +59,7 @@ namespace OneSim.Traffic.Domain.Entities
         /// </returns>
         public bool IsWithin(int distance, Point2D point)
         {
+            // Todo: Defined in two places, move somewhere more common
             const int NauticalMilesPerDegree = 60;
             double degreeDistance =
                 Math.Sqrt(
