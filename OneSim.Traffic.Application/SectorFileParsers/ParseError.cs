@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
+namespace OneSim.Traffic.Application.SectorFileParsers
 {
     using System;
 
