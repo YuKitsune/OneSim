@@ -55,6 +55,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
             TerminalRoutes = new List<TerminalRoute>();
             ControllerPositions = new List<ControllerPosition>();
             Sectors = new List<Sector>();
+            ParseErrors = new List<ParseError>();
         }
     }
 }
