@@ -1,0 +1,116 @@
+body {
+    padding: 0px;
+    margin: 0px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.ParallaxVideo video {
+    min-width: 100%;
+    min-height: 100%;
+    position: fixed;
+    top: 0;
+    z-index: -999;
+    filter: blur(2px) brightness(40%);
+    -webkit-filter: blur(2px) brightness(40%);
+    transform: scale(1.1);
+}
+
+
+/*Splashscreen*/
+.splashscreen {
+    height: 100vh;
+    width: 100%;
+    color: #fff;
+    font-size: 3vw;
+    font-weight: 500;
+    line-height: 100vh;
+    vertical-align: middle;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.splash-call-to-action {
+    z-index: 2;
+    top: 85%;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+}
+
+.splash-call-to-action a {
+    font-size: 150%;
+    border-radius: 25px;
+    padding-left: 2%;
+    padding-right: 2%;
+    padding-bottom: 1vh;
+    padding-top: 0.6vh;
+    font-weight: 2;
+}
+
+/*ITEMS*/
+.main-item {
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/*Header Navbar*/
+
+.header-nav {
+    position: fixed;
+    z-index: 9999;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    height: 100px;
+    width: 100%;
+}
+.header-logo-text {
+    font-weight: lighter;
+    font-size: 200%;
+    line-height: 100px;
+    vertical-align: middle;
+}
+
+/*Footer*/
+.footer {
+    margin-top: 2vh;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    height: 100px;
+}
+
+.footer-logo-text {
+    font-weight: lighter;
+    font-size: 150%;
+    line-height: 100px;
+    vertical-align: middle;
+}
+
+.footer-links {
+    line-height: 100px;
+    vertical-align: middle;
+    text-align: right;
+}
+
+.footer-links a {
+    margin-left: 10px;
+    color: #ffffff;
+    -webkit-transition: 0.2s; /* For Safari 3.0 to 6.0 */
+    transition: 0.2s; /* For modern browsers */
+}
+
+.footer-links a:hover {
+    color: #494f54;
+    text-decoration: none;
+    -webkit-transition: 0.2s; /* For Safari 3.0 to 6.0 */
+    transition: 0.2s; /* For modern browsers */
+}
