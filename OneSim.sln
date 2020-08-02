@@ -61,6 +61,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Common.Infrastructur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OneSim.Common.Domain", "OneSim.Common.Domain\OneSim.Common.Domain.csproj", "{179E2F48-58A6-412F-BB84-0016BD8DC494}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneSim.Web", "OneSim.Web\OneSim.Web.csproj", "{CB0CEE47-D6A4-4935-928F-BE08B1001F75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -435,6 +437,26 @@ Global
 		{179E2F48-58A6-412F-BB84-0016BD8DC494}.Release|x64.Build.0 = Release|Any CPU
 		{179E2F48-58A6-412F-BB84-0016BD8DC494}.Release|x86.ActiveCfg = Release|Any CPU
 		{179E2F48-58A6-412F-BB84-0016BD8DC494}.Release|x86.Build.0 = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|ARM.Build.0 = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|x64.Build.0 = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Debug|x86.Build.0 = Debug|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|ARM.ActiveCfg = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|ARM.Build.0 = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|ARM64.Build.0 = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|x64.ActiveCfg = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|x64.Build.0 = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|x86.ActiveCfg = Release|Any CPU
+		{CB0CEE47-D6A4-4935-928F-BE08B1001F75}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
