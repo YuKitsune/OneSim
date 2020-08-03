@@ -41,9 +41,12 @@ namespace OneSim.Traffic.Application.SectorFileParsers.PositionFile
         ///     Parses the given <see cref="string"/> as a EuroScope Extension files content.
         /// </summary>
         /// <param name="fileContent">
-        ///     The EuroScope Extension file content.
+        ///     The Position file content.
         /// </param>
-        public void Parse(string fileContent)
+        /// <returns>
+        ///     The <see cref="PositionFileParseResult"/>.
+        /// </returns>
+        public PositionFileParseResult Parse(string fileContent)
         {
             string[] lines = fileContent.Split('\r', '\n');
             foreach (string line in lines)
@@ -70,6 +73,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.PositionFile
 
                 ParsePositionLine();
             }
+
+            return Result;
         }
 
         /// <summary>

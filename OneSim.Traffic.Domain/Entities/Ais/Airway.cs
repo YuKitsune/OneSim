@@ -31,7 +31,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public Airway(string identifier, List<Fix> fixes = null)
             : base(fixes)
         {
-            if (string.IsNullOrEmpty(Identifier)) throw new ArgumentNullException(nameof(identifier));
+            if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
             Identifier = identifier;
             Direction = AirwayDirection.OnmiDirectional;
         }

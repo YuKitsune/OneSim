@@ -80,7 +80,10 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
         /// <param name="fileContent">
         ///     The EuroScope Extension file content.
         /// </param>
-        public void Parse(string fileContent)
+        /// <returns>
+        ///     The <see cref="EuroScopeExtensionFileParseResult"/>.
+        /// </returns>
+        public EuroScopeExtensionFileParseResult Parse(string fileContent)
         {
             string[] lines = fileContent.Split('\r', '\n');
             foreach (string line in lines)
@@ -165,6 +168,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
                         break;
                 }
             }
+
+            return Result;
         }
 
         /// <summary>

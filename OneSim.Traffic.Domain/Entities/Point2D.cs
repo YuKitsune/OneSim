@@ -57,7 +57,7 @@ namespace OneSim.Traffic.Domain.Entities
         ///     <c>true</c> if the <paramref name="point"/> is within <paramref name="distance"/> nautical miles of the
         ///     current <see cref="Point2D"/>, <c>false</c> otherwise.
         /// </returns>
-        public bool IsWithin(int distance, Point2D point)
+        public bool IsWithin(double distance, Point2D point)
         {
             // Todo: Defined in two places, move somewhere more common
             const int NauticalMilesPerDegree = 60;
@@ -66,7 +66,28 @@ namespace OneSim.Traffic.Domain.Entities
                     Math.Pow(Latitude - point.Latitude, 2) +
                     Math.Pow(Longitude - point.Longitude, 2));
 
-            return (Math.Floor(degreeDistance) * NauticalMilesPerDegree) <= distance;
+            double nauticalMileDistance = degreeDistance / NauticalMilesPerDegree;
+
+            return nauticalMileDistance <= distance;
         }
+
+        /// <summary>
+        ///     Gets a value indicating whether or not the current and the given <see cref="Point2D"/>s are equal, given
+        ///     a certain amount of tolerance.
+        /// </summary>
+        /// <param name="point">
+        ///     The other <see cref="Point2D"/>.
+        /// </param>
+        /// <param name="delta">
+        ///     The <see cref="double"/> indicating the amount of tolerance. E.g. with a tolerance of 0.01,
+        ///     0.0001 and 0.0002 would be equal.
+        /// </param>
+        /// <returns>
+        ///     <c>true</c> if the current and given <see cref="Point2D"/> are equal with the given tolerance,
+        ///     <c>false</c> otherwise.
+        /// </returns>
+        public bool Equals(Point2D point, double delta) =>
+            !(Math.Abs(Latitude - point.Latitude) < delta) &&
+            !(Math.Abs(Longitude - point.Longitude) < delta);
     }
 }

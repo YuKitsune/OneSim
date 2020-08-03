@@ -142,7 +142,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         /// </returns>
         public static Fix GetFixFromPoint(SectorFileParseResult result, Point2D point)
         {
-            const int MaxDistance = 1;
+            const double MaxDistance = 5;
 
             // Check fixes
             Fix matchingFix = result.Fixes.FirstOrDefault(f => f.Location.IsWithin(MaxDistance, point));

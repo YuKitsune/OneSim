@@ -67,6 +67,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         /// </summary>
         public SectorFileParseResult()
         {
+            SectorSet = new SectorSet();
+
             Airports = new List<Airport>();
             Fixes = new List<Fix>();
             Navaids = new List<Navaid>();
