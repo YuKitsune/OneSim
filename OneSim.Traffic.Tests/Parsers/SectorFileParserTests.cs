@@ -6,6 +6,7 @@
 
 namespace OneSim.Traffic.Tests.Parsers
 {
+    using System;
     using System.Linq;
     using System.Text.RegularExpressions;
 
@@ -89,7 +90,11 @@ H91(23)                   SANEG          SANEG          BN             BN       
             Assert.AreEqual(6, result.Fixes.Count);
             Fix sanadFix = result.Fixes.FirstOrDefault(f => f.Identifier == "SANAD");
             Assert.IsNotNull(sanadFix);
-            Assert.IsTrue(sanadFix.Location.Equals(new Point2D(31.38639, 151.4124), 0.00001));
+            Assert.AreEqual(
+                new Coordinate(
+                    new CoordinateComponent(CardinalDirection.South, 031, 23, 11),
+                    new CoordinateComponent(CardinalDirection.East, 151, 24, 44.6)),
+                sanadFix.Location);
         }
 
         /// <summary>
@@ -98,6 +103,22 @@ H91(23)                   SANEG          SANEG          BN             BN       
         [Test]
         public void CanParseNavaid()
         {
+            // Arrange
+            SectorFileParser parser = new SectorFileParser();
+
+            // Act
+            SectorFileParseResult result = parser.Parse(TestSectorFile);
+
+            // Assert
+            Assert.AreEqual(2, result.Navaids.Count);
+            Navaid brisbaneNavaid = result.Navaids.FirstOrDefault(n => n.Identifier == "BN");
+            Assert.IsNotNull(brisbaneNavaid);
+            Assert.AreEqual(
+                new Coordinate(
+                    new CoordinateComponent(CardinalDirection.South, 027, 21, 57.900),
+                    new CoordinateComponent(CardinalDirection.East, 153, 08, 21.200)),
+                brisbaneNavaid.Location);
+            Assert.AreEqual(113200, brisbaneNavaid.Frequency);
         }
 
         /// <summary>
@@ -106,6 +127,22 @@ H91(23)                   SANEG          SANEG          BN             BN       
         [Test]
         public void CanParseAirport()
         {
+            // Arrange
+            SectorFileParser parser = new SectorFileParser();
+
+            // Act
+            SectorFileParseResult result = parser.Parse(TestSectorFile);
+
+            // Assert
+            Assert.AreEqual(2, result.Navaids.Count);
+            Airport brisbaneAirport = result.Airports.FirstOrDefault(n => n.Identifier == "YBBN");
+            Assert.IsNotNull(brisbaneAirport);
+            Assert.AreEqual(
+                new Coordinate(
+                    new CoordinateComponent(CardinalDirection.South, 027, 23, 03.000),
+                    new CoordinateComponent(CardinalDirection.East, 153, 07, 03.000)),
+                brisbaneAirport.Location);
+            Assert.AreEqual(brisbaneAirport.Class, AirspaceClass.C);
         }
 
         /// <summary>
@@ -114,6 +151,28 @@ H91(23)                   SANEG          SANEG          BN             BN       
         [Test]
         public void CanParseRunway()
         {
+            // Arrange
+            SectorFileParser parser = new SectorFileParser();
+
+            // Act
+            SectorFileParseResult result = parser.Parse(TestSectorFile);
+
+            // Assert
+            // Check the airport
+            Assert.AreEqual(2, result.Navaids.Count);
+            Airport brisbaneAirport = result.Airports.FirstOrDefault(n => n.Identifier == "YBBN");
+            Assert.IsNotNull(brisbaneAirport);
+
+            // Check the runway
+            Assert.AreEqual(4, brisbaneAirport.Runways.Count);
+            Runway runway19L = brisbaneAirport.Runways.FirstOrDefault(r => r.Identifier == "19L");
+            Assert.IsNotNull(runway19L);
+            Assert.AreEqual(
+                new Coordinate(
+                    new CoordinateComponent(CardinalDirection.South, 027, 22, 28.820),
+                    new CoordinateComponent(CardinalDirection.East, 153, 08, 03.500)),
+                runway19L.ThresholdLocation);
+            Assert.AreEqual(196, runway19L.Heading);
         }
 
         /// <summary>
@@ -122,6 +181,17 @@ H91(23)                   SANEG          SANEG          BN             BN       
         [Test]
         public void RunwaysAssignToCorrectAirport()
         {
+            // Arrange
+            SectorFileParser parser = new SectorFileParser();
+
+            // Act
+            SectorFileParseResult result = parser.Parse(TestSectorFile);
+
+            // Assert
+            // Check the airport
+            Assert.AreEqual(2, result.Airports.Count);
+            Assert.AreEqual(4, result.Airports.First(a => a.Identifier == "YBBN").Runways.Count);
+            Assert.AreEqual(8, result.Airports.First(a => a.Identifier == "YBAF").Runways.Count);
         }
 
         /// <summary>
@@ -130,6 +200,19 @@ H91(23)                   SANEG          SANEG          BN             BN       
         [Test]
         public void CanParseAirways()
         {
+            // Arrange
+            SectorFileParser parser = new SectorFileParser();
+
+            // Act
+            SectorFileParseResult result = parser.Parse(TestSectorFile);
+
+            // Assert
+            Airway airway = result.HighAirways.FirstOrDefault(a => a.Identifier == "H91");
+            Assert.IsNotNull(airway);
+            Assert.IsTrue(
+                airway.Fixes.Select(f => f.Identifier)
+                      .ToArray()
+                      .SequenceEqual(new[] { "SANAD", "ADMAR", "TESSI", "APAGI", "HUUGO", "SANEG", "BN" }));
         }
     }
 }

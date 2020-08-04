@@ -18,5 +18,24 @@ namespace OneSim.Traffic.Domain.Entities
         ///     located at <see cref="Point4D"/>.
         /// </summary>
         public DateTime DateTime { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Point4D"/> class.
+        /// </summary>
+        /// <param name="latitude">
+        ///     The latitude.
+        /// </param>
+        /// <param name="longitude">
+        ///     The longitude.
+        /// </param>
+        /// <param name="altitude">
+        ///     The altitude.
+        /// </param>
+        /// <param name="dateTime">
+        ///     The <see cref="DateTime"/> at which the owner of the <see cref="Point4D"/> was located at the
+        ///     <see cref="Point4D"/>.
+        /// </param>
+        public Point4D(double latitude, double longitude, int altitude, DateTime dateTime)
+            : base(latitude, longitude, altitude) => DateTime = dateTime;
     }
 }

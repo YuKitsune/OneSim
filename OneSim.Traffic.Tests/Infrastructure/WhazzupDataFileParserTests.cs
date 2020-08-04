@@ -119,9 +119,11 @@ CONNECTED CLIENTS = 317
                                       Callsign = "QFA238",
                                       NetworkId = "1283544",
                                       Name = "Cristian Torz YMML",
-                                      Latitude = 1.36475,
-                                      Longitude = 103.98409,
-                                      Altitude = 14,
+                                      Location =
+                                          new Point3D(
+                                              1.36475,
+                                              103.98409,
+                                              14),
                                       GroundSpeed = 164,
                                       Heading = 22,
                                       FlightPlan = new FlightPlan
@@ -165,9 +167,9 @@ CONNECTED CLIENTS = 317
             Assert.AreEqual(expectedPilot.LogonTime, pilot.LogonTime);
 
             double tolerance = 0.00001;
-            Assert.IsTrue(expectedPilot.Latitude.WithinTolerance(pilot.Latitude, tolerance));
-            Assert.IsTrue(expectedPilot.Longitude.WithinTolerance(pilot.Longitude, tolerance));
-            Assert.AreEqual(expectedPilot.Altitude, pilot.Altitude);
+            Assert.IsTrue(expectedPilot.Location.Latitude.WithinTolerance(pilot.Location.Latitude, tolerance));
+            Assert.IsTrue(expectedPilot.Location.Longitude.WithinTolerance(pilot.Location.Longitude, tolerance));
+            Assert.AreEqual(expectedPilot.Location.Altitude, pilot.Location.Altitude);
             Assert.AreEqual(expectedPilot.GroundSpeed, pilot.GroundSpeed);
             Assert.AreEqual(expectedPilot.Heading, pilot.Heading);
             Assert.IsTrue(expectedPilot.Squawk == pilot.Squawk);
@@ -202,9 +204,11 @@ CONNECTED CLIENTS = 317
                                       Callsign = "SWA6264",
                                       NetworkId = "1384148",
                                       Name = "Zac Stephenson KOKC",
-                                      Latitude = 42.36476,
-                                      Longitude = -71.01649,
-                                      Altitude = 15,
+                                      Location =
+                                          new Point3D(
+                                              42.36476,
+                                              -71.01649,
+                                              15),
                                       GroundSpeed = 0,
                                       Heading = 119,
                                       Server = "USA-WEST",
@@ -225,9 +229,9 @@ CONNECTED CLIENTS = 317
 
             // Pilot specific assertions
             double tolerance = 0.00001;
-            Assert.IsTrue(expectedPilot.Latitude.WithinTolerance(pilot.Latitude, tolerance));
-            Assert.IsTrue(expectedPilot.Longitude.WithinTolerance(pilot.Longitude, tolerance));
-            Assert.AreEqual(expectedPilot.Altitude, pilot.Altitude);
+            Assert.IsTrue(expectedPilot.Location.Latitude.WithinTolerance(pilot.Location.Latitude, tolerance));
+            Assert.IsTrue(expectedPilot.Location.Longitude.WithinTolerance(pilot.Location.Longitude, tolerance));
+            Assert.AreEqual(expectedPilot.Location.Altitude, pilot.Location.Altitude);
             Assert.AreEqual(expectedPilot.GroundSpeed, pilot.GroundSpeed);
             Assert.AreEqual(expectedPilot.Heading, pilot.Heading);
             Assert.IsTrue(expectedPilot.Squawk == pilot.Squawk);

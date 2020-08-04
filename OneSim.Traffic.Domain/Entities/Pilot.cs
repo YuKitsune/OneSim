@@ -16,19 +16,9 @@ namespace OneSim.Traffic.Domain.Entities
     public class Pilot : BaseClient
     {
         /// <summary>
-        ///     Gets or sets the Latitude.
+        ///     Gets or sets the <see cref="Pilot"/>s current location.
         /// </summary>
-        public double Latitude { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the Longitude.
-        /// </summary>
-        public double Longitude { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the altitude in feet (ft).
-        /// </summary>
-        public int Altitude { get; set; }
+        public Point3D Location { get; set; }
 
         /// <summary>
         ///     Gets or sets the ground speed in knots (kts).

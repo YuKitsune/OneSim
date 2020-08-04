@@ -198,9 +198,10 @@ namespace OneSim.Traffic.Infrastructure
                               Server = pilotLineSections[14],
                               AdministrativeRating = AdministrativeRating.User,
                               LogonTime = ParseStatusDateTime(pilotLineSections[37]),
-                              Latitude = double.Parse(pilotLineSections[5]),
-                              Longitude = double.Parse(pilotLineSections[6]),
-                              Altitude = int.Parse(pilotLineSections[7]),
+                              Location = new Point3D(
+                                  double.Parse(pilotLineSections[5]),
+                                  double.Parse(pilotLineSections[6]),
+                                  int.Parse(pilotLineSections[7])),
                               GroundSpeed = int.Parse(pilotLineSections[8]),
                               Heading = int.Parse(pilotLineSections[38]),
                               Squawk = pilotLineSections[17]

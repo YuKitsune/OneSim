@@ -37,9 +37,11 @@ namespace OneSim.Traffic.Tests.Services
                                                  Callsign = "STG101",
                                                  NetworkId = "1234567",
                                                  Name = "Stingy Joe",
-                                                 Latitude = 0,
-                                                 Longitude = 0,
-                                                 Altitude = 37000,
+                                                 Location =
+                                                     new Point3D(
+                                                         0,
+                                                         0,
+                                                         37000),
                                                  GroundSpeed = 200,
                                                  Heading = 0,
                                                  Squawk = new SquawkCode("1234"),
@@ -75,9 +77,11 @@ namespace OneSim.Traffic.Tests.Services
                                                     Callsign = "STG102",
                                                     NetworkId = "1234568",
                                                     Name = "Stingy Sally",
-                                                    Latitude = 1,
-                                                    Longitude = 1,
-                                                    Altitude = 36000,
+                                                    Location =
+                                                        new Point3D(
+                                                            1,
+                                                            1,
+                                                            36000),
                                                     GroundSpeed = 200,
                                                     Heading = 0,
                                                     Squawk = new SquawkCode("1235")
@@ -199,9 +203,9 @@ namespace OneSim.Traffic.Tests.Services
             Assert.IsNotNull(pilotWithPlan.FlightPlan);
             Point3D pilotWithPlanPoint = pilotWithPlan.History.First();
             Assert.IsNotNull(pilotWithPlanPoint);
-            Assert.AreEqual(pilotWithPlanPoint.Latitude, pilotWithPlan.Latitude);
-            Assert.AreEqual(pilotWithPlanPoint.Longitude, pilotWithPlan.Longitude);
-            Assert.AreEqual(pilotWithPlanPoint.Altitude, pilotWithPlan.Altitude);
+            Assert.AreEqual(pilotWithPlanPoint.Latitude, pilotWithPlan.Location.Latitude);
+            Assert.AreEqual(pilotWithPlanPoint.Longitude, pilotWithPlan.Location.Longitude);
+            Assert.AreEqual(pilotWithPlanPoint.Altitude, pilotWithPlan.Location.Altitude);
 
             // Check the pilot without a plan
             Pilot pilotWithoutPlan = await trafficDbContext.Pilots
@@ -214,23 +218,23 @@ namespace OneSim.Traffic.Tests.Services
             Assert.IsNull(pilotWithoutPlan.FlightPlan);
             Point3D pilotWithoutPlanPoint = pilotWithoutPlan.History.First();
             Assert.IsNotNull(pilotWithoutPlanPoint);
-            Assert.AreEqual(pilotWithoutPlanPoint.Latitude, pilotWithoutPlan.Latitude);
-            Assert.AreEqual(pilotWithoutPlanPoint.Longitude, pilotWithoutPlan.Longitude);
-            Assert.AreEqual(pilotWithoutPlanPoint.Altitude, pilotWithoutPlan.Altitude);
+            Assert.AreEqual(pilotWithoutPlanPoint.Latitude, pilotWithoutPlan.Location.Latitude);
+            Assert.AreEqual(pilotWithoutPlanPoint.Longitude, pilotWithoutPlan.Location.Longitude);
+            Assert.AreEqual(pilotWithoutPlanPoint.Altitude, pilotWithoutPlan.Location.Altitude);
 
             // Update pilot positions
             provider.Pilots.Clear();
 
             Pilot updatedPilotWithPlan = PilotWithFlightPlan;
-            updatedPilotWithPlan.Latitude = 1;
-            updatedPilotWithPlan.Longitude = 1;
-            updatedPilotWithPlan.Altitude = 35000;
+            updatedPilotWithPlan.Location.Latitude = 1;
+            updatedPilotWithPlan.Location.Longitude = 1;
+            updatedPilotWithPlan.Location.Altitude = 35000;
             provider.Pilots.Add(updatedPilotWithPlan);
 
             Pilot updatedPilotWithoutPlan = PilotWithoutFlightPlan;
-            updatedPilotWithoutPlan.Latitude = 1;
-            updatedPilotWithoutPlan.Longitude = 1;
-            updatedPilotWithoutPlan.Altitude = 34000;
+            updatedPilotWithoutPlan.Location.Latitude = 1;
+            updatedPilotWithoutPlan.Location.Longitude = 1;
+            updatedPilotWithoutPlan.Location.Altitude = 34000;
             provider.Pilots.Add(updatedPilotWithoutPlan);
 
             // Act
@@ -264,9 +268,9 @@ namespace OneSim.Traffic.Tests.Services
             Assert.IsNotNull(pilotWithPlan.FlightPlan);
             pilotWithPlanPoint = pilotWithPlan.History.OrderBy(h => h.DateTime).ToList()[1];
             Assert.IsNotNull(pilotWithPlanPoint);
-            Assert.AreEqual(pilotWithPlanPoint.Latitude, pilotWithPlan.Latitude);
-            Assert.AreEqual(pilotWithPlanPoint.Longitude, pilotWithPlan.Longitude);
-            Assert.AreEqual(pilotWithPlanPoint.Altitude, pilotWithPlan.Altitude);
+            Assert.AreEqual(pilotWithPlanPoint.Latitude, pilotWithPlan.Location.Latitude);
+            Assert.AreEqual(pilotWithPlanPoint.Longitude, pilotWithPlan.Location.Longitude);
+            Assert.AreEqual(pilotWithPlanPoint.Altitude, pilotWithPlan.Location.Altitude);
 
             // Check the pilot without a plan
             pilotWithoutPlan = await trafficDbContext.Pilots
@@ -279,9 +283,9 @@ namespace OneSim.Traffic.Tests.Services
             Assert.IsNull(pilotWithoutPlan.FlightPlan);
             pilotWithoutPlanPoint = pilotWithoutPlan.History.OrderBy(h => h.DateTime).ToList()[1];
             Assert.IsNotNull(pilotWithoutPlanPoint);
-            Assert.AreEqual(pilotWithoutPlanPoint.Latitude, pilotWithoutPlan.Latitude);
-            Assert.AreEqual(pilotWithoutPlanPoint.Longitude, pilotWithoutPlan.Longitude);
-            Assert.AreEqual(pilotWithoutPlanPoint.Altitude, pilotWithoutPlan.Altitude);
+            Assert.AreEqual(pilotWithoutPlanPoint.Latitude, pilotWithoutPlan.Location.Latitude);
+            Assert.AreEqual(pilotWithoutPlanPoint.Longitude, pilotWithoutPlan.Location.Longitude);
+            Assert.AreEqual(pilotWithoutPlanPoint.Altitude, pilotWithoutPlan.Location.Altitude);
         }
 
         /// <summary>

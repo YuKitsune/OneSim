@@ -213,13 +213,11 @@ namespace OneSim.Traffic.Application
 
                 // Add to the history
                 pilot.History.Add(
-                    new Point4D
-                    {
-                        Latitude = pilot.Latitude,
-                        Longitude = pilot.Longitude,
-                        Altitude = pilot.Altitude,
-                        DateTime = DateTime.UtcNow
-                    });
+                    new Point4D(
+                        pilot.Location.Latitude,
+                        pilot.Location.Longitude,
+                        pilot.Location.Altitude,
+                        DateTime.UtcNow));
 
                 // Add the pilot to the database
                 _trafficDbContext.Pilots.Add(pilot);
