@@ -454,6 +454,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                         currentDistance < distance)
                     {
                         closestAirport = airport;
+                        distance = currentDistance;
                     }
                 }
 
