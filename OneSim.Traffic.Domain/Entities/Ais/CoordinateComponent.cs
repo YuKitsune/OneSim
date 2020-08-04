@@ -261,10 +261,11 @@ namespace OneSim.Traffic.Domain.Entities.Ais
 
             double result = Degrees;
             result += Minutes / 60.0;
-            result += Math.Round(Seconds, 7) / 3600.0;
+            result += Math.Round(Seconds, SecondsRoundingDigits) / 3600.0;
 
             // Return the result, negated if necessary.
-            return Math.Round(negative ? (result * -1.0) : result, DecimalRoundingDigits);
+            double value = Math.Round(negative ? (result * -1.0) : result, DecimalRoundingDigits);
+            return value;
         }
     }
 }
