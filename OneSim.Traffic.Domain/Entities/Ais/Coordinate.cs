@@ -34,8 +34,16 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         /// </param>
         public Coordinate(CoordinateComponent latitude, CoordinateComponent longitude)
         {
-            Latitude = latitude ?? throw new ArgumentNullException(nameof(latitude));
-            Longitude = longitude ?? throw new ArgumentNullException(nameof(longitude));
+            // Check for null
+            if (latitude == null) throw new ArgumentNullException(nameof(latitude));
+            if (longitude == null) throw new ArgumentNullException(nameof(longitude));
+
+            // Check the axis is correct
+            if (latitude.CardinalAxis != CardinalAxis.Latitude) throw new ArgumentException($"The {nameof(latitude)} must be on the North/South plane.", nameof(latitude));
+            if (longitude.CardinalAxis != CardinalAxis.Longitude) throw new ArgumentException($"The {nameof(longitude)} does be on the East/West plane.", nameof(longitude));
+
+            Latitude = latitude;
+            Longitude = longitude;
         }
 
         /// <summary>
