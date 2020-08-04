@@ -29,6 +29,13 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public CardinalDirection CardinalDirection { get; }
 
         /// <summary>
+        ///     Gets the <see cref="CardinalAxis"/> which the current <see cref="CoordinateComponent"/> represents.
+        /// </summary>
+        public CardinalAxis CardinalAxis => CardinalDirection == CardinalDirection.North || CardinalDirection == CardinalDirection.South ?
+                                                CardinalAxis.Latitude :
+                                                CardinalAxis.Longitude;
+
+        /// <summary>
         ///     Gets the degrees.
         /// </summary>
         public uint Degrees { get; }
@@ -84,8 +91,8 @@ namespace OneSim.Traffic.Domain.Entities.Ais
             // Figure out the direction
             CardinalDirection = cardinalAxis switch
             {
-                CardinalAxis.Latitude => decimalValue >= 0 ? CardinalDirection.East : CardinalDirection.West,
-                CardinalAxis.Longitude => decimalValue >= 0 ? CardinalDirection.North : CardinalDirection.South,
+                CardinalAxis.Latitude => decimalValue >= 0 ? CardinalDirection.North : CardinalDirection.South,
+                CardinalAxis.Longitude => decimalValue >= 0 ? CardinalDirection.East : CardinalDirection.West,
                 _ => throw new NotSupportedException($"The axis {cardinalAxis} is not supported.")
             };
 
