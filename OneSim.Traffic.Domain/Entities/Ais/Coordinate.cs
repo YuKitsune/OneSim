@@ -75,5 +75,34 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     The <see cref="Point2D"/> instance.
         /// </returns>
         public Point2D GetPoint() => new Point2D(Longitude.GetDecimal(), Latitude.GetDecimal());
+
+        /// <summary>
+        ///     Determines whether or not the <paramref name="obj"/> is equal to the current <see cref="Coordinate"/>
+        ///     instance.
+        /// </summary>
+        /// <param name="obj">
+        ///     The <see cref="object"/> to compare.
+        /// </param>
+        /// <returns>
+        ///     <c>true</c> if the <paramref name="obj"/> has the same value as the current <see cref="Coordinate"/>
+        ///     instance, <c>false</c> otherwise.
+        /// </returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj != null &&
+                obj is Coordinate coordinate)
+                return Latitude.Equals(coordinate.Latitude) && Longitude.Equals(coordinate.Longitude);
+
+            // If we made it to here, then we don't have a match
+            return false;
+        }
+
+        /// <summary>
+        ///     Gets the <see cref="string"/> representation of the current <see cref="Coordinate"/>.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="string"/>.
+        /// </returns>
+        public override string ToString() => $"{Latitude} {Longitude}";
     }
 }

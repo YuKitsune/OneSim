@@ -129,9 +129,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
                 out uint degrees,
                 out uint minutes,
                 out double seconds))
-            {
                 return new CoordinateComponent(direction, degrees, minutes, seconds);
-            }
 
             // If we fall through to this line, then there was a problem with the value.
             throw new Exception($"Invalid formatting in lat/lon value: {dmsString}");
@@ -266,6 +264,52 @@ namespace OneSim.Traffic.Domain.Entities.Ais
             // Return the result, negated if necessary.
             double value = Math.Round(negative ? (result * -1.0) : result, DecimalRoundingDigits);
             return value;
+        }
+
+        /// <summary>
+        ///     Determines whether or not the <paramref name="obj"/> is equal to the current
+        ///     <see cref="CoordinateComponent"/> instance.
+        /// </summary>
+        /// <param name="obj">
+        ///     The <see cref="object"/> to compare.
+        /// </param>
+        /// <returns>
+        ///     <c>true</c> if the <paramref name="obj"/> has the same value as the current
+        ///     <see cref="CoordinateComponent"/> instance, <c>false</c> otherwise.
+        /// </returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj != null &&
+                obj is CoordinateComponent coordinateComponent)
+            {
+                return CardinalDirection == coordinateComponent.CardinalDirection &&
+                       Degrees == coordinateComponent.Degrees &&
+                       Minutes == coordinateComponent.Minutes &&
+                       Math.Abs(Seconds - coordinateComponent.Seconds) < 0.0001;
+            }
+
+            // If we made it to here, then we don't have a match
+            return false;
+        }
+
+        /// <summary>
+        ///     Gets the <see cref="string"/> representation of the current <see cref="CoordinateComponent"/>.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="string"/>.
+        /// </returns>
+        public override string ToString()
+        {
+            char direction = CardinalDirection switch
+            {
+                CardinalDirection.North => 'N',
+                CardinalDirection.East => 'E',
+                CardinalDirection.South => 'S',
+                CardinalDirection.West => 'W',
+                _ => throw new NotSupportedException($"The direction {CardinalDirection} is not supported.")
+            };
+
+            return $"{direction}{Degrees:000}.{Minutes:00}.{Seconds:#0.000}";
         }
     }
 }
