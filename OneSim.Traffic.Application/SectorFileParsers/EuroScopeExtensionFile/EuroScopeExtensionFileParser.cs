@@ -272,14 +272,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
 
                 case "CIRCLE_SECTORLINE":
 
-                    Point2D centerPoint;
+                    Coordinate centerPoint;
                     int radius;
                     if (sections.Length == 5)
                     {
-                        centerPoint =
-                            new Point2D(
-                                FileParserUtils.DmsToDecimal(sections[3]),
-                                FileParserUtils.DmsToDecimal(sections[2]));
+                        centerPoint = new Coordinate(sections[2], sections[3]);
                         radius = int.Parse(sections[4]);
                     }
                     else if (sections.Length == 4)
@@ -294,14 +291,14 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
                     }
 
                     const int ArcResolution = 1;
-                    List<Point2D> points = new List<Point2D>();
+                    List<Coordinate> points = new List<Coordinate>();
                     for (int i = 0; i < 360; i += ArcResolution)
                     {
                         // Todo: Defined in two places, move somewhere more common
                         const int NauticalMilesPerDegree = 60;
-                        double latitude = centerPoint.Latitude + ((radius * NauticalMilesPerDegree) * Math.Cos(i));
-                        double longitude = centerPoint.Longitude + ((radius * NauticalMilesPerDegree) * Math.Sin(i));
-                        points.Add(new Point2D(longitude, latitude));
+                        double latitude = centerPoint.GetPoint().Latitude + ((radius * NauticalMilesPerDegree) * Math.Cos(i));
+                        double longitude = centerPoint.GetPoint().Longitude + ((radius * NauticalMilesPerDegree) * Math.Sin(i));
+                        points.Add(new Coordinate(latitude, longitude));
                     }
 
                     SectorLine circleLine = new SectorLine(sections[0]);
@@ -311,9 +308,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
                     break;
 
                 case "COORD":
-                    Point2D point = new Point2D(
-                        FileParserUtils.DmsToDecimal(sections[2]),
-                        FileParserUtils.DmsToDecimal(sections[1]));
+                    Coordinate point = new Coordinate(sections[1], sections[2]);
                     SectorLines.First(l => l.LineId == CurrentSectorLineName).Points.Add(point);
                     break;
 

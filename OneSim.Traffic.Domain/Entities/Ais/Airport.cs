@@ -41,9 +41,9 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     The ICAO identifier.
         /// </param>
         /// <param name="location">
-        ///     The <see cref="Point2D"/> representing the location.
+        ///     The <see cref="Coordinate"/> representing the location.
         /// </param>
-        public Airport(string identifier, Point2D location)
+        public Airport(string identifier, Coordinate location)
             : base(identifier, location)
         {
             ControllerPositions = new List<ControllerPosition>();

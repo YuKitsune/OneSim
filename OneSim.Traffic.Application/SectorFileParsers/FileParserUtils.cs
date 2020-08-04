@@ -62,102 +62,33 @@ namespace OneSim.Traffic.Application.SectorFileParsers
         public static bool IsWhitespace(char c) => c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\f';
 
         /// <summary>
-        ///     Converts a DMS coordinate to a <see cref="double"/>.
-        /// </summary>
-        /// <param name="s">
-        ///     The DMS coordinate in the form of a <see cref="string"/>.
-        /// </param>
-        /// <returns>
-        ///     The coordinate in the form of a <see cref="double"/>.
-        /// </returns>
-        public static double DmsToDecimal(string s)
-        {
-            // Make sure we got a value.
-            if (!string.IsNullOrEmpty(s))
-            {
-                // Find out which side of the axis we're on, then strip out the N, S, E or W.
-                bool neg = s.IndexOfAny(new[] { 'S', 's', 'W', 'w' }) > -1;
-                s = s.Substring(1);
-
-                // Get the whole degrees portion.
-                char[] sep = { '.', ',' };
-                int pt1 = s.IndexOfAny(sep);
-                if (pt1 > -1)
-                {
-                    string deg = s.Substring(0, pt1);
-
-                    // Get the minutes portion.
-                    int pt2 = s.IndexOfAny(sep, pt1 + 1);
-                    if (pt2 > -1)
-                    {
-                        string min = s.Substring(pt1 + 1, (pt2 - pt1) - 1);
-
-                        // Get the whole seconds portion.
-                        int pt3 = s.IndexOfAny(sep, pt2 + 1);
-                        if (pt3 > -1)
-                        {
-                            string secWhole = s.Substring(pt2 + 1, (pt3 - pt2) - 1);
-
-                            // Get the partial seconds portion.
-                            if (pt3 < s.Length - 1)
-                            {
-                                string secDec = s.Substring(pt3 + 1);
-
-                                // Reassemble the seconds value.
-                                string sec = secWhole + "." + secDec;
-
-                                // Parse into numeric values.
-                                int.TryParse(deg, out int degrees);
-                                int.TryParse(min, out int minutes);
-                                double.TryParse(sec, out double seconds);
-
-                                // Do the math.
-                                double result = degrees;
-                                result += minutes / 60.0;
-                                result += seconds / 3600.0;
-
-                                // Return the result, negated if necessary.
-                                return Math.Round(neg ? (result * -1.0) : result, 7);
-                            }
-                        }
-                    }
-                }
-            }
-
-            // If we fall through to this line, then there was a problem with the value.
-            throw new Exception($"Invalid formatting in lat/lon value: {s}");
-        }
-
-        /// <summary>
-        ///     Gets a <see cref="Fix"/> given a <see cref="Point2D"/>.
+        ///     Gets a <see cref="Fix"/> given a <see cref="Coordinate"/>.
         /// </summary>
         /// <param name="result">
         ///     The <see cref="SectorFileParseResult"/> to get the fixes from.
         /// </param>
-        /// <param name="point">
-        ///     The <see cref="Point2D"/>.
+        /// <param name="coordinate">
+        ///     The <see cref="Coordinate"/>.
         /// </param>
         /// <returns>
-        ///     The <see cref="Fix"/> at the <paramref name="point"/>.
+        ///     The <see cref="Fix"/> at the <paramref name="coordinate"/>.
         /// </returns>
-        public static Fix GetFixFromPoint(SectorFileParseResult result, Point2D point)
+        public static Fix GetFixFromCoordinate(SectorFileParseResult result, Coordinate coordinate)
         {
-            const double MaxDistance = 5;
-
             // Check fixes
-            Fix matchingFix = result.Fixes.FirstOrDefault(f => f.Location.IsWithin(MaxDistance, point));
+            Fix matchingFix = result.Fixes.FirstOrDefault(f => f.Location.Equals(coordinate));
             if (matchingFix != null) return matchingFix;
 
             // Check navaids
-            Navaid matchingNavaid = result.Navaids.FirstOrDefault(n => n.Location.IsWithin(MaxDistance, point));
+            Navaid matchingNavaid = result.Navaids.FirstOrDefault(n => n.Location.Equals(coordinate));
             if (matchingNavaid != null) return matchingNavaid;
 
             // Check airports
-            Fix matchingAirport = result.Airports.FirstOrDefault(a => a.Location.IsWithin(MaxDistance, point));
+            Fix matchingAirport = result.Airports.FirstOrDefault(a => a.Location.Equals(coordinate));
             if (matchingAirport != null) return matchingAirport;
 
             // Made it this far and haven't found anything, we're fucked
-            throw new Exception($"Unable to find any fixes within {MaxDistance}nm of {point}.");
+            throw new Exception($"Unable to find any fixes at {coordinate}.");
         }
 
         /// <summary>

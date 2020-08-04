@@ -9,6 +9,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
     using System.Collections.Generic;
 
     using OneSim.Traffic.Domain.Entities;
+    using OneSim.Traffic.Domain.Entities.Ais;
 
     /// <summary>
     ///     The Sector Line.
@@ -21,10 +22,10 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
         public string LineId { get; }
 
         /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="Point2D"/>s representing the current
+        ///     Gets the <see cref="List{T}"/> of <see cref="Coordinate"/>s representing the current
         ///     <see cref="SectorLine"/>.
         /// </summary>
-        public List<Point2D> Points { get; }
+        public List<Coordinate> Points { get; }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="SectorLine"/> class.
@@ -35,7 +36,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
         public SectorLine(string lineId)
         {
             LineId = lineId;
-            Points = new List<Point2D>();
+            Points = new List<Coordinate>();
         }
     }
 }

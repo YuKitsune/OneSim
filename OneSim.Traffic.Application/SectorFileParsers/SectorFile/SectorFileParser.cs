@@ -10,7 +10,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using System.Threading;
 
     using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Ais;
@@ -72,7 +71,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         /// <summary>
         ///     The <see cref="Regex"/> for <see cref="Fix"/>es.
         /// </summary>
-        private static readonly Regex FixIdentifierRegex = new Regex(@"[A-Z]{3,5}");
+        private static readonly Regex FixIdentifierRegex = new Regex(@"[A-Z]{2,5}");
 
         /// <summary>
         ///     The current <see cref="Match"/>.
@@ -101,28 +100,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         ///     The error message.
         /// </param>
         private void AddParseError(string message) => Result.ParseErrors.Add(new ParseError(_lineNumber, _currentLine, message));
-
-        /// <summary>
-        ///     Converts a DMS coordinate to a <see cref="double"/>.
-        /// </summary>
-        /// <param name="s">
-        ///     The DMS coordinate in the form of a <see cref="string"/>.
-        /// </param>
-        /// <returns>
-        ///     The coordinate in the form of a <see cref="double"/>.
-        /// </returns>
-        public double DmsToDecimal(string s)
-        {
-            try
-            {
-                return FileParserUtils.DmsToDecimal(s);
-            }
-            catch (Exception ex)
-            {
-                AddParseError(ex.Message);
-                return 0.0;
-            }
-        }
 
         /// <summary>
         ///     Parses the given sector file content.
@@ -363,9 +340,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 string identifier = _currentMatch.Groups[1].Value.ToUpper();
                 Navaid navaid = new Navaid(
                     identifier,
-                    new Point2D(
-                        DmsToDecimal(_currentMatch.Groups[4].Value),
-                        DmsToDecimal(_currentMatch.Groups[3].Value)),
+                    new Coordinate(
+                        _currentMatch.Groups[3].Value,
+                        _currentMatch.Groups[4].Value),
                     FileParserUtils.ParseFrequency(_currentMatch.Groups[2].Value),
                     type);
 
@@ -389,9 +366,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 string identifier = _currentMatch.Groups[1].Value.ToUpper();
                 Airport airport = new Airport(
                     identifier,
-                    new Point2D(
-                        DmsToDecimal(_currentMatch.Groups[4].Value),
-                        DmsToDecimal(_currentMatch.Groups[3].Value)));
+                    new Coordinate(
+                        _currentMatch.Groups[3].Value,
+                        _currentMatch.Groups[4].Value));
 
                 // Todo: CTAF: ParseFrequency(mMatch.Groups[2].Value),
 
@@ -418,9 +395,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 string identifier = _currentMatch.Groups[1].Value.ToUpper();
                 Fix fix = new Fix(
                     identifier,
-                    new Point2D(
-                        DmsToDecimal(_currentMatch.Groups[2].Value),
-                        DmsToDecimal(_currentMatch.Groups[3].Value)));
+                    new Coordinate(
+                        _currentMatch.Groups[2].Value,
+                        _currentMatch.Groups[3].Value));
 
                 Result.Fixes.Add(fix);
             }
@@ -442,24 +419,24 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 int.TryParse(_currentMatch.Groups[3].Value, out int firstHeading);
                 Runway firstRunway = new Runway(
                     _currentMatch.Groups[1].Value.ToUpper(),
-                    new Point2D(
-                        DmsToDecimal(_currentMatch.Groups[6].Value),
-                        DmsToDecimal(_currentMatch.Groups[5].Value)),
+                    new Coordinate(
+                        _currentMatch.Groups[5].Value,
+                        _currentMatch.Groups[6].Value),
                     firstHeading);
 
                 // Create the second runway
                 int.TryParse(_currentMatch.Groups[4].Value, out int secondHeading);
                 Runway secondRunway = new Runway(
                     _currentMatch.Groups[2].Value.ToUpper(),
-                    new Point2D(
-                        DmsToDecimal(_currentMatch.Groups[8].Value),
-                        DmsToDecimal(_currentMatch.Groups[7].Value)),
+                    new Coordinate(
+                        _currentMatch.Groups[7].Value,
+                        _currentMatch.Groups[8].Value),
                     secondHeading);
 
                 // Find the midpoint between the thresholds
                 Point2D runwayMidpoint = new Point2D(
-                    (firstRunway.ThresholdLocation.Longitude - secondRunway.ThresholdLocation.Longitude) / 2,
-                    (firstRunway.ThresholdLocation.Latitude - secondRunway.ThresholdLocation.Latitude) / 2);
+                    (firstRunway.ThresholdLocation.GetPoint().Latitude + secondRunway.ThresholdLocation.GetPoint().Latitude) / 2,
+                    (firstRunway.ThresholdLocation.GetPoint().Longitude + secondRunway.ThresholdLocation.GetPoint().Longitude) / 2);
 
                 // Find the closest airport so we can add it
                 Airport closestAirport = null;
@@ -468,8 +445,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 {
                     double currentDistance =
                         Math.Sqrt(
-                            Math.Pow(airport.Location.Latitude - runwayMidpoint.Latitude, 2) +
-                            Math.Pow(airport.Location.Longitude - runwayMidpoint.Longitude, 2));
+                            Math.Pow(airport.Location.GetPoint().Latitude - runwayMidpoint.Latitude, 2) +
+                            Math.Pow(airport.Location.GetPoint().Longitude - runwayMidpoint.Longitude, 2));
 
                     // If we don't have an airport set, just use the current one, otherwise override if we have a
                     // closer one
@@ -508,10 +485,10 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 // Create the segment
                 NamedSegment segment = new NamedSegment(
                     _currentMatch.Groups[1].Value,
-                    GetPoint(
+                    GetCoordinate(
                         _currentMatch.Groups[3].Value,
                         _currentMatch.Groups[2].Value),
-                    GetPoint(
+                    GetCoordinate(
                         _currentMatch.Groups[5].Value,
                         _currentMatch.Groups[4].Value));
 
@@ -587,16 +564,16 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 NamedSegment lastSegment = currentSegments.First(s => !segments.Select(s1 => s1.Start).Contains(s.End));
 
                 // Add the first segment to the route
-                route.Fixes.Add(FileParserUtils.GetFixFromPoint(Result, firstSegment.Start));
-                route.Fixes.Add(FileParserUtils.GetFixFromPoint(Result, firstSegment.End));
+                route.Fixes.Add(FileParserUtils.GetFixFromCoordinate(Result, firstSegment.Start));
+                route.Fixes.Add(FileParserUtils.GetFixFromCoordinate(Result, firstSegment.End));
                 while (true)
                 {
                     // Find the next segment
                     Fix lastFix = route.Fixes.Last();
-                    NamedSegment nextSegment = currentSegments.First(s => s.Start.IsWithin(0.00001, lastFix.Location));
+                    NamedSegment nextSegment = currentSegments.First(s => s.Start.Equals(lastFix.Location));
 
                     // Add it in
-                    Fix fix = FileParserUtils.GetFixFromPoint(Result, nextSegment.End);
+                    Fix fix = FileParserUtils.GetFixFromCoordinate(Result, nextSegment.End);
                     if (route.Fixes.Any(f => f.Identifier == fix.Identifier))
                     {
                         throw new Exception(
@@ -616,7 +593,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         }
 
         /// <summary>
-        ///     Gets a new <see cref="Point2D"/> instance given a longitude and latitude string.
+        ///     Gets a new <see cref="Coordinate"/> instance given a longitude and latitude string.
         ///     This also checks for any matching fixes in the <paramref name="longitude"/> or <see cref="latitude"/>
         ///     components.
         /// </summary>
@@ -627,17 +604,14 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         ///     The latitude.
         /// </param>
         /// <returns>
-        ///     The <see cref="Point2D"/>.
+        ///     The <see cref="Coordinate"/>.
         /// </returns>
-        private Point2D GetPoint(string longitude, string latitude)
+        private Coordinate GetCoordinate(string longitude, string latitude)
         {
-            double longitudeValue;
-            double latitudeValue;
+            CoordinateComponent longitudeComponent = FixIdentifierRegex.Match(longitude).Success ? FileParserUtils.GetFixFromName(Result, longitude).Location.Longitude : CoordinateComponent.Parse(longitude);
+            CoordinateComponent latitudeComponent = FixIdentifierRegex.Match(latitude).Success ? FileParserUtils.GetFixFromName(Result, latitude).Location.Latitude : CoordinateComponent.Parse(latitude);
 
-            longitudeValue = FixIdentifierRegex.Match(longitude).Success ? FileParserUtils.GetFixFromName(Result, longitude).Location.Longitude : DmsToDecimal(longitude);
-            latitudeValue = FixIdentifierRegex.Match(latitude).Success ? FileParserUtils.GetFixFromName(Result, latitude).Location.Latitude : DmsToDecimal(latitude);
-
-            return new Point2D(longitudeValue, latitudeValue);
+            return new Coordinate(latitudeComponent, longitudeComponent);
         }
     }
 }

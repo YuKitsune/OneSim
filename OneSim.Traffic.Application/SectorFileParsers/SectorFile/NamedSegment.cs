@@ -6,7 +6,7 @@
 
 namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
 {
-    using OneSim.Traffic.Domain.Entities;
+    using OneSim.Traffic.Domain.Entities.Ais;
 
     /// <summary>
     ///     A single line segment which has been named.
@@ -19,14 +19,14 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         public string Label { get; set; }
 
         /// <summary>
-        ///     Gets or sets the starting <see cref="Point2D"/>.
+        ///     Gets or sets the starting <see cref="Coordinate"/>.
         /// </summary>
-        public Point2D Start { get; set; }
+        public Coordinate Start { get; set; }
 
         /// <summary>
-        ///     Gets or sets the end <see cref="Point2D"/>.
+        ///     Gets or sets the end <see cref="Coordinate"/>.
         /// </summary>
-        public Point2D End { get; set; }
+        public Coordinate End { get; set; }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="NamedSegment"/> class.
@@ -35,12 +35,12 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
         ///     The name of the <see cref="NamedSegment"/>.
         /// </param>
         /// <param name="start">
-        ///     The starting <see cref="Point2D"/>.
+        ///     The starting <see cref="Coordinate"/>.
         /// </param>
         /// <param name="end">
-        ///     The end <see cref="Point2D"/>.
+        ///     The end <see cref="Coordinate"/>.
         /// </param>
-        public NamedSegment(string label, Point2D start, Point2D end)
+        public NamedSegment(string label, Coordinate start, Coordinate end)
         {
             Label = label;
             Start = start;

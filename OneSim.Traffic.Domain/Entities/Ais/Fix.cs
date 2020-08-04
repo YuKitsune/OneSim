@@ -24,9 +24,9 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public string Identifier { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="Point2D"/> representing the current <see cref="Fix"/>es location.
+        ///     Gets or sets the <see cref="Coordinate"/> representing the current <see cref="Fix"/>es location.
         /// </summary>
-        public Point2D Location { get; set; }
+        public Coordinate Location { get; set; }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Fix"/> class.
@@ -35,9 +35,9 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     The ICAO identifier.
         /// </param>
         /// <param name="location">
-        ///     The <see cref="Point2D"/> representing the location.
+        ///     The <see cref="Coordinate"/> representing the location.
         /// </param>
-        public Fix(string identifier, Point2D location)
+        public Fix(string identifier, Coordinate location)
         {
             if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
             if (location == null) throw new ArgumentNullException(nameof(location));

@@ -25,9 +25,9 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public string Identifier { get; set; }
 
         /// <summary>
-        ///     Gets or sets the threshold position represented by a <see cref="Point2D"/>.
+        ///     Gets or sets the threshold position represented by a <see cref="Coordinate"/>.
         /// </summary>
-        public Point2D ThresholdLocation { get; set; }
+        public Coordinate ThresholdLocation { get; set; }
 
         // Todo: Do we want the length?
 
@@ -43,12 +43,12 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     The ICAO identifier.
         /// </param>
         /// <param name="thresholdLocation">
-        ///     The <see cref="Point2D"/> representing the location.
+        ///     The <see cref="Coordinate"/> representing the location.
         /// </param>
         /// <param name="heading">
         ///     The heading.
         /// </param>
-        public Runway(string identifier, Point2D thresholdLocation, int heading)
+        public Runway(string identifier, Coordinate thresholdLocation, int heading)
         {
             if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
             if (thresholdLocation == null) throw new ArgumentNullException(nameof(thresholdLocation));

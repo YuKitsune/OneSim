@@ -29,7 +29,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     The ICAO identifier.
         /// </param>
         /// <param name="location">
-        ///     The <see cref="Point2D"/> representing the location.
+        ///     The <see cref="Coordinate"/> representing the location.
         /// </param>
         /// <param name="frequency">
         ///     the frequency of the <see cref="Navaid"/> multiplied by 1000.
@@ -38,7 +38,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         /// <param name="type">
         ///     The <see cref="NavaidType"/>.
         /// </param>
-        public Navaid(string identifier, Point2D location, int frequency, NavaidType type)
+        public Navaid(string identifier, Coordinate location, int frequency, NavaidType type)
             : base(identifier, location)
         {
             Frequency = frequency;

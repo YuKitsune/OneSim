@@ -24,10 +24,10 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         public string Identifier { get; set; }
 
         /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="Point2D"/>2 representing the lateral border of the
+        ///     Gets the <see cref="List{T}"/> of <see cref="Coordinate"/>s representing the lateral border of the
         ///     current <see cref="Sector"/>.
         /// </summary>
-        public List<Point2D> Border { get; }
+        public List<Coordinate> Border { get; }
 
         // Todo: Holes.
 
@@ -58,7 +58,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         /// </summary>
         public Sector()
         {
-            Border = new List<Point2D>();
+            Border = new List<Coordinate>();
             Positions = new List<ControllerPriority>();
             ActiveRunways = new List<Runway>();
         }
