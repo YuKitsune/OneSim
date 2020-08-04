@@ -184,7 +184,6 @@ namespace OneSim.Traffic.Tests.Services
 
             // Assert
             Assert.AreEqual(2, trafficDbContext.Pilots.Count());
-            Assert.AreEqual(2, trafficDbContext.Points.Count());
             Assert.AreEqual(1, trafficDbContext.FlightNotifications.Count());
             Assert.AreEqual(2, trafficDbContext.FlightPlans.Count());
             Assert.AreEqual(1, trafficDbContext.Controllers.Count());
@@ -249,7 +248,6 @@ namespace OneSim.Traffic.Tests.Services
 
             // Assert
             Assert.AreEqual(2, trafficDbContext.Pilots.Count());
-            Assert.AreEqual(4, trafficDbContext.Points.Count());
             Assert.AreEqual(1, trafficDbContext.FlightNotifications.Count());
             Assert.AreEqual(2, trafficDbContext.FlightPlans.Count());
             Assert.AreEqual(1, trafficDbContext.Controllers.Count());
@@ -321,7 +319,6 @@ namespace OneSim.Traffic.Tests.Services
             // Assert
             Assert.AreEqual(2, trafficDbContext.Pilots.Count());
             Assert.AreEqual(1, trafficDbContext.FlightPlans.Count());
-            Assert.AreEqual(2, trafficDbContext.Points.Count());
 
             // Clear the provider data
             provider.Pilots.Clear();
@@ -340,7 +337,6 @@ namespace OneSim.Traffic.Tests.Services
             // Assert
             Assert.AreEqual(0, trafficDbContext.Pilots.Count());
             Assert.AreEqual(0, trafficDbContext.FlightPlans.Count());
-            Assert.AreEqual(0, trafficDbContext.Points.Count());
         }
 
         /// <summary>

@@ -195,7 +195,6 @@ namespace OneSim.Traffic.Application
                                                      .ToList();
 
             // Remove all of the pilots, flight plans (only for pilots with plans) and history trails
-            _trafficDbContext.Points.RemoveRange(_trafficDbContext.Points);
             _trafficDbContext.Pilots.RemoveRange(_trafficDbContext.Pilots);
             _trafficDbContext.FlightPlans.RemoveRange(_trafficDbContext.Pilots.Where(p => p.FlightPlan != null).Select(p => p.FlightPlan));
             await _trafficDbContext.SaveChangesAsync();

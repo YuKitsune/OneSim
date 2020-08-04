@@ -40,11 +40,6 @@ namespace OneSim.Traffic.Persistence
         public DbSet<FlightPlan> FlightPlans { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="Point3D"/>s.
-        /// </summary>
-        public DbSet<Point3D> Points { get; set; }
-
-        /// <summary>
         ///     Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="Server"/>s.
         /// </summary>
         public DbSet<Server> Servers { get; set; }

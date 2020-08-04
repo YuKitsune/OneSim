@@ -42,10 +42,5 @@ namespace OneSim.Traffic.Application.Abstractions
         ///     Gets or sets the <see cref="Server"/>s <see cref="DbSet{TEntity}"/>.
         /// </summary>
         DbSet<Server> Servers { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the <see cref="Point3D"/>s <see cref="DbSet{TEntity}"/>.
-        /// </summary>
-        DbSet<Point3D> Points { get; set; }
     }
 }
