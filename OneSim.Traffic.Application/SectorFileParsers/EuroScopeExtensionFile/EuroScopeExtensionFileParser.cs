@@ -58,12 +58,17 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
         /// <summary>
         ///     Gets or sets the <see cref="List{T}"/> of found <see cref="SectorLine"/>s.
         /// </summary>
-        private List<SectorLine> SectorLines { get; set; }
+        private List<SectorLine> SectorLines { get; }
 
         /// <summary>
         ///     Gets or sets the <see cref="Sector"/> currently being parsed.
         /// </summary>
         private Sector CurrentSector { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="EuroScopeExtensionFileParser"/> class.
+        /// </summary>
+        public EuroScopeExtensionFileParser() => SectorLines = new List<SectorLine>();
 
         /// <summary>
         ///     Adds a new <see cref="ParseError"/> to the error list.
@@ -174,6 +179,9 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
                         break;
                 }
             }
+
+            // Finish off the sector
+            if (CurrentSector != null) Result.Sectors.Add(CurrentSector);
 
             return Result;
         }
