@@ -194,7 +194,7 @@ ACTIVE:YBBN:19R";
 
             // Assert
             Assert.AreEqual(3, result.ControllerPositions.Count);
-            ControllerPosition approachPosition = result.ControllerPositions.FirstOrDefault(p => p.SectorId == "BP");
+            ControllerPosition approachPosition = result.ControllerPositions.FirstOrDefault(p => p.PositionId == "BP");
             Assert.IsNotNull(approachPosition);
             Assert.AreEqual("Brisbane Approach", approachPosition.RadioCallsign);
             Assert.AreEqual("Brisbane Approach (North)", approachPosition.Name);

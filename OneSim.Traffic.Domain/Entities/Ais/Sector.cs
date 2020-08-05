@@ -21,7 +21,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         /// <summary>
         ///     Gets or sets local sector file identifier for the current <see cref="Sector"/>.
         /// </summary>
-        public string Identifier { get; set; }
+        public string SectorIdentifier { get; set; }
 
         /// <summary>
         ///     Gets the <see cref="List{T}"/> of <see cref="Coordinate"/>s representing the lateral border of the

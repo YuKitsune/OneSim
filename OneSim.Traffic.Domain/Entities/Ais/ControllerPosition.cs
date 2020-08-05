@@ -38,7 +38,7 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     Gets or sets the ID of the current <see cref="ControllerPosition"/> within the context of the original
         ///     sector file it was imported from.
         /// </summary>
-        public string SectorId { get; set; }
+        public string PositionId { get; set; }
 
         /// <summary>
         ///     Gets or sets the prefix of the network logon callsign.

@@ -199,7 +199,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
                     Name = sections[0],
                     RadioCallsign = sections[1],
                     Frequency = FileParserUtils.ParseFrequency(sections[2]),
-                    SectorId = sections[3],
+                    PositionId = sections[3],
                     CallsignPrefix = sections[5],
                     CallsignMiddle = sections[4],
                     CallsignSuffix = sections[6]
@@ -324,7 +324,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
                     if (CurrentSector != null) Result.Sectors.Add(CurrentSector);
                     CurrentSector = new Sector
                                     {
-                                        Identifier = sections[1],
+                                        SectorIdentifier = sections[1],
                                         LowerLevel = int.Parse(sections[2]),
                                         UpperLevel = int.Parse(sections[3]),
                                     };
@@ -342,7 +342,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
                     {
                         string sectorId = sections[i];
                         ControllerPosition position =
-                            Result.ControllerPositions.FirstOrDefault(p => p.SectorId == sectorId);
+                            Result.ControllerPositions.FirstOrDefault(p => p.PositionId == sectorId);
 
                         if (position == null)
                         {

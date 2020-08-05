@@ -98,7 +98,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.PositionFile
                     Name = sections[0],
                     RadioCallsign = sections[1],
                     Frequency = FileParserUtils.ParseFrequency(sections[2]),
-                    SectorId = sections[3],
+                    PositionId = sections[3],
                     CallsignPrefix = sections[5],
                     CallsignMiddle = sections[4],
                     CallsignSuffix = sections[6]
