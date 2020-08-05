@@ -22,7 +22,7 @@ namespace OneSim.Traffic.Tests.Ais
         /// <summary>
         ///     The Sector file content.
         /// </summary>
-        private const string TestSectorFile =
+        public const string TestSectorFile =
             @"; DUMMY SECTOR FILE
 // for testing purposes only
 // Using data from VATPAC VRC Sector File AIRAC 2006
@@ -62,6 +62,13 @@ TESSI S029.27.03.700 E152.18.45.200   ;DB045# 1037672
 APAGI S028.50.56.000 E152.35.07.100   ;DB045# 1031909
 HUUGO S028.05.23.300 E152.55.29.200   ;DB045# 1034402
 SANEG S027.49.04.200 E153.02.38.300   ;DB045# 1037113
+ISRIB S027.19.20.800 E153.13.23.900   ;DB045# 1034527
+LUMDI S027.21.35.000 E153.18.19.000   ;DB045# 1035204
+MAVPI S027.31.31.500 E153.13.35.100   ;DB045# 1039241
+BOSVU S027.24.53.500 E153.06.40.900   ;DB045# 1032497
+DADAN S027.29.48.500 E153.08.58.700   ;DB045# 1033354
+DENIS S027.33.22.600 E153.08.05.300   ;DB045# 1033398
+LILEE S027.36.55.600 E153.06.41.800   ;DB045# 1035063
 
 [HIGH AIRWAY]
 H91(66)                   SANAD          SANAD          ADMAR          ADMAR             ;DB065# 636844
