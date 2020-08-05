@@ -256,7 +256,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
                              .Select(f => FileParserUtils.GetFixFromName(SectorFileResult, f))
                              .ToList();
 
-            TerminalRoute route = new TerminalRoute(sections[3], routeType, fixes);
+            TerminalRoute route = new TerminalRoute(sections[3], routeType, fixes, new List<Runway> { targetRunway });
 
             Result.TerminalRoutes.Add(route);
         }

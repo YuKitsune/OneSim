@@ -37,14 +37,17 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         /// <param name="fixes">
         ///     The <see cref="List{T}"/> of <see cref="Fix"/>es which make up the <see cref="TerminalRoute"/>.
         /// </param>
-        public TerminalRoute(string identifier, TerminalRouteType type, List<Fix> fixes = null)
+        /// <param name="validRunways">
+        ///     The <see cref="List{T}"/> of <see cref="Runway"/>s which the <see cref="TerminalRoute"/> is valid for.
+        /// </param>
+        public TerminalRoute(string identifier, TerminalRouteType type, List<Fix> fixes = null, List<Runway> validRunways = null)
             : base(fixes)
         {
-            if (string.IsNullOrEmpty(Identifier)) throw new ArgumentNullException(nameof(identifier));
+            if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
+
             Identifier = identifier;
             Type = type;
-
-            ValidRunways = new List<Runway>();
+            ValidRunways = validRunways ?? new List<Runway>();
         }
     }
 }
