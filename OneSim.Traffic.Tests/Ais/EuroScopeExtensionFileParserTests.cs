@@ -209,6 +209,23 @@ ACTIVE:YBBN:19R";
         [Test]
         public void CanParseSectors()
         {
+            // Arrange
+            SectorFileParser sectorFileParser = new SectorFileParser();
+            EuroScopeExtensionFileParser parser = new EuroScopeExtensionFileParser();
+
+            // Act
+            SectorFileParseResult sectorFileParseResult = sectorFileParser.Parse(SectorFileParserTests.TestSectorFile);
+            EuroScopeExtensionFileParseResult result = parser.Parse(TestExtensionFile, sectorFileParseResult);
+
+            // Assert
+            Assert.AreEqual(4, result.Sectors.Count);
+            Sector brisbaneApproachRunway01 = result.Sectors.FirstOrDefault(s => s.SectorIdentifier == "BNA01");
+            Assert.IsNotNull(brisbaneApproachRunway01);
+            Assert.AreEqual(24, brisbaneApproachRunway01.Border.Count);
+            Assert.IsTrue(brisbaneApproachRunway01.Positions.Select(p => p.Position.PositionId).ToArray().SequenceEqual(new[] { "BP", "BD" }));
+            Assert.AreEqual(2, brisbaneApproachRunway01.ActiveRunways.Count);
+            Assert.IsTrue(brisbaneApproachRunway01.ActiveRunways.Any(r => r.Identifier == "01L"));
+            Assert.IsTrue(brisbaneApproachRunway01.ActiveRunways.Any(r => r.Identifier == "01R"));
         }
     }
 }
