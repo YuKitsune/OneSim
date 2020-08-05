@@ -4,16 +4,13 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Tests.Parsers
+namespace OneSim.Traffic.Tests.Ais
 {
-    using System;
     using System.Linq;
-    using System.Text.RegularExpressions;
 
     using NUnit.Framework;
 
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
-    using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Ais;
 
     /// <summary>
