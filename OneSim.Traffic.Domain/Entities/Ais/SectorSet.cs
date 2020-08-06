@@ -7,6 +7,7 @@
 namespace OneSim.Traffic.Domain.Entities.Ais
 {
     using System;
+    using System.Collections.Generic;
 
     using OneSim.Traffic.Domain.Entities;
 
@@ -35,5 +36,21 @@ namespace OneSim.Traffic.Domain.Entities.Ais
         ///     Gets or sets the <see cref="NetworkType"/> which the current <see cref="SectorSet"/> is valid for.
         /// </summary>
         public NetworkType Network { get; set; }
+
+        /// <summary>
+        ///     Gets the <see cref="List{T}"/> of <see cref="FlightInformationRegion"/>s which the current
+        ///     <see cref="SectorSet"/> covers.
+        /// </summary>
+        public List<FlightInformationRegion> CoveredFlightInformationRegions { get; }
+
+        /// <summary>
+        ///     Gets or sets the ID of the user who submitted the current <see cref="SectorSet"/>.
+        /// </summary>
+        public string SubmittedByUserId { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SectorSet"/> class.
+        /// </summary>
+        public SectorSet() => CoveredFlightInformationRegions = new List<FlightInformationRegion>();
     }
 }
