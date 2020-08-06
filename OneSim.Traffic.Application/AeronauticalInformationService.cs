@@ -6,12 +6,16 @@
 
 namespace OneSim.Traffic.Application
 {
+    using System.Linq;
     using System.Threading.Tasks;
+
+    using Microsoft.EntityFrameworkCore;
 
     using OneSim.Traffic.Application.Abstractions;
     using OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile;
     using OneSim.Traffic.Application.SectorFileParsers.PositionFile;
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
+    using OneSim.Traffic.Domain.Entities.Ais;
 
     /// <summary>
     ///     The service responsible for managing Aeronautical data.

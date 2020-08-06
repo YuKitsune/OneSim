@@ -7,7 +7,9 @@
 namespace OneSim.Traffic.Application.Abstractions
 {
     using Microsoft.EntityFrameworkCore;
+
     using OneSim.Traffic.Domain.Entities.Ais;
+
     using Strato.Persistence.Abstractions;
 
     /// <summary>
@@ -15,6 +17,11 @@ namespace OneSim.Traffic.Application.Abstractions
     /// </summary>
     public interface IAeronauticalDbContext : IDbContext
     {
+        /// <summary>
+        ///     Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="SectorSet"/>s.
+        /// </summary>
+        DbSet<SectorSet> SectorSets { get; set; }
+
         /// <summary>
         ///     Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="Fix"/>es.
         /// </summary>
