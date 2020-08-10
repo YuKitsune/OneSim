@@ -7,11 +7,13 @@
 namespace OneSim.Traffic.Api.Controllers
 {
     using System;
+    using System.IO;
     using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
+    using OneSim.Traffic.Api.ViewModels;
     using OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile;
     using OneSim.Traffic.Application.SectorFileParsers.PositionFile;
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
@@ -35,27 +37,83 @@ namespace OneSim.Traffic.Api.Controllers
         }
 
         /// <summary>
-        ///     Submits the Sector File (.sct) and Position File (.pof) for parsing.
+        ///     Submits the Sector File (.sct) and Position File (.pof) for parsing as an asynchronous operation.
         /// </summary>
         /// <returns>
-        ///     The <see cref="IActionResult"/>.
+        ///     The <see cref="Task{T}"/> representing the asynchronous operation.
+        ///     The <see cref="Task{T}.Result"/> contains the <see cref="IActionResult"/>.
         /// </returns>
         [HttpPost]
-        public IActionResult SubmitSectorFile()
+        public async Task<IActionResult> SubmitSectorFile(UploadSectorFileViewModel viewModel)
         {
-            throw new NotImplementedException();
-        }
+            if (ModelState.IsValid)
+            {
+                // Make sure we have the correct combination of files
+                if (viewModel.SectorFile != null)
+                {
+                    string sectorFileContent = string.Empty;
+                    await using (Stream stream = viewModel.SectorFile.OpenReadStream())
+                    using (StreamReader streamReader = new StreamReader(stream))
+                    {
+                        sectorFileContent = await streamReader.ReadToEndAsync();
+                    }
 
-        /// <summary>
-        ///     Submits the Sector File (.sct2) and EuroScope Extension File (.ese) for parsing.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="IActionResult"/>.
-        /// </returns>
-        [HttpPost]
-        public IActionResult SubmitEuroScopeExtensionFile()
-        {
-            throw new NotImplementedException();
+                    if (!string.IsNullOrEmpty(sectorFileContent))
+                    {
+                        SectorFileParser sectorFileParser = new SectorFileParser();
+                        SectorFileParseResult sectorFileParseResult = sectorFileParser.Parse(sectorFileContent);
+
+                        if (viewModel.EuroScopeExtensionFile != null &&
+                            viewModel.PositionFile != null)
+                        {
+                            ModelState.AddModelError(string.Empty, "Cannot submit a EuroScope Extension file (.ese) and a Position file (.pof) at the same time.");
+                        }
+                        else if (viewModel.EuroScopeExtensionFile != null)
+                        {
+                            string euroScopeExtensionFileContent = string.Empty;
+                            await using Stream stream = viewModel.EuroScopeExtensionFile.OpenReadStream();
+                            using StreamReader streamReader = new StreamReader(stream);
+                            euroScopeExtensionFileContent = await streamReader.ReadToEndAsync();
+
+                            if (!string.IsNullOrEmpty(euroScopeExtensionFileContent))
+                            {
+                                EuroScopeExtensionFileParser euroScopeExtensionFileParser = new EuroScopeExtensionFileParser();
+                                EuroScopeExtensionFileParseResult euroScopeExtensionFileParseResult = new EuroScopeExtensionFileParseResult();
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "The EuroScope Extension file (.ese) was empty.");
+                            }
+                        }
+                        else if (viewModel.PositionFile != null)
+                        {
+                            string positionFileContent = string.Empty;
+                            await using Stream stream = viewModel.PositionFile.OpenReadStream();
+                            using StreamReader streamReader = new StreamReader(stream);
+                            positionFileContent = await streamReader.ReadToEndAsync();
+
+                            if (!string.IsNullOrEmpty(positionFileContent))
+                            {
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "The Position file (.pos) was empty.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "The Sector file (.sct) was empty.");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "No Sector File (.sct) was submitted.");
+                }
+            }
+
+            // Made it this far, something ain't right
+            return View("SubmitAisData", viewModel);
         }
 
         /// <summary>
