@@ -77,13 +77,23 @@ namespace OneSim.Traffic.Api.Controllers
 
                             if (!string.IsNullOrEmpty(euroScopeExtensionFileContent))
                             {
-                                EuroScopeExtensionFileParser euroScopeExtensionFileParser = new EuroScopeExtensionFileParser();
-                                EuroScopeExtensionFileParseResult euroScopeExtensionFileParseResult = new EuroScopeExtensionFileParseResult();
+                                EuroScopeExtensionFileParser euroScopeExtensionFileParser =
+                                    new EuroScopeExtensionFileParser();
+                                EuroScopeExtensionFileParseResult euroScopeExtensionFileParseResult =
+                                    euroScopeExtensionFileParser.Parse(
+                                        euroScopeExtensionFileContent,
+                                        sectorFileParseResult);
+
+                                return RedirectToAction(
+                                    nameof(ReviewEuroScopeExtensionFileResult),
+                                    new ReviewEuroScopeExtensionFileViewModel
+                                    {
+                                        SectorFileParseResult = sectorFileParseResult,
+                                        EuroScopeExtensionFileParseResult = euroScopeExtensionFileParseResult
+                                    });
                             }
-                            else
-                            {
-                                ModelState.AddModelError(string.Empty, "The EuroScope Extension file (.ese) was empty.");
-                            }
+
+                            ModelState.AddModelError(string.Empty, "The EuroScope Extension file (.ese) was empty.");
                         }
                         else if (viewModel.PositionFile != null)
                         {
@@ -94,11 +104,20 @@ namespace OneSim.Traffic.Api.Controllers
 
                             if (!string.IsNullOrEmpty(positionFileContent))
                             {
+                                PositionFileParser positionFileParser = new PositionFileParser();
+                                PositionFileParseResult positionFileParseResult =
+                                    positionFileParser.Parse(positionFileContent);
+
+                                return RedirectToAction(
+                                    nameof(ReviewSectorFileResult),
+                                    new ReviewSectorFileViewModel
+                                    {
+                                        SectorFileParseResult = sectorFileParseResult,
+                                        PositionFileParseResult = positionFileParseResult
+                                    });
                             }
-                            else
-                            {
-                                ModelState.AddModelError(string.Empty, "The Position file (.pos) was empty.");
-                            }
+
+                            ModelState.AddModelError(string.Empty, "The Position file (.pos) was empty.");
                         }
                     }
                     else
@@ -113,7 +132,7 @@ namespace OneSim.Traffic.Api.Controllers
             }
 
             // Made it this far, something ain't right
-            return View("SubmitAisData", viewModel);
+            return View(nameof(SubmitAisData), viewModel);
         }
 
         /// <summary>
