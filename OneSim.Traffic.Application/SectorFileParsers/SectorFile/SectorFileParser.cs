@@ -557,34 +557,52 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
 
                 // Get all segments with the current identifier, and create a new route
                 List<NamedSegment> currentSegments = segments.Where(s => AirwayIdentifierRegex.Match(s.Label).Value == cleanIdentifier).ToList();
-                TRoute route = routeFactory(cleanIdentifier);
 
-                // Find our first segment (start point doesn't match any of the end points), and our last segment
-                // (end point doesn't match any of the start points)
-                NamedSegment firstSegment = currentSegments.First(s => !segments.Select(s1 => s1.End).Contains(s.Start));
-                NamedSegment lastSegment = currentSegments.First(s => !segments.Select(s1 => s1.Start).Contains(s.End));
-
-                // Add the first segment to the route
-                route.Fixes.Add(FileParserUtils.GetFixFromCoordinate(Result, firstSegment.Start));
-                route.Fixes.Add(FileParserUtils.GetFixFromCoordinate(Result, firstSegment.End));
-                while (true)
+                // If we couldn't find any segments, then something has seriously fucked up...
+                if (!currentSegments.Any())
                 {
-                    // Find the next segment
-                    Fix lastFix = route.Fixes.Last();
-                    NamedSegment nextSegment = currentSegments.First(s => s.Start.Equals(lastFix.Location));
+                    AddParseError($"Couldn't find any segments when building Airway \"{identifier}\".");
+                    continue;
+                }
 
-                    // Add it in
-                    Fix fix = FileParserUtils.GetFixFromCoordinate(Result, nextSegment.End);
-                    if (route.Fixes.Any(f => f.Identifier == fix.Identifier))
+                // If the airway only has 1 segment, then just make the airway out of that
+                TRoute route = routeFactory(cleanIdentifier);
+                if (currentSegments.Count == 1)
+                {
+                    NamedSegment segment = currentSegments.First();
+                    route.Fixes.Add(FileParserUtils.GetFixFromCoordinate(Result, segment.Start));
+                    route.Fixes.Add(FileParserUtils.GetFixFromCoordinate(Result, segment.End));
+                }
+                else
+                {
+                    // Otherwise, build the airway like a linked list
+                    // Find our first segment (start point doesn't match any of the end points), and our last segment
+                    // (end point doesn't match any of the start points)
+                    NamedSegment firstSegment = currentSegments.First(s => currentSegments.All(s1 => s1.End != s.Start));
+                    NamedSegment lastSegment = currentSegments.First(s => currentSegments.All(s1 => s1.Start != s.End));
+
+                    // Add the first segment to the route
+                    route.Fixes.Add(FileParserUtils.GetFixFromCoordinate(Result, firstSegment.Start));
+                    route.Fixes.Add(FileParserUtils.GetFixFromCoordinate(Result, firstSegment.End));
+                    while (true)
                     {
-                        throw new Exception(
-                            $"The fix \"{fix.Identifier}\" was found multiple times in airway \"{route.Identifier}\".");
+                        // Find the next segment
+                        Fix lastFix = route.Fixes.Last();
+                        NamedSegment nextSegment = currentSegments.First(s => s.Start.Equals(lastFix.Location));
+
+                        // Add it in
+                        Fix fix = FileParserUtils.GetFixFromCoordinate(Result, nextSegment.End);
+                        if (route.Fixes.Any(f => f.Identifier == fix.Identifier))
+                        {
+                            throw new Exception(
+                                $"The fix \"{fix.Identifier}\" was found multiple times in airway \"{route.Identifier}\".");
+                        }
+
+                        route.Fixes.Add(fix);
+
+                        // If the next segment is the same as the last segment, then we've finished with this route
+                        if (nextSegment == lastSegment) break;
                     }
-
-                    route.Fixes.Add(fix);
-
-                    // If the next segment is the same as the last segment, then we've finished with this route
-                    if (nextSegment == lastSegment) break;
                 }
 
                 routes.Add(route);
