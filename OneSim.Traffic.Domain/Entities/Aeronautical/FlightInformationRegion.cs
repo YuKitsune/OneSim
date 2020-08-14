@@ -6,9 +6,12 @@
 
 namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
+    using System.Diagnostics;
+
     /// <summary>
     ///     The Flight Information Region (FIR).
     /// </summary>
+    [DebuggerDisplay("{Identifier}")]
     public class FlightInformationRegion
     {
         /// <summary>
@@ -19,6 +22,6 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
         /// <summary>
         ///     Gets or sets the current <see cref="FlightInformationRegion"/>s ICAO code.
         /// </summary>
-        public string IacoCode { get; set; }
+        public string Identifier { get; set; }
     }
 }

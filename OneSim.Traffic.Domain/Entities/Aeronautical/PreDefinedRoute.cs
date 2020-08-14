@@ -7,10 +7,12 @@
 namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     /// <summary>
     ///     The pre-defined route.
     /// </summary>
+    [DebuggerDisplay("{Identifier}")]
     public abstract class PreDefinedRoute : SectorSetSpecificEntity
     {
         /// <summary>

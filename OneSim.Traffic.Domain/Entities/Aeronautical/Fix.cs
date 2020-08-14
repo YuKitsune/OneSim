@@ -7,10 +7,12 @@
 namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     ///     The navigation fix.
     /// </summary>
+    [DebuggerDisplay("{Identifier}")]
     public class Fix : SectorSetSpecificEntity
     {
         /// <summary>

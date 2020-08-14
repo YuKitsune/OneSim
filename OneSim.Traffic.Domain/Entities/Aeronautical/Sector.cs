@@ -7,10 +7,12 @@
 namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     /// <summary>
     ///     The Air Traffic Control sector.
     /// </summary>
+    [DebuggerDisplay("{SectorIdentifier}")]
     public class Sector : SectorSetSpecificEntity
     {
         /// <summary>

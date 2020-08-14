@@ -7,10 +7,12 @@
 namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     ///     The runway.
     /// </summary>
+    [DebuggerDisplay("{Identifier}")]
     public class Runway : SectorSetSpecificEntity
     {
         /// <summary>

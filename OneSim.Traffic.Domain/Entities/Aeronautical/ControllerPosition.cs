@@ -6,9 +6,12 @@
 
 namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
+    using System.Diagnostics;
+
     /// <summary>
     ///     The Air Traffic Controller position.
     /// </summary>
+    [DebuggerDisplay("{Name} (\"{RadioCallsign}\")")]
     public class ControllerPosition : SectorSetSpecificEntity
     {
         /// <summary>
