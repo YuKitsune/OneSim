@@ -106,17 +106,23 @@ namespace OneSim.Traffic.Map.Controllers
                                     euroScopeExtensionFileParser.Parse(
                                         euroScopeExtensionFileContent,
                                         sectorFileParseResult);
-
-                                return RedirectToAction(
-                                    nameof(ReviewEuroScopeExtensionFileResult),
-                                    new ReviewEuroScopeExtensionFileViewModel
-                                    {
-                                        SectorFileParseResult = sectorFileParseResult,
-                                        EuroScopeExtensionFileParseResult = euroScopeExtensionFileParseResult
-                                    });
+                                try
+                                {
+                                    await _aeronauticalInformationService.AddSectorFile(
+                                        sectorFileParseResult,
+                                        euroScopeExtensionFileParseResult);
+                                    return RedirectToAction(nameof(DataSubmitted));
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Todo: log
+                                    ModelState.AddModelError(string.Empty, "An error has occurred while submitting the sector file.");
+                                }
                             }
-
-                            ModelState.AddModelError(string.Empty, "The EuroScope Extension file (.ese) was empty.");
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "The EuroScope Extension file (.ese) was empty.");
+                            }
                         }
                         else if (viewModel.PositionFile != null)
                         {
@@ -130,17 +136,23 @@ namespace OneSim.Traffic.Map.Controllers
                                 PositionFileParser positionFileParser = new PositionFileParser();
                                 PositionFileParseResult positionFileParseResult =
                                     positionFileParser.Parse(positionFileContent);
-
-                                return RedirectToAction(
-                                    nameof(ReviewSectorFileResult),
-                                    new ReviewSectorFileViewModel
-                                    {
-                                        SectorFileParseResult = sectorFileParseResult,
-                                        PositionFileParseResult = positionFileParseResult
-                                    });
+                                try
+                                {
+                                    await _aeronauticalInformationService.AddSectorFile(
+                                        sectorFileParseResult,
+                                        positionFileParseResult);
+                                    return RedirectToAction(nameof(DataSubmitted));
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Todo: log
+                                    ModelState.AddModelError(string.Empty, "An error has occurred while submitting the sector file.");
+                                }
                             }
-
-                            ModelState.AddModelError(string.Empty, "The Position file (.pos) was empty.");
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "The Position file (.pos) was empty.");
+                            }
                         }
                     }
                     else
@@ -158,111 +170,7 @@ namespace OneSim.Traffic.Map.Controllers
             viewModel.SectorFile = null;
             viewModel.PositionFile = null;
             viewModel.EuroScopeExtensionFile = null;
-            return View(nameof(SubmitAisData), viewModel);
-        }
-
-        /// <summary>
-        ///     Displays the <see cref="SectorFileParseResult"/> and <see cref="PositionFileParseResult"/> for manual
-        ///     review.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="IActionResult"/>.
-        /// </returns>
-        [HttpGet]
-        public IActionResult ReviewSectorFileResult() => View();
-
-        /// <summary>
-        ///     Displays the <see cref="SectorFileParseResult"/> and <see cref="EuroScopeExtensionFileParseResult"/> for
-        ///     manual review.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="IActionResult"/>.
-        /// </returns>
-        [HttpGet]
-        public IActionResult ReviewEuroScopeExtensionFileResult() => View();
-
-        /// <summary>
-        ///     Commits the <see cref="SectorFileParseResult"/> and <see cref="PositionFileParseResult"/> to the
-        ///     database as an asynchronous operation.
-        /// </summary>
-        /// <param name="viewModel">
-        ///     The <see cref="ReviewSectorFileViewModel"/>.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="Task{T}"/> representing the asynchronous operation.
-        ///     The <see cref="Task{T}.Result"/> contains the <see cref="IActionResult"/>.
-        /// </returns>
-        [HttpPost]
-        public async Task<IActionResult> CommitSectorFile(ReviewSectorFileViewModel viewModel)
-        {
-            if (ModelState.IsValid)
-            {
-                if (viewModel.TermsAndConditionsAccepted)
-                {
-                    try
-                    {
-                        await _aeronauticalInformationService.AddSectorFile(
-                            viewModel.SectorFileParseResult,
-                            viewModel.PositionFileParseResult);
-                        return RedirectToAction(nameof(AisDataSubmitted));
-                    }
-                    catch (Exception ex)
-                    {
-                        // Todo: log
-                        ModelState.AddModelError(string.Empty, "An error has occurred while submitting the sector file.");
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "The Terms and Conditions must be accepted prior to submitting any data.");
-                }
-            }
-
-            // Made it this far, something ain't right
-            viewModel.TermsAndConditionsAccepted = false;
-            return View("ReviewSectorFileResult", viewModel);
-        }
-
-        /// <summary>
-        ///     Commits the <see cref="SectorFileParseResult"/> and <see cref="EuroScopeExtensionFileParseResult"/> to
-        ///     the database as an asynchronous operation.
-        /// </summary>
-        /// <param name="viewModel">
-        ///     The <see cref="ReviewEuroScopeExtensionFileViewModel"/>.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="Task{T}"/> representing the asynchronous operation.
-        ///     The <see cref="Task{T}.Result"/> contains the <see cref="IActionResult"/>.
-        /// </returns>
-        [HttpPost]
-        public async Task<IActionResult> CommitEuroScopeExtensionFile(ReviewEuroScopeExtensionFileViewModel viewModel)
-        {
-            if (ModelState.IsValid)
-            {
-                if (viewModel.TermsAndConditionsAccepted)
-                {
-                    try
-                    {
-                        await _aeronauticalInformationService.AddSectorFile(
-                            viewModel.SectorFileParseResult,
-                            viewModel.EuroScopeExtensionFileParseResult);
-                        return RedirectToAction(nameof(AisDataSubmitted));
-                    }
-                    catch (Exception ex)
-                    {
-                        // Todo: log
-                        ModelState.AddModelError(string.Empty, "An error has occurred while submitting the sector file.");
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "The Terms and Conditions must be accepted prior to submitting any data.");
-                }
-            }
-
-            // Made it this far, something ain't right
-            viewModel.TermsAndConditionsAccepted = false;
-            return View("ReviewEuroScopeExtensionFileResult", viewModel);
+            return View(nameof(SubmitData), viewModel);
         }
 
         /// <summary>
