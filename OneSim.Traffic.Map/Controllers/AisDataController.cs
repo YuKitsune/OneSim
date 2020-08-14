@@ -4,16 +4,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Api.Controllers
+namespace OneSim.Traffic.Map.Controllers
 {
     using System;
     using System.IO;
+    using System.Linq;
+    using System.Security.Claims;
     using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
     using OneSim.Traffic.Api.ViewModels;
+    using OneSim.Traffic.Application;
     using OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile;
     using OneSim.Traffic.Application.SectorFileParsers.PositionFile;
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
@@ -25,20 +28,35 @@ namespace OneSim.Traffic.Api.Controllers
     public class AisDataController : Controller
     {
         /// <summary>
+        ///     The <see cref="AeronauticalInformationService"/>.
+        /// </summary>
+        private readonly AeronauticalInformationService _aeronauticalInformationService;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="AisDataController"/> class.
+        /// </summary>
+        /// <param name="aeronauticalInformationService">
+        ///     The <see cref="AeronauticalInformationService"/>.
+        /// </param>
+        public AisDataController(AeronauticalInformationService aeronauticalInformationService) =>
+            _aeronauticalInformationService = aeronauticalInformationService ??
+                                              throw new ArgumentNullException(nameof(aeronauticalInformationService));
+
+        /// <summary>
         ///     Gets the view for submitting AIS data.
         /// </summary>
         /// <returns>
         ///     The <see cref="IActionResult"/>.
         /// </returns>
         [HttpGet]
-        public IActionResult SubmitAisData()
-        {
-            throw new NotImplementedException();
-        }
+        public IActionResult SubmitAisData() => View();
 
         /// <summary>
         ///     Submits the Sector File (.sct) and Position File (.pof) for parsing as an asynchronous operation.
         /// </summary>
+        /// <param name="viewModel">
+        ///     The <see cref="UploadSectorFileViewModel"/>.
+        /// </param>
         /// <returns>
         ///     The <see cref="Task{T}"/> representing the asynchronous operation.
         ///     The <see cref="Task{T}.Result"/> contains the <see cref="IActionResult"/>.
@@ -62,6 +80,11 @@ namespace OneSim.Traffic.Api.Controllers
                     {
                         SectorFileParser sectorFileParser = new SectorFileParser();
                         SectorFileParseResult sectorFileParseResult = sectorFileParser.Parse(sectorFileContent);
+                        sectorFileParseResult.SectorSet.Network = viewModel.Network;
+                        sectorFileParseResult.SectorSet.EffectiveDate = viewModel.EffectiveDate;
+
+                        string userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                        sectorFileParseResult.SectorSet.SubmittedByUserId = userId;
 
                         if (viewModel.EuroScopeExtensionFile != null &&
                             viewModel.PositionFile != null)
@@ -132,6 +155,9 @@ namespace OneSim.Traffic.Api.Controllers
             }
 
             // Made it this far, something ain't right
+            viewModel.SectorFile = null;
+            viewModel.PositionFile = null;
+            viewModel.EuroScopeExtensionFile = null;
             return View(nameof(SubmitAisData), viewModel);
         }
 
@@ -143,10 +169,7 @@ namespace OneSim.Traffic.Api.Controllers
         ///     The <see cref="IActionResult"/>.
         /// </returns>
         [HttpGet]
-        public IActionResult ReviewSectorFileResult()
-        {
-            throw new NotImplementedException();
-        }
+        public IActionResult ReviewSectorFileResult() => View();
 
         /// <summary>
         ///     Displays the <see cref="SectorFileParseResult"/> and <see cref="EuroScopeExtensionFileParseResult"/> for
@@ -156,39 +179,90 @@ namespace OneSim.Traffic.Api.Controllers
         ///     The <see cref="IActionResult"/>.
         /// </returns>
         [HttpGet]
-        public IActionResult ReviewEuroScopeExtensionFileResult()
-        {
-            throw new NotImplementedException();
-        }
+        public IActionResult ReviewEuroScopeExtensionFileResult() => View();
 
         /// <summary>
         ///     Commits the <see cref="SectorFileParseResult"/> and <see cref="PositionFileParseResult"/> to the
         ///     database as an asynchronous operation.
         /// </summary>
+        /// <param name="viewModel">
+        ///     The <see cref="ReviewSectorFileViewModel"/>.
+        /// </param>
         /// <returns>
         ///     The <see cref="Task{T}"/> representing the asynchronous operation.
         ///     The <see cref="Task{T}.Result"/> contains the <see cref="IActionResult"/>.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult> CommitSectorFile()
+        public async Task<IActionResult> CommitSectorFile(ReviewSectorFileViewModel viewModel)
         {
-            await Task.Yield();
-            throw new NotImplementedException();
+            if (ModelState.IsValid)
+            {
+                if (viewModel.TermsAndConditionsAccepted)
+                {
+                    try
+                    {
+                        await _aeronauticalInformationService.AddSectorFile(
+                            viewModel.SectorFileParseResult,
+                            viewModel.PositionFileParseResult);
+                        return RedirectToAction(nameof(AisDataSubmitted));
+                    }
+                    catch (Exception ex)
+                    {
+                        // Todo: log
+                        ModelState.AddModelError(string.Empty, "An error has occurred while submitting the sector file.");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "The Terms and Conditions must be accepted prior to submitting any data.");
+                }
+            }
+
+            // Made it this far, something ain't right
+            viewModel.TermsAndConditionsAccepted = false;
+            return View("ReviewSectorFileResult", viewModel);
         }
 
         /// <summary>
         ///     Commits the <see cref="SectorFileParseResult"/> and <see cref="EuroScopeExtensionFileParseResult"/> to
         ///     the database as an asynchronous operation.
         /// </summary>
+        /// <param name="viewModel">
+        ///     The <see cref="ReviewEuroScopeExtensionFileViewModel"/>.
+        /// </param>
         /// <returns>
         ///     The <see cref="Task{T}"/> representing the asynchronous operation.
         ///     The <see cref="Task{T}.Result"/> contains the <see cref="IActionResult"/>.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult> CommitEuroScopeExtensionFile()
+        public async Task<IActionResult> CommitEuroScopeExtensionFile(ReviewEuroScopeExtensionFileViewModel viewModel)
         {
-            await Task.Yield();
-            throw new NotImplementedException();
+            if (ModelState.IsValid)
+            {
+                if (viewModel.TermsAndConditionsAccepted)
+                {
+                    try
+                    {
+                        await _aeronauticalInformationService.AddSectorFile(
+                            viewModel.SectorFileParseResult,
+                            viewModel.EuroScopeExtensionFileParseResult);
+                        return RedirectToAction(nameof(AisDataSubmitted));
+                    }
+                    catch (Exception ex)
+                    {
+                        // Todo: log
+                        ModelState.AddModelError(string.Empty, "An error has occurred while submitting the sector file.");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "The Terms and Conditions must be accepted prior to submitting any data.");
+                }
+            }
+
+            // Made it this far, something ain't right
+            viewModel.TermsAndConditionsAccepted = false;
+            return View("ReviewEuroScopeExtensionFileResult", viewModel);
         }
 
         /// <summary>
@@ -198,9 +272,6 @@ namespace OneSim.Traffic.Api.Controllers
         ///     The <see cref="IActionResult"/>.
         /// </returns>
         [HttpGet]
-        public IActionResult AisDataSubmitted()
-        {
-            throw new NotImplementedException();
-        }
+        public IActionResult AisDataSubmitted() => View();
     }
 }

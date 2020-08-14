@@ -197,7 +197,7 @@ namespace OneSim.Traffic.Api
                 $"*/{dataRefreshMinutes} * * * *");
         }
 
-        // Todo: Move this somewhere more accessable
+        // Todo: Move this somewhere more accessible
 
         /// <summary>
         ///     Gets the <see cref="Type"/> which implements the <typeparamref name="T"/> for the specified <see cref="NetworkType"/>.

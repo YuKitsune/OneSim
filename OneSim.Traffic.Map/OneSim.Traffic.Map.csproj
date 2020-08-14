@@ -47,6 +47,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OneSim.Common.Domain\OneSim.Common.Domain.csproj" />
+      <ProjectReference Include="..\OneSim.Traffic.Application\OneSim.Traffic.Application.csproj" />
     </ItemGroup>
 
 
