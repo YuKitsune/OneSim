@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Domain.Entities.Ais
+namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     /// <summary>
     ///     The class representing what priority a particular <see cref="ControllerPosition"/> has when assuming a

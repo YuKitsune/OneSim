@@ -12,7 +12,7 @@ namespace OneSim.Traffic.Api.ViewModels
     using Microsoft.AspNetCore.Http;
 
     using OneSim.Traffic.Domain.Entities;
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The View Model for uploading a sector file.

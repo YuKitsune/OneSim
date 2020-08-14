@@ -1,24 +1,24 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CardinalAxis.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="TerminalRouteType.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Domain.Entities.Ais
+namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     /// <summary>
-    ///     The cardinal axis or plane.
+    ///     The type of terminal routing.
     /// </summary>
-    public enum CardinalAxis
+    public enum TerminalRouteType
     {
         /// <summary>
-        ///     Latitude.
+        ///     Standard Instrument Departure (SID).
         /// </summary>
-        Latitude,
+        StandardInstrumentDeparture,
 
         /// <summary>
-        ///     Longitude.
+        ///     Standard Terminal Arrival Route (STAR).
         /// </summary>
-        Longitude
+        StandardTerminalArrivalRoute
     }
 }

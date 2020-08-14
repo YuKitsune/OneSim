@@ -8,7 +8,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
 {
     using System.Collections.Generic;
 
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The Sector File parse result.

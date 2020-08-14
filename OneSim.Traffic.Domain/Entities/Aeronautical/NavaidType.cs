@@ -1,34 +1,24 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CardinalDirection.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="NavaidType.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Domain.Entities.Ais
+namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     /// <summary>
-    ///     The cardinal directions.
+    ///     The type of radio navigational aid.
     /// </summary>
-    public enum CardinalDirection
+    public enum NavaidType
     {
         /// <summary>
-        ///     North.
+        ///     VHF Omnidirectional Range.
         /// </summary>
-        North,
+        VOR,
 
         /// <summary>
-        ///     East.
+        ///     Non-directional Beacon.
         /// </summary>
-        East,
-
-        /// <summary>
-        ///     South.
-        /// </summary>
-        South,
-
-        /// <summary>
-        ///     West.
-        /// </summary>
-        West
+        NDB
     }
 }

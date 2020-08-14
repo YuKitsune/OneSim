@@ -16,6 +16,7 @@ namespace OneSim.Traffic.Map
     using Microsoft.IdentityModel.Logging;
 
     using OneSim.Common.Domain.Configuration;
+    using OneSim.Traffic.Application;
 
     /// <summary>
     ///     The Startup class.
@@ -43,6 +44,8 @@ namespace OneSim.Traffic.Map
         /// </param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<AeronauticalInformationService>();
+
             services.AddControllersWithViews();
 
             // Add Identity Server authentication

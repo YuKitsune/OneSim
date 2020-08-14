@@ -4,14 +4,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Tests.Ais
+namespace OneSim.Traffic.Tests.Aeronautical
 {
     using System.Linq;
 
     using NUnit.Framework;
 
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The <see cref="SectorFileParser"/> Tests.

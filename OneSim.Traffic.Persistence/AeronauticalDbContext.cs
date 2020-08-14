@@ -10,13 +10,18 @@ namespace OneSim.Traffic.Persistence
 
     using OneSim.Traffic.Application.Abstractions;
     using OneSim.Traffic.Domain.Entities;
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The database containing aeronautical information.
     /// </summary>
     public class AeronauticalDbContext : DbContext, IAeronauticalDbContext
     {
+        /// <summary>
+        ///     Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="SectorSet"/>s.
+        /// </summary>
+        public DbSet<SectorSet> SectorSets { get; set; }
+
         /// <summary>
         ///     Gets or sets the <see cref="DbSet{TEntity}"/> of <see cref="Fix"/>es.
         /// </summary>

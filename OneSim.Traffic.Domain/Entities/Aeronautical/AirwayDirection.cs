@@ -1,24 +1,24 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TerminalRouteType.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="AirwayDirection.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Domain.Entities.Ais
+namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     /// <summary>
-    ///     The type of terminal routing.
+    ///     The possible directions an airway can be flown.
     /// </summary>
-    public enum TerminalRouteType
+    public enum AirwayDirection
     {
         /// <summary>
-        ///     Standard Instrument Departure (SID).
+        ///     The airway can only be flown in one direction.
         /// </summary>
-        StandardInstrumentDeparture,
+        UniDirectional,
 
         /// <summary>
-        ///     Standard Terminal Arrival Route (STAR).
+        ///     The airway can be flown in either direction.
         /// </summary>
-        StandardTerminalArrivalRoute
+        OnmiDirectional
     }
 }

@@ -9,7 +9,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
     using System.Collections.Generic;
 
     using OneSim.Traffic.Domain.Entities;
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The Sector Line.

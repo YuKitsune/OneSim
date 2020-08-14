@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Tests.Ais
+namespace OneSim.Traffic.Tests.Aeronautical
 {
     using System.Linq;
 
@@ -12,7 +12,7 @@ namespace OneSim.Traffic.Tests.Ais
 
     using OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile;
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The <see cref="EuroScopeExtensionFileParser"/> tests.

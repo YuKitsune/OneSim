@@ -1,24 +1,34 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AirwayDirection.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="CardinalDirection.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Domain.Entities.Ais
+namespace OneSim.Traffic.Domain.Entities.Aeronautical
 {
     /// <summary>
-    ///     The possible directions an airway can be flown.
+    ///     The cardinal directions.
     /// </summary>
-    public enum AirwayDirection
+    public enum CardinalDirection
     {
         /// <summary>
-        ///     The airway can only be flown in one direction.
+        ///     North.
         /// </summary>
-        UniDirectional,
+        North,
 
         /// <summary>
-        ///     The airway can be flown in either direction.
+        ///     East.
         /// </summary>
-        OnmiDirectional
+        East,
+
+        /// <summary>
+        ///     South.
+        /// </summary>
+        South,
+
+        /// <summary>
+        ///     West.
+        /// </summary>
+        West
     }
 }

@@ -8,7 +8,7 @@ namespace OneSim.Traffic.Application.Abstractions
 {
     using Microsoft.EntityFrameworkCore;
 
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     using Strato.Persistence.Abstractions;
 

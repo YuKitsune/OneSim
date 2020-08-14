@@ -9,7 +9,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.PositionFile
     using System.Collections.Generic;
 
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The Position File parse result.

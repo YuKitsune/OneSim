@@ -6,7 +6,7 @@
 
 namespace OneSim.Traffic.Application.SectorFileParsers.PositionFile
 {
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The Position File (.pof) parser.

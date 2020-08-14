@@ -12,7 +12,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
     using System.Text.RegularExpressions;
 
     using OneSim.Traffic.Domain.Entities;
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The Sector File (.sct or .stc2) parser.

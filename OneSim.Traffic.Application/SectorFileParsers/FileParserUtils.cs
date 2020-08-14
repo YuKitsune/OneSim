@@ -12,7 +12,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers
 
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
     using OneSim.Traffic.Domain.Entities;
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     The file parser utilities.

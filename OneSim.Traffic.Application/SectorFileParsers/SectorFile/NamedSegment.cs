@@ -6,7 +6,7 @@
 
 namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
 {
-    using OneSim.Traffic.Domain.Entities.Ais;
+    using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
     ///     A single line segment which has been named.

@@ -1,0 +1,71 @@
+@model OneSim.Traffic.Api.ViewModels.UploadSectorFileViewModel
+@{
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+
+<ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#sectorAndPosition">Sector and Position File (.sct/.pof)</a></li>
+    <li><a data-toggle="tab" href="#sectorAndEuroScope">Sector and EuroScope Extension File (.sct/.ese)</a></li>
+</ul>
+
+<div class="tab-content">
+    
+    <div id="sectorAndPosition" class="tab-pane fade in active">
+        <form class="ui large form" asp-action="SubmitSectorFile" asp-controller="AeronauticalData" method="post">
+            <div class="ui stacked segment">
+
+                @* Validation message *@
+                <div asp-validation-summary="All" class="ui error message" style="padding: 5px;"></div>
+
+                @* Sector File *@
+                <div class="field">
+                    <label>Sector File</label>
+                    <input type="file" asp-for="SectorFile">
+                </div>
+
+                @* Position File *@
+                <div class="field">
+                    <label>Position File</label>
+                    <input type="file" asp-for="PositionFile">
+                </div>
+
+                @* Anti-forgery token *@
+                @Html.AntiForgeryToken()
+                
+                @* Submit / Review button *@
+                <button class="ui fluid large blue button" type="submit">Review</button>
+                
+            </div>
+        </form>
+    </div>
+    
+    <div id="sectorAndEuroScope" class="tab-pane fade">
+        <form class="ui large form" asp-action="SubmitSectorFile" asp-controller="AeronauticalData" method="post">
+            <div class="ui stacked segment">
+
+                @* Validation message *@
+                <div asp-validation-summary="All" class="ui error message" style="padding: 5px;"></div>
+
+                @* Sector File *@
+                <div class="field">
+                    <label>Sector File</label>
+                    <input type="file" asp-for="SectorFile">
+                </div>
+
+                @* EuroScope Extension File *@
+                <div class="field">
+                    <label>EuroScope Extension</label>
+                    <input type="file" asp-for="EuroScopeExtensionFile">
+                </div>
+
+                @* Anti-forgery token *@
+                @Html.AntiForgeryToken()
+                
+                @* Submit / Review button *@
+                <button class="ui fluid large blue button" type="submit">Review</button>
+                
+            </div>
+        </form>
+    </div>
+    
+</div>

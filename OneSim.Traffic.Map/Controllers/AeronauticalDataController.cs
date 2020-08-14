@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AisDataController.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="AeronauticalDataController.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ namespace OneSim.Traffic.Map.Controllers
     ///     The Aeronautical Information Data <see cref="Controller"/>.
     /// </summary>
     [Authorize]
-    public class AisDataController : Controller
+    public class AeronauticalDataController : Controller
     {
         /// <summary>
         ///     The <see cref="AeronauticalInformationService"/>.
@@ -33,23 +33,23 @@ namespace OneSim.Traffic.Map.Controllers
         private readonly AeronauticalInformationService _aeronauticalInformationService;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="AisDataController"/> class.
+        ///     Initializes a new instance of the <see cref="AeronauticalDataController"/> class.
         /// </summary>
         /// <param name="aeronauticalInformationService">
         ///     The <see cref="AeronauticalInformationService"/>.
         /// </param>
-        public AisDataController(AeronauticalInformationService aeronauticalInformationService) =>
+        public AeronauticalDataController(AeronauticalInformationService aeronauticalInformationService) =>
             _aeronauticalInformationService = aeronauticalInformationService ??
                                               throw new ArgumentNullException(nameof(aeronauticalInformationService));
 
         /// <summary>
-        ///     Gets the view for submitting AIS data.
+        ///     Gets the view for submitting aeronautical data.
         /// </summary>
         /// <returns>
         ///     The <see cref="IActionResult"/>.
         /// </returns>
         [HttpGet]
-        public IActionResult SubmitAisData() => View();
+        public IActionResult SubmitData() => View();
 
         /// <summary>
         ///     Submits the Sector File (.sct) and Position File (.pof) for parsing as an asynchronous operation.
@@ -61,7 +61,7 @@ namespace OneSim.Traffic.Map.Controllers
         ///     The <see cref="Task{T}"/> representing the asynchronous operation.
         ///     The <see cref="Task{T}.Result"/> contains the <see cref="IActionResult"/>.
         /// </returns>
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitSectorFile(UploadSectorFileViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -272,6 +272,6 @@ namespace OneSim.Traffic.Map.Controllers
         ///     The <see cref="IActionResult"/>.
         /// </returns>
         [HttpGet]
-        public IActionResult AisDataSubmitted() => View();
+        public IActionResult DataSubmitted() => View();
     }
 }
