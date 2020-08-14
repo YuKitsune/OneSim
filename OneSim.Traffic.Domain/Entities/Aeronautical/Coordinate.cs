@@ -85,6 +85,66 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
         public Point2D GetPoint() => new Point2D(Longitude.GetDecimal(), Latitude.GetDecimal());
 
         /// <summary>
+        ///     Determines whether the <see cref="Coordinate"/> on the left of the operator is equal to the
+        ///     <see cref="Coordinate"/> on the right hand side of the operator.
+        /// </summary>
+        /// <param name="left">
+        ///     The <see cref="Coordinate"/> on the left of the operator.
+        /// </param>
+        /// <param name="right">
+        ///     The <see cref="Coordinate"/> on the right of the operator.
+        /// </param>
+        /// <returns>
+        ///     <c>true</c> if the <paramref name="right"/> has the same value as <paramref name="left"/>, <c>false</c>
+        ///     otherwise.
+        /// </returns>
+        public static bool operator ==(Coordinate left, Coordinate right)
+        {
+            // Note: Can't use == in here, since we're overriding it, otherwise we'll get a recursive call.
+
+            // If both null, i guess they're equal
+            if (object.ReferenceEquals(left, null) &&
+                object.ReferenceEquals(right, null))
+                return true;
+
+            // Made it here, one of them isn't null, check them individually
+            if (object.ReferenceEquals(left, null)) return false;
+            if (object.ReferenceEquals(right, null)) return false;
+
+            // Made it this far, no nulls, now actually compare them
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        ///     Determines whether the <see cref="Coordinate"/> on the left of the operator is not equal to the
+        ///     <see cref="Coordinate"/> on the right hand side of the operator.
+        /// </summary>
+        /// <param name="left">
+        ///     The <see cref="Coordinate"/> on the left of the operator.
+        /// </param>
+        /// <param name="right">
+        ///     The <see cref="Coordinate"/> on the right of the operator.
+        /// </param>
+        /// <returns>
+        ///     <c>false</c> if the <paramref name="right"/> has the same value as <paramref name="left"/>, <c>true</c>
+        ///     otherwise.
+        /// </returns>
+        public static bool operator !=(Coordinate left, Coordinate right)
+        {
+            // If both null, i guess they're equal
+            if (object.ReferenceEquals(left, null) &&
+                object.ReferenceEquals(right, null))
+                return false;
+
+            // Made it here, one of them isn't null, check them individually
+            if (object.ReferenceEquals(left, null)) return true;
+            if (object.ReferenceEquals(right, null)) return true;
+
+            // Made it this far, no nulls, now actually compare them
+            return !left.Equals(right);
+        }
+
+        /// <summary>
         ///     Determines whether or not the <paramref name="obj"/> is equal to the current <see cref="Coordinate"/>
         ///     instance.
         /// </summary>
