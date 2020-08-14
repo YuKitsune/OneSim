@@ -7,10 +7,12 @@
 namespace OneSim.Traffic.Domain.Entities
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     ///     The base OFSN client.
     /// </summary>
+    [DebuggerDisplay("{Callsign}")]
     public abstract class BaseClient
     {
         /// <summary>

@@ -6,9 +6,12 @@
 
 namespace OneSim.Traffic.Domain.Entities
 {
+    using System.Diagnostics;
+
     /// <summary>
     ///     The Flight Notification. Also known as a "prefile", or "pre-filed flight plan".
     /// </summary>
+    [DebuggerDisplay("{Callsign}")]
     public class FlightNotification
     {
         /// <summary>
