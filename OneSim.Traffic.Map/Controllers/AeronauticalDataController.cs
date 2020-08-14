@@ -62,107 +62,125 @@ namespace OneSim.Traffic.Map.Controllers
         ///     The <see cref="Task{T}.Result"/> contains the <see cref="IActionResult"/>.
         /// </returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitSectorFile(UploadSectorFileViewModel viewModel)
+        public async Task<IActionResult> SubmitSectorFile([FromForm] UploadSectorFileViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                // Make sure we have the correct combination of files
-                if (viewModel.SectorFile != null)
+                try
                 {
-                    string sectorFileContent = string.Empty;
-                    await using (Stream stream = viewModel.SectorFile.OpenReadStream())
-                    using (StreamReader streamReader = new StreamReader(stream))
+                    // Make sure we have the correct combination of files
+                    if (viewModel.SectorFile != null)
                     {
-                        sectorFileContent = await streamReader.ReadToEndAsync();
-                    }
-
-                    if (!string.IsNullOrEmpty(sectorFileContent))
-                    {
-                        SectorFileParser sectorFileParser = new SectorFileParser();
-                        SectorFileParseResult sectorFileParseResult = sectorFileParser.Parse(sectorFileContent);
-                        sectorFileParseResult.SectorSet.Network = viewModel.Network;
-                        sectorFileParseResult.SectorSet.EffectiveDate = viewModel.EffectiveDate;
-
-                        string userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                        sectorFileParseResult.SectorSet.SubmittedByUserId = userId;
-
-                        if (viewModel.EuroScopeExtensionFile != null &&
-                            viewModel.PositionFile != null)
+                        string sectorFileContent = string.Empty;
+                        await using (Stream stream = viewModel.SectorFile.OpenReadStream())
+                        using (StreamReader streamReader = new StreamReader(stream))
                         {
-                            ModelState.AddModelError(string.Empty, "Cannot submit a EuroScope Extension file (.ese) and a Position file (.pof) at the same time.");
+                            sectorFileContent = await streamReader.ReadToEndAsync();
                         }
-                        else if (viewModel.EuroScopeExtensionFile != null)
-                        {
-                            string euroScopeExtensionFileContent = string.Empty;
-                            await using Stream stream = viewModel.EuroScopeExtensionFile.OpenReadStream();
-                            using StreamReader streamReader = new StreamReader(stream);
-                            euroScopeExtensionFileContent = await streamReader.ReadToEndAsync();
 
-                            if (!string.IsNullOrEmpty(euroScopeExtensionFileContent))
+                        if (!string.IsNullOrEmpty(sectorFileContent))
+                        {
+                            SectorFileParser sectorFileParser = new SectorFileParser();
+                            SectorFileParseResult sectorFileParseResult = sectorFileParser.Parse(sectorFileContent);
+                            sectorFileParseResult.SectorSet.Network = viewModel.Network;
+                            sectorFileParseResult.SectorSet.EffectiveDate = viewModel.EffectiveDate;
+
+                            string userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                            sectorFileParseResult.SectorSet.SubmittedByUserId = userId;
+
+                            if (viewModel.EuroScopeExtensionFile != null &&
+                                viewModel.PositionFile != null)
                             {
-                                EuroScopeExtensionFileParser euroScopeExtensionFileParser =
-                                    new EuroScopeExtensionFileParser();
-                                EuroScopeExtensionFileParseResult euroScopeExtensionFileParseResult =
-                                    euroScopeExtensionFileParser.Parse(
-                                        euroScopeExtensionFileContent,
-                                        sectorFileParseResult);
-                                try
+                                ModelState.AddModelError(
+                                    string.Empty,
+                                    "Cannot submit a EuroScope Extension file (.ese) and a Position file (.pof) at the same time.");
+                            }
+                            else if (viewModel.EuroScopeExtensionFile != null)
+                            {
+                                string euroScopeExtensionFileContent = string.Empty;
+                                await using Stream stream = viewModel.EuroScopeExtensionFile.OpenReadStream();
+                                using StreamReader streamReader = new StreamReader(stream);
+                                euroScopeExtensionFileContent = await streamReader.ReadToEndAsync();
+
+                                if (!string.IsNullOrEmpty(euroScopeExtensionFileContent))
                                 {
-                                    await _aeronauticalInformationService.AddSectorFile(
-                                        sectorFileParseResult,
-                                        euroScopeExtensionFileParseResult);
-                                    return RedirectToAction(nameof(DataSubmitted));
+                                    EuroScopeExtensionFileParser euroScopeExtensionFileParser =
+                                        new EuroScopeExtensionFileParser();
+                                    EuroScopeExtensionFileParseResult euroScopeExtensionFileParseResult =
+                                        euroScopeExtensionFileParser.Parse(
+                                            euroScopeExtensionFileContent,
+                                            sectorFileParseResult);
+                                    try
+                                    {
+                                        await _aeronauticalInformationService.AddSectorFile(
+                                            sectorFileParseResult,
+                                            euroScopeExtensionFileParseResult);
+                                        return RedirectToAction(nameof(DataSubmitted));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        // Todo: log
+                                        ModelState.AddModelError(
+                                            string.Empty,
+                                            "An error has occurred while submitting the sector file.");
+                                    }
                                 }
-                                catch (Exception ex)
+                                else
                                 {
-                                    // Todo: log
-                                    ModelState.AddModelError(string.Empty, "An error has occurred while submitting the sector file.");
+                                    ModelState.AddModelError(
+                                        string.Empty,
+                                        "The EuroScope Extension file (.ese) was empty.");
                                 }
                             }
-                            else
+                            else if (viewModel.PositionFile != null)
                             {
-                                ModelState.AddModelError(string.Empty, "The EuroScope Extension file (.ese) was empty.");
+                                string positionFileContent = string.Empty;
+                                await using Stream stream = viewModel.PositionFile.OpenReadStream();
+                                using StreamReader streamReader = new StreamReader(stream);
+                                positionFileContent = await streamReader.ReadToEndAsync();
+
+                                if (!string.IsNullOrEmpty(positionFileContent))
+                                {
+                                    PositionFileParser positionFileParser = new PositionFileParser();
+                                    PositionFileParseResult positionFileParseResult =
+                                        positionFileParser.Parse(positionFileContent);
+                                    try
+                                    {
+                                        await _aeronauticalInformationService.AddSectorFile(
+                                            sectorFileParseResult,
+                                            positionFileParseResult);
+                                        return RedirectToAction(nameof(DataSubmitted));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        // Todo: log
+                                        ModelState.AddModelError(
+                                            string.Empty,
+                                            "An error has occurred while submitting the sector file.");
+                                    }
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError(string.Empty, "The Position file (.pos) was empty.");
+                                }
                             }
                         }
-                        else if (viewModel.PositionFile != null)
+                        else
                         {
-                            string positionFileContent = string.Empty;
-                            await using Stream stream = viewModel.PositionFile.OpenReadStream();
-                            using StreamReader streamReader = new StreamReader(stream);
-                            positionFileContent = await streamReader.ReadToEndAsync();
-
-                            if (!string.IsNullOrEmpty(positionFileContent))
-                            {
-                                PositionFileParser positionFileParser = new PositionFileParser();
-                                PositionFileParseResult positionFileParseResult =
-                                    positionFileParser.Parse(positionFileContent);
-                                try
-                                {
-                                    await _aeronauticalInformationService.AddSectorFile(
-                                        sectorFileParseResult,
-                                        positionFileParseResult);
-                                    return RedirectToAction(nameof(DataSubmitted));
-                                }
-                                catch (Exception ex)
-                                {
-                                    // Todo: log
-                                    ModelState.AddModelError(string.Empty, "An error has occurred while submitting the sector file.");
-                                }
-                            }
-                            else
-                            {
-                                ModelState.AddModelError(string.Empty, "The Position file (.pos) was empty.");
-                            }
+                            ModelState.AddModelError(string.Empty, "The Sector file (.sct) was empty.");
                         }
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "The Sector file (.sct) was empty.");
+                        ModelState.AddModelError(string.Empty, "No Sector File (.sct) was submitted.");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    ModelState.AddModelError(string.Empty, "No Sector File (.sct) was submitted.");
+                    // Todo: log
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "An error has occurred while submitting the sector file.");
                 }
             }
 

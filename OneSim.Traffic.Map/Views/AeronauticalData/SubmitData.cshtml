@@ -4,69 +4,74 @@
     Layout = "~/Views/Shared/_SimpleLayout.cshtml";
 }
 
-<ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#sectorAndPosition">Sector and Position File (.sct/.pof)</a></li>
-    <li><a data-toggle="tab" href="#sectorAndEuroScope">Sector and EuroScope Extension File (.sct/.ese)</a></li>
-</ul>
-
-<div class="tab-content">
-    
-    <div id="sectorAndPosition" class="tab-pane fade in active">
-        <form class="ui large form" asp-action="SubmitSectorFile" asp-controller="AeronauticalData" method="post">
-            <div class="ui stacked segment">
-
-                @* Validation message *@
-                <div asp-validation-summary="All" class="ui error message" style="padding: 5px;"></div>
-
-                @* Sector File *@
-                <div class="field">
-                    <label>Sector File</label>
-                    <input type="file" asp-for="SectorFile">
-                </div>
-
-                @* Position File *@
-                <div class="field">
-                    <label>Position File</label>
-                    <input type="file" asp-for="PositionFile">
-                </div>
-
-                @* Anti-forgery token *@
-                @Html.AntiForgeryToken()
-                
-                @* Submit / Review button *@
-                <button class="ui fluid large blue button" type="submit">Review</button>
-                
-            </div>
-        </form>
-    </div>
-    
-    <div id="sectorAndEuroScope" class="tab-pane fade">
-        <form class="ui large form" asp-action="SubmitSectorFile" asp-controller="AeronauticalData" method="post">
-            <div class="ui stacked segment">
-
-                @* Validation message *@
-                <div asp-validation-summary="All" class="ui error message" style="padding: 5px;"></div>
-
-                @* Sector File *@
-                <div class="field">
-                    <label>Sector File</label>
-                    <input type="file" asp-for="SectorFile">
-                </div>
-
-                @* EuroScope Extension File *@
-                <div class="field">
-                    <label>EuroScope Extension</label>
-                    <input type="file" asp-for="EuroScopeExtensionFile">
-                </div>
-
-                @* Anti-forgery token *@
-                @Html.AntiForgeryToken()
-                
-                @* Submit / Review button *@
-                <button class="ui fluid large blue button" type="submit">Review</button>
-                
-            </div>
-        </form>
-    </div>
-    
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="vrc">VRC</a>
+    <a class="item" data-tab="euroScope">EuroScope</a>
+    <a class="item" data-tab="vStarsVEram">vSTARS/vERAM</a>
+    <a class="item" data-tab="vatSys">vatSys</a>
 </div>
+<div class="ui bottom attached tab segment active" data-tab="vrc">
+    <form class="ui large form" asp-action="SubmitSectorFile" asp-controller="AeronauticalData" method="post" enctype="multipart/form-data">
+        <div class="ui stacked segment">
+
+            @* Validation message *@
+            <div asp-validation-summary="All" class="ui error message" style="padding: 5px;"></div>
+
+            @* Sector File *@
+            <div class="field">
+                <label>Sector File</label>
+                <input asp-for="SectorFile" accept=".sct,.st2">
+            </div>
+
+            @* Position File *@
+            <div class="field">
+                <label>Position File</label>
+                <input asp-for="PositionFile" accept=".pof">
+            </div>
+
+            @* Anti-forgery token *@
+            @Html.AntiForgeryToken()
+
+            @* Submit / Review button *@
+            <button class="ui fluid large blue button" type="submit">Review</button>
+
+        </div>
+    </form>
+</div>
+<div class="ui bottom attached tab segment" data-tab="euroScope">
+    <form class="ui large form" asp-action="SubmitSectorFile" asp-controller="AeronauticalData" method="post" enctype="multipart/form-data">
+        <div class="ui stacked segment">
+
+            @* Validation message *@
+            <div asp-validation-summary="All" class="ui error message" style="padding: 5px;"></div>
+
+            @* Sector File *@
+            <div class="field">
+                <label>Sector File</label>
+                <input type="file" asp-for="SectorFile" accept=".sct,.st2">
+            </div>
+
+            @* EuroScope Extension File *@
+            <div class="field">
+                <label>EuroScope Extension</label>
+                <input type="file" asp-for="EuroScopeExtensionFile" accept=".ese">
+            </div>
+
+            @* Anti-forgery token *@
+            @Html.AntiForgeryToken()
+            
+            @* Submit / Review button *@
+            <button class="ui fluid large blue button" type="submit">Review</button>
+            
+        </div>
+    </form>
+</div>
+<div class="ui bottom attached tab segment" data-tab="vStarsVEram">
+  vSTARs and vERAM data files not yet implemented.
+</div>
+<div class="ui bottom attached tab segment" data-tab="vatSys">
+    vatSys data files not yet implemented.
+</div>
+<script>
+    $('.menu .item').tab();
+</script>
