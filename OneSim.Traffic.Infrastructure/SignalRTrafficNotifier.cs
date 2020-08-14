@@ -31,7 +31,7 @@ namespace OneSim.Traffic.Infrastructure
         ///        The <see cref="IHubContext{THub}"/> for the <see cref="TrafficDataHub"/>.
         /// </param>
         public SignalRTrafficNotifier(IHubContext<TrafficDataHub> hubContext) => _hubContext = hubContext ??
-                                                                                               throw new ArgumentNullException(nameof(hubContext), "The HubContext cannot be null");
+            throw new ArgumentNullException(nameof(hubContext), "The HubContext cannot be null");
 
         /// <summary>
         ///     Notifies the subscribers that there is new traffic data available.

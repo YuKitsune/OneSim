@@ -277,7 +277,7 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
         ///     <c>true</c> if the <paramref name="obj"/> has the same value as the current
         ///     <see cref="CoordinateComponent"/> instance, <c>false</c> otherwise.
         /// </returns>
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             if (obj != null &&
                 obj is CoordinateComponent coordinateComponent)
@@ -291,6 +291,14 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
             // If we made it to here, then we don't have a match
             return false;
         }
+
+        /// <summary>
+        ///     Gets the hash code of the current <see cref="CoordinateComponent"/> instance.
+        /// </summary>
+        /// <returns>
+        ///     The hash code.
+        /// </returns>
+        public override int GetHashCode() => HashCode.Combine((int)CardinalDirection, Degrees, Minutes, Seconds);
 
         /// <summary>
         ///     Gets the <see cref="string"/> representation of the current <see cref="CoordinateComponent"/>.

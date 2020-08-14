@@ -7,11 +7,9 @@
 namespace OneSim.Traffic.Application.SectorFileParsers
 {
     using System;
-    using System.Globalization;
     using System.Linq;
 
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
-    using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>

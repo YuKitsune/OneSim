@@ -21,7 +21,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.PositionFile
         /// <summary>
         ///     The current line number.
         /// </summary>
-        private int _lineNumber = 0;
+        private int _lineNumber;
 
         /// <summary>
         ///     The current line content.
@@ -48,6 +48,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.PositionFile
         /// </returns>
         public PositionFileParseResult Parse(string fileContent)
         {
+            Result = new PositionFileParseResult();
             string[] lines = fileContent.Split('\r', '\n');
             foreach (string line in lines)
             {

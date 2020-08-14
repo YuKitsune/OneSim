@@ -32,6 +32,7 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
             : base(fixes)
         {
             if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
+
             Identifier = identifier;
             Direction = AirwayDirection.OnmiDirectional;
         }

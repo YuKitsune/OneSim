@@ -54,6 +54,7 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
         {
             if (string.IsNullOrEmpty(identifier)) throw new ArgumentNullException(nameof(identifier));
             if (thresholdLocation == null) throw new ArgumentNullException(nameof(thresholdLocation));
+
             Identifier = identifier;
             ThresholdLocation = thresholdLocation;
             Heading = heading;

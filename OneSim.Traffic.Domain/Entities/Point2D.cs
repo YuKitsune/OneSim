@@ -24,14 +24,14 @@ namespace OneSim.Traffic.Domain.Entities
         public int Id { get; set; }
 
         /// <summary>
-        ///     Gets or sets the latitude.
+        ///     Gets the latitude.
         /// </summary>
-        public double Latitude { get; set; }
+        public double Latitude { get; }
 
         /// <summary>
-        ///     Gets or sets the longitude.
+        ///     Gets the longitude.
         /// </summary>
-        public double Longitude { get; set; }
+        public double Longitude { get; }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Point2D"/> class.
@@ -59,7 +59,7 @@ namespace OneSim.Traffic.Domain.Entities
         ///     <c>true</c> if the current and given <see cref="Point2D"/> are equal with the given tolerance,
         ///     <c>false</c> otherwise.
         /// </returns>
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             if (obj != null &&
                 obj is Point2D other)
@@ -70,5 +70,13 @@ namespace OneSim.Traffic.Domain.Entities
 
             return false;
         }
+
+        /// <summary>
+        ///     Gets the hash code for the current <see cref="Point2D"/> instance.
+        /// </summary>
+        /// <returns>
+        ///     The hash code.
+        /// </returns>
+        public override int GetHashCode() => HashCode.Combine(Latitude, Longitude);
     }
 }

@@ -9,7 +9,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
     using System;
     using System.Collections.Generic;
 
-    using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
     using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>

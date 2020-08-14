@@ -165,11 +165,11 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                                     continue;
 
                                 case "VOR":
-                                    _currentSection = FileSection.VOR;
+                                    _currentSection = FileSection.Vor;
                                     continue;
 
                                 case "NDB":
-                                    _currentSection = FileSection.NDB;
+                                    _currentSection = FileSection.Ndb;
                                     continue;
 
                                 case "AIRPORT":
@@ -231,8 +231,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                                     ParseInfoLine(++infoSectionLine);
                                     break;
 
-                                case FileSection.VOR:
-                                case FileSection.NDB:
+                                case FileSection.Vor:
+                                case FileSection.Ndb:
                                     ParseVorNdbLine();
                                     break;
 
@@ -254,7 +254,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                                     ParseRunwayLine();
                                     break;
 
-                                case FileSection.ARTCC:
+                                case FileSection.Artcc:
                                 case FileSection.ArtccHigh:
                                 case FileSection.ArtccLow:
                                 case FileSection.HighAirway:
@@ -262,8 +262,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                                     ParseNamedSegmentLine();
                                     break;
 
-                                case FileSection.SID:
-                                case FileSection.STAR:
+                                case FileSection.Sid:
+                                case FileSection.Star:
                                 case FileSection.Geo:
                                 case FileSection.Regions:
                                 case FileSection.Labels:
@@ -331,8 +331,8 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                 // Check which type of Navaid we're reading
                 NavaidType type = _currentSection switch
                 {
-                    FileSection.VOR => NavaidType.VOR,
-                    FileSection.NDB => NavaidType.NDB,
+                    FileSection.Vor => NavaidType.Vor,
+                    FileSection.Ndb => NavaidType.Ndb,
                     _ => throw new InvalidOperationException("Invalid file section.")
                 };
 
@@ -508,7 +508,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.SectorFile
                     // case FileSection.ArtccLow:
                     //     if (ArtccLowSegmentFound != null) ArtccLowSegmentFound(this, new DataFoundEventArgs<LabeledSegment>(segment));
                     //     break;
-
                     case FileSection.HighAirway:
                         Result.HighAirwaySegments.Add(segment);
                         break;

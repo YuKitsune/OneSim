@@ -9,7 +9,6 @@ namespace OneSim.Traffic.Persistence
     using Microsoft.EntityFrameworkCore;
 
     using OneSim.Traffic.Application.Abstractions;
-    using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>

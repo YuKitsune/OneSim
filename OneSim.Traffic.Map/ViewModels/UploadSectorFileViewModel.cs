@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Traffic.Api.ViewModels
+namespace OneSim.Traffic.Map.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -30,8 +30,8 @@ namespace OneSim.Traffic.Api.ViewModels
         public DateTimeOffset EffectiveDate { get; set; }
 
         /// <summary>
-        ///     Gets the <see cref="List{T}"/> of <see cref="FlightInformationRegion.IcaoCode"/>s which the given sector
-        ///     files cover.
+        ///     Gets the <see cref="List{T}"/> of <see cref="FlightInformationRegion.Identifier"/>s which the given
+        ///     sector files cover.
         /// </summary>
         public List<string> CoveredFlightInformationRegions { get; }
 

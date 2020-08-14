@@ -103,13 +103,13 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
             // Note: Can't use == in here, since we're overriding it, otherwise we'll get a recursive call.
 
             // If both null, i guess they're equal
-            if (object.ReferenceEquals(left, null) &&
-                object.ReferenceEquals(right, null))
+            if (ReferenceEquals(left, null) &&
+                ReferenceEquals(right, null))
                 return true;
 
             // Made it here, one of them isn't null, check them individually
-            if (object.ReferenceEquals(left, null)) return false;
-            if (object.ReferenceEquals(right, null)) return false;
+            if (ReferenceEquals(left, null)) return false;
+            if (ReferenceEquals(right, null)) return false;
 
             // Made it this far, no nulls, now actually compare them
             return left.Equals(right);
@@ -132,13 +132,13 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
         public static bool operator !=(Coordinate left, Coordinate right)
         {
             // If both null, i guess they're equal
-            if (object.ReferenceEquals(left, null) &&
-                object.ReferenceEquals(right, null))
+            if (ReferenceEquals(left, null) &&
+                ReferenceEquals(right, null))
                 return false;
 
             // Made it here, one of them isn't null, check them individually
-            if (object.ReferenceEquals(left, null)) return true;
-            if (object.ReferenceEquals(right, null)) return true;
+            if (ReferenceEquals(left, null)) return true;
+            if (ReferenceEquals(right, null)) return true;
 
             // Made it this far, no nulls, now actually compare them
             return !left.Equals(right);
@@ -155,7 +155,7 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
         ///     <c>true</c> if the <paramref name="obj"/> has the same value as the current <see cref="Coordinate"/>
         ///     instance, <c>false</c> otherwise.
         /// </returns>
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             if (obj != null &&
                 obj is Coordinate coordinate)
@@ -164,6 +164,14 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
             // If we made it to here, then we don't have a match
             return false;
         }
+
+        /// <summary>
+        ///     Gets the hash code of the current <see cref="Coordinate"/> instance.
+        /// </summary>
+        /// <returns>
+        ///     The hash code.
+        /// </returns>
+        public override int GetHashCode() => HashCode.Combine(Latitude, Longitude);
 
         /// <summary>
         ///     Gets the <see cref="string"/> representation of the current <see cref="Coordinate"/>.

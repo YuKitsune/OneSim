@@ -263,8 +263,8 @@ namespace OneSim.Traffic.Application
 
             // Get all the notices from the last batch
             List<FlightNotification> oldNotifications = await _trafficDbContext.FlightNotifications
-                                                                               .Include(n => n.FlightPlan)
-                                                                               .ToListAsync();
+                                                           .Include(n => n.FlightPlan)
+                                                           .ToListAsync();
 
             // Remove all of the notices and flight plans
             _trafficDbContext.FlightPlans.RemoveRange(oldNotifications.Select(n => n.FlightPlan));

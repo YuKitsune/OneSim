@@ -15,11 +15,11 @@ namespace OneSim.Traffic.Map.Controllers
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
-    using OneSim.Traffic.Api.ViewModels;
     using OneSim.Traffic.Application;
     using OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile;
     using OneSim.Traffic.Application.SectorFileParsers.PositionFile;
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
+    using OneSim.Traffic.Map.ViewModels;
 
     /// <summary>
     ///     The Aeronautical Information Data <see cref="Controller"/>.
@@ -71,7 +71,7 @@ namespace OneSim.Traffic.Map.Controllers
                     // Make sure we have the correct combination of files
                     if (viewModel.SectorFile != null)
                     {
-                        string sectorFileContent = string.Empty;
+                        string sectorFileContent;
                         await using (Stream stream = viewModel.SectorFile.OpenReadStream())
                         using (StreamReader streamReader = new StreamReader(stream))
                         {

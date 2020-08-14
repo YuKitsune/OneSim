@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SectorFileParser.cs" company="Strato Systems Pty. Ltd.">
+// <copyright file="ParseError.cs" company="Strato Systems Pty. Ltd.">
 //   Copyright (c) Strato Systems Pty. Ltd. All rights reserved.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -11,25 +11,25 @@ namespace OneSim.Traffic.Application.SectorFileParsers
     /// <summary>
     ///     The file parse error.
     /// </summary>
-    public class ParseError 
+    public class ParseError
     {
         /// <summary>
-        ///     The number of the line where the current <see cref="ParseError"/> occurred.
+        ///     Gets the number of the line where the current <see cref="ParseError"/> occurred.
         /// </summary>
-        public int LineNumber { get; set; }
+        public int LineNumber { get; }
 
         /// <summary>
-        ///     The content of the line where the current <see cref="ParseError"/> exists.
+        ///     Gets the content of the line where the current <see cref="ParseError"/> exists.
         /// </summary>
-        public string LineContents { get; set; }
+        public string LineContents { get; }
 
         /// <summary>
-        ///     The message outlining the error.
+        ///     Gets the message outlining the error.
         /// </summary>
-        public string Message { get; set; }
+        public string Message { get; }
 
         /// <summary>
-        ///     The message outlining the error.
+        ///     Initializes a new instance of the <see cref="ParseError"/> class.
         /// </summary>
         /// <param name="lineNumber">
         ///     The number of the line where the <see cref="ParseError"/> occurred.

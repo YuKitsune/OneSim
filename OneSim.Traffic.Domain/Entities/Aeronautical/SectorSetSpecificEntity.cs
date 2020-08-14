@@ -14,7 +14,7 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
     public abstract class SectorSetSpecificEntity
     {
         /// <summary>
-        ///     The <see cref="SectorSet"/> which owns the current object.
+        ///     Gets or sets the <see cref="SectorSet"/> which owns the current object.
         /// </summary>
         [Required]
         public SectorSet ParentSectorSet { get; set; }

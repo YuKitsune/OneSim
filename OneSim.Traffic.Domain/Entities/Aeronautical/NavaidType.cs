@@ -14,11 +14,11 @@ namespace OneSim.Traffic.Domain.Entities.Aeronautical
         /// <summary>
         ///     VHF Omnidirectional Range.
         /// </summary>
-        VOR,
+        Vor,
 
         /// <summary>
         ///     Non-directional Beacon.
         /// </summary>
-        NDB
+        Ndb
     }
 }

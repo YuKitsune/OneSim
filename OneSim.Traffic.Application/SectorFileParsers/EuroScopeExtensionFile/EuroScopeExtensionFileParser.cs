@@ -12,7 +12,6 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
     using System.Text.RegularExpressions;
 
     using OneSim.Traffic.Application.SectorFileParsers.SectorFile;
-    using OneSim.Traffic.Domain.Entities;
     using OneSim.Traffic.Domain.Entities.Aeronautical;
 
     /// <summary>
@@ -38,7 +37,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
         /// <summary>
         ///     The current line number.
         /// </summary>
-        private int _lineNumber = 0;
+        private int _lineNumber;
 
         /// <summary>
         ///     The current line content.
@@ -56,7 +55,7 @@ namespace OneSim.Traffic.Application.SectorFileParsers.EuroScopeExtensionFile
         private string CurrentSectorLineName { get; set; }
 
         /// <summary>
-        ///     Gets or sets the <see cref="List{T}"/> of found <see cref="SectorLine"/>s.
+        ///     Gets the <see cref="List{T}"/> of found <see cref="SectorLine"/>s.
         /// </summary>
         private List<SectorLine> SectorLines { get; }
 
