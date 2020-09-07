@@ -58,6 +58,8 @@ namespace OneSim.Windows.Windows
             NavigationContext = navigationContext ?? throw new ArgumentNullException(nameof(navigationContext));
             NavigationContext.Register<FlyNowView, FlyNowViewModel>();
             NavigationContext.Register<HangarView, HangarViewModel>();
+            NavigationContext.Register<MapView, MapViewModel>();
+            NavigationContext.Register<SettingsView, SettingsViewModel>();
             NavigationControl.UseNavigationContext(NavigationContext);
 
             // Setup the Event Aggregator

@@ -12,7 +12,7 @@ namespace OneSim.Windows.ViewModels
     using Strato.Mvvm.ViewModels;
 
     /// <summary>
-    ///     The main window <see cref="ViewModel"/>.
+    ///     The Main Window <see cref="ViewModel"/>.
     /// </summary>
     public class MainWindowViewModel : ViewModel
     {
@@ -41,8 +41,8 @@ namespace OneSim.Windows.ViewModels
             {
                 SidebarItem.FromViewModel("Fly", new FlyNowViewModel()),
                 SidebarItem.FromViewModel("Hangar", new HangarViewModel()),
-                SidebarItem.FromViewModel("Map", new FlyNowViewModel()),
-                SidebarItem.FromViewModel("Settings", new FlyNowViewModel()),
+                SidebarItem.FromViewModel("Map", new MapViewModel()),
+                SidebarItem.FromViewModel("Settings", new SettingsViewModel()),
             };
     }
 }

@@ -1,16 +1,17 @@
-﻿<UserControl x:Class="OneSim.Windows.Views.HangarView"
+﻿<UserControl x:Class="OneSim.Windows.Views.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OneSim.Windows.Views"
              xmlns:viewModels="clr-namespace:OneSim.Windows.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Padding="5">
     <UserControl.DataContext>
-        <viewModels:HangarViewModel/>
+        <viewModels:SettingsViewModel/>
     </UserControl.DataContext>
     <Grid>
-        <TextBlock Text="Hangar"></TextBlock>
+        <TextBlock Text="Settings"></TextBlock>
     </Grid>
 </UserControl>
