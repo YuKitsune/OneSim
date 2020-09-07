@@ -40,8 +40,7 @@ namespace OneSim.Windows.ViewModels
             new List<SidebarItem>
             {
                 SidebarItem.FromViewModel("Fly", new FlyNowViewModel()),
-                SidebarItem.FromViewModel("Career", new FlyNowViewModel()),
-                SidebarItem.FromViewModel("Bookings", new FlyNowViewModel()),
+                SidebarItem.FromViewModel("Hangar", new HangarViewModel()),
                 SidebarItem.FromViewModel("Map", new FlyNowViewModel()),
                 SidebarItem.FromViewModel("Settings", new FlyNowViewModel()),
             };

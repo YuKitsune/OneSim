@@ -16,7 +16,7 @@ namespace OneSim.Windows.Windows
     using OneSim.Windows.Controls;
     using OneSim.Windows.Extensions;
     using OneSim.Windows.ViewModels;
-    using OneSim.Windows.Views.MainViews;
+    using OneSim.Windows.Views;
     using Strato.EventAggregator.Abstractions;
     using Strato.Mvvm.Navigation;
     using Strato.Mvvm.Navigation.Events;
@@ -57,6 +57,7 @@ namespace OneSim.Windows.Windows
             // Setup the navigation context
             NavigationContext = navigationContext ?? throw new ArgumentNullException(nameof(navigationContext));
             NavigationContext.Register<FlyNowView, FlyNowViewModel>();
+            NavigationContext.Register<HangarView, HangarViewModel>();
             NavigationControl.UseNavigationContext(NavigationContext);
 
             // Setup the Event Aggregator
@@ -78,7 +79,7 @@ namespace OneSim.Windows.Windows
         /// </param>
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Todo: NavigationContext.NavigateTo<FirstViewModel>();
+            NavigationContext.NavigateTo<FlyNowViewModel>();
         }
 
         /// <summary>

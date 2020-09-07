@@ -4,10 +4,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OneSim.Windows.Views.MainViews
+namespace OneSim.Windows.Views
 {
     using System.Windows.Controls;
-
     using Strato.Mvvm;
 
     /// <summary>
