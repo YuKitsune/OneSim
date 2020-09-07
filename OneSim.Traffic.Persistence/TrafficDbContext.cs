@@ -77,8 +77,22 @@ namespace OneSim.Traffic.Persistence
                         .HasConversion(
                              s => s.ToString(),
                              s => (SquawkCode)s);
-            modelBuilder.Entity<Pilot>().OwnsOne(p => p.Location);
-            modelBuilder.Entity<Pilot>().OwnsMany(p => p.History);
+            modelBuilder.Entity<Pilot>().OwnsOne(
+                p => p.Location,
+                a =>
+                {
+                    a.Property(p => p.Latitude);
+                    a.Property(p => p.Longitude);
+                    a.Property(p => p.Altitude);
+                });
+            modelBuilder.Entity<Pilot>().OwnsMany(
+                p => p.History,
+                a =>
+                {
+                    a.Property(p => p.Latitude);
+                    a.Property(p => p.Longitude);
+                    a.Property(p => p.Altitude);
+                });
         }
     }
 }

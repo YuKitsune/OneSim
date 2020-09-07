@@ -33,7 +33,12 @@ namespace OneSim.Traffic.Domain.Entities
         public Point3D(double latitude, double longitude, int altitude)
             : base(latitude, longitude)
         {
-            if (altitude < 0) throw new ArgumentException("The {nameof(altitude)} cannot be less than 0.", nameof(altitude));
+            if (altitude < 0)
+            {
+                throw new ArgumentException(
+                    $"The {nameof(altitude)} cannot be less than 0.",
+                    nameof(altitude));
+            }
 
             Altitude = altitude;
         }
