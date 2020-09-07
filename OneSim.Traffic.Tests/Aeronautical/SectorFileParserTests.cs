@@ -91,7 +91,7 @@ H91(23)                   SANEG          SANEG          BN             BN       
             SectorFileParseResult result = parser.Parse(TestSectorFile);
 
             // Assert
-            Assert.AreEqual(6, result.Fixes.Count);
+            Assert.AreEqual(13, result.Fixes.Count);
             Fix sanadFix = result.Fixes.FirstOrDefault(f => f.Identifier == "SANAD");
             Assert.IsNotNull(sanadFix);
             Assert.AreEqual(

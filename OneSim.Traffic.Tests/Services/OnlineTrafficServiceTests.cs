@@ -225,15 +225,11 @@ namespace OneSim.Traffic.Tests.Services
             provider.Pilots.Clear();
 
             Pilot updatedPilotWithPlan = PilotWithFlightPlan;
-            updatedPilotWithPlan.Location.Latitude = 1;
-            updatedPilotWithPlan.Location.Longitude = 1;
-            updatedPilotWithPlan.Location.Altitude = 35000;
+            updatedPilotWithPlan.Location = new Point3D(1, 1, 35000);
             provider.Pilots.Add(updatedPilotWithPlan);
 
             Pilot updatedPilotWithoutPlan = PilotWithoutFlightPlan;
-            updatedPilotWithoutPlan.Location.Latitude = 1;
-            updatedPilotWithoutPlan.Location.Longitude = 1;
-            updatedPilotWithoutPlan.Location.Altitude = 34000;
+            updatedPilotWithoutPlan.Location = new Point3D(1, 1, 34000);
             provider.Pilots.Add(updatedPilotWithoutPlan);
 
             // Act
